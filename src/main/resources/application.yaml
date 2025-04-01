@@ -1,0 +1,39 @@
+server:
+  port: 8765
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/spotlightsarajevo
+    username: hajrudin.imamovic
+    password: Lndrlh040344
+  security:
+    user:
+      name: hajrudin
+      password: aa
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_versioned_data: true
+          batch_size: 50
+          fetch_size: 500
+        order_inserts: true
+        order_updates: true
+    show-sql: 'false'
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    org.springframework.boot.autoconfigure.security: INFO
+    org.springframework.security: INFO
+
+springdoc:
+  api-docs:
+    path: /spotlight-sarajevo-api
+  swagger-ui:
+    oauth:
+      app-name: SpotlightSarajevo
