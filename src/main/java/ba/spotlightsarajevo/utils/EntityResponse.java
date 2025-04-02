@@ -5,8 +5,13 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
+/**
+ * Generic Response Wrapper class that contains information about the request response. It contains the message
+ * of the response, the {@link ResponseCode}, the time of the response and the response payload.
+ *
+ * @param <T> The entity model response that was retrieved.
+ */
 @AllArgsConstructor
 @Data
 public class EntityResponse<T extends Serializable> {
@@ -14,6 +19,4 @@ public class EntityResponse<T extends Serializable> {
     private String statusCode;
     private LocalDateTime time;
     private T payload;
-
-
 }
