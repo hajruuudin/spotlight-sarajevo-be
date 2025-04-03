@@ -13,7 +13,7 @@ public class TagModel implements Serializable {
     private static final long versionUUId = 1L;
 
     @Schema(description = "Unique identifier of the tag")
-    private Integer tagId;
+    private Integer id;
 
     @Schema(description = "Name of the tag")
     private String tagName;

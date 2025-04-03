@@ -4,12 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
 @Schema(description = "Properties of a spot entity create request")
-public class SpotUpdate {
+public class SpotUpdate implements Serializable {
     @Serial
     private static final long versionUUId = 1L;
 

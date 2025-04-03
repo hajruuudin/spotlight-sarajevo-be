@@ -4,12 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
 @Schema(description = "Model for all properties of a spot entity")
-public class SpotModel {
+public class SpotModel implements Serializable {
     @Serial
     private static final long versionUUId = 1L;
 
