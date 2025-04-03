@@ -18,8 +18,8 @@ public class SpotTagEntity {
     private Integer id;
 
     @Column(name = "spot_id")
-    private Integer spot_id;
+    private Integer spotId;
 
     @Column(name = "tag_id")
-    private Integer tag_id;
+    private Integer tagId;
 }

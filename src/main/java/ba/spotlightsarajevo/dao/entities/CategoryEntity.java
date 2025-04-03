@@ -20,8 +20,8 @@ public class CategoryEntity implements Serializable {
     private Integer id;
 
     @Column(name = "category_name")
-    private String category_name;
+    private String categoryName;
 
     @Column(name = "category_description")
-    private String category_description;
+    private String categoryDescription;
 }

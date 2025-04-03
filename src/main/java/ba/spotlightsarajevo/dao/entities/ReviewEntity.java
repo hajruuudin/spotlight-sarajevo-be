@@ -21,7 +21,7 @@ public class ReviewEntity implements Serializable {
     private Integer id;
 
     @Column(name = "user_id")
-    private Integer user_id;
+    private Integer userId;
 
     @Column(name = "header")
     private String header;
@@ -42,7 +42,7 @@ public class ReviewEntity implements Serializable {
     private BigDecimal accessibility;
 
     @Column(name = "staff_kindness")
-    private BigDecimal staff_kindness;
+    private BigDecimal staffKindness;
 
     @Column(name = "quality")
     private BigDecimal quality;
@@ -51,5 +51,5 @@ public class ReviewEntity implements Serializable {
     private BigDecimal atmosphere;
 
     @Column(name = "spot_id")
-    private Integer spot_id;
+    private Integer spotId;
 }

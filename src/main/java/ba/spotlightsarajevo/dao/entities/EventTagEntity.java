@@ -20,8 +20,8 @@ public class EventTagEntity implements Serializable {
     private Integer id;
 
     @Column(name = "event_id")
-    private Integer event_id;
+    private Integer eventId;
 
     @Column(name = "tag_id")
-    private Integer tag_id;
+    private Integer tagId;
 }

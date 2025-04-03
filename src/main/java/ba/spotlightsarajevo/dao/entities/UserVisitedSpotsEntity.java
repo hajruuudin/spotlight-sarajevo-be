@@ -17,14 +17,15 @@ public class UserVisitedSpotsEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
     @Column(name = "user_id")
-    private Integer user_id;
+    private Integer userId;
 
     @Column(name = "spot_id")
-    private Integer spot_id;
+    private Integer spotId;
 
     @Column(name = "added_at")
-    private LocalDateTime added_at;
+    private LocalDateTime addedAt;
 }

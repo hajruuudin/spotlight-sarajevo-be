@@ -21,11 +21,11 @@ public class UserAttendedEventsEntity implements Serializable {
     private Integer id;
 
     @Column(name = "user_id")
-    private Integer user_id;
+    private Integer userId;
 
     @Column(name = "event_id")
-    private Integer event_id;
+    private Integer eventId;
 
     @Column(name = "added_at")
-    private LocalDateTime added_at;
+    private LocalDateTime addedAt;
 }

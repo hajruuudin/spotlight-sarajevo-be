@@ -20,8 +20,8 @@ public class SpotReviewEntity implements Serializable {
     private Integer id;
 
     @Column(name = "spot_id")
-    private Integer spot_id;
+    private Integer spotId;
 
     @Column(name = "review_id")
-    private Integer review_id;
+    private Integer reviewId;
 }

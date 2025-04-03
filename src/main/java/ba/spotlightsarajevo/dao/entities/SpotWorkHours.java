@@ -26,11 +26,11 @@ public class SpotWorkHours implements Serializable {
     private WeekDay day;
 
     @Column(name = "start_time")
-    private LocalTime start_time;
+    private LocalTime startTime;
 
     @Column(name = "end_time")
-    private LocalTime end_time;
+    private LocalTime endTime;
 
     @Column(name = "spot_id")
-    private Integer spot_id;
+    private Integer spotId;
 }

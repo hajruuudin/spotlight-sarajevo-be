@@ -20,9 +20,9 @@ public class UserFavouriteCategoriesEntity implements Serializable {
     private Integer id;
 
     @Column(name = "user_id")
-    private Integer user_id;
+    private Integer userId;
 
     @Column(name = "category_id")
-    private Integer category_id;
+    private Integer categoryId;
 
 }
