@@ -22,22 +22,22 @@ public class CommunityRequestEntity implements Serializable {
     private Integer id;
 
     @Column(name = "user_id")
-    private Integer user_id;
+    private Integer userId;
 
     @Column(name = "user_name")
-    private String user_name;
+    private String userName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "request_type")
-    private CommunityRequestType request_type;
+    private CommunityRequestType requestType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "object_type")
-    private ObjectType object_type;
+    private ObjectType objectType;
 
     @Column(name = "request_name")
-    private String request_name;
+    private String requestName;
 
     @Column(name = "request_description")
-    private String request_description;
+    private String requestDescription;
 }

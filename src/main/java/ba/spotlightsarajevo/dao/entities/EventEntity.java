@@ -25,52 +25,52 @@ public class EventEntity implements Serializable {
     private String slug;
 
     @Column(name = "official_name")
-    private String official_name;
+    private String officialName;
 
     @Column(name = "small_description")
-    private String small_description;
+    private String smallDescription;
 
     @Column(name = "full_description")
-    private String full_description;
+    private String fullDescription;
 
     @Column(name = "category_id")
-    private Integer category_id;
+    private Integer categoryId;
 
     @Column(name = "start_date")
-    private LocalDateTime start_date;
+    private LocalDateTime startDate;
 
     @Column(name = "end_date")
-    private LocalDateTime end_date;
+    private LocalDateTime endDate;
 
     @Column(name = "entry_price")
-    private BigDecimal entry_price;
+    private BigDecimal entryPrice;
 
     @Column(name = "age_limit")
-    private Integer age_limit;
+    private Integer ageLimit;
 
     @Column(name = "reservation")
     private Boolean reservation;
 
     @Column(name = "cancel_refund")
-    private String cancel_refund;
+    private String cancelRefund;
 
     @Column(name = "open_status")
-    private String open_satus;
+    private String openStatus;
 
     @Column(name = "event_language")
-    private String event_language;
+    private String eventLanguage;
 
     @Column(name = "created")
     private LocalDateTime created;
 
     @Column(name = "created_by")
-    private String created_by;
+    private String createdBy;
 
     @Column(name = "modified")
     private LocalDateTime modified;
 
     @Column(name = "modified_by")
-    private String modified_by;
+    private String modifiedBy;
 
 
 

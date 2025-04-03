@@ -20,8 +20,8 @@ public class TagEntity implements Serializable {
     private Integer id;
 
     @Column(name = "tag_name")
-    private String tag_name;
+    private String tagName;
 
     @Column(name = "tag_description")
-    private String tag_description;
+    private String tagDescription;
 }

@@ -14,7 +14,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "ss_spot_work_hours")
-public class SpotWorkHours implements Serializable {
+public class SpotWorkHoursEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,11 +26,11 @@ public class SpotWorkHours implements Serializable {
     private WeekDay day;
 
     @Column(name = "start_time")
-    private LocalTime start_time;
+    private LocalTime startTime;
 
     @Column(name = "end_time")
-    private LocalTime end_time;
+    private LocalTime endTime;
 
     @Column(name = "spot_id")
-    private Integer spot_id;
+    private Integer spotId;
 }

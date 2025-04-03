@@ -20,8 +20,8 @@ public class UserCollectionEntity implements Serializable {
     private Integer id;
 
     @Column(name = "user_id")
-    private Integer user_id;
+    private Integer userId;
 
     @Column(name = "collection_id")
-    private Integer collection_id;
+    private Integer collectionId;
 }

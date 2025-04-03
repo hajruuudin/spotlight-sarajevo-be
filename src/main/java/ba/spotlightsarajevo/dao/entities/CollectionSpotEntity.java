@@ -20,8 +20,8 @@ public class CollectionSpotEntity implements Serializable {
     private Integer id;
 
     @Column(name = "collection_id")
-    private Integer collection_id;
+    private Integer collectionId;
 
     @Column(name = "spot_id")
-    private Integer spot_id;
+    private Integer spotId;
 }

@@ -22,15 +22,15 @@ public class MediaStoreEntity implements Serializable {
     private Integer id;
 
     @Column(name = "item_id")
-    private Integer item_id;
+    private Integer itemId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "item_category")
-    private ObjectType item_category;
+    private ObjectType itemCategory;
 
     @Column(name = "created")
     private LocalDateTime created;
 
     @Column(name = "created_by")
-    private String created_by;
+    private String createdBy;
 }

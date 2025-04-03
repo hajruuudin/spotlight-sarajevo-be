@@ -20,23 +20,23 @@ public class UserPreferencesEntity implements Serializable {
     private Integer id;
 
     @Column(name = "user_id")
-    private Integer user_id;
+    private Integer userId;
 
     @Column(name = "language")
     private String language;
 
     @Column(name = "favourites_id")
-    private String favourites_id;
+    private String favouritesId;
 
     @Column(name = "answer_01")
-    private String answer_01;
+    private Boolean answer01;
 
     @Column(name = "answer_02")
-    private String answer_02;
+    private Boolean answer02;
 
     @Column(name = "answer_03")
-    private String answer_03;
+    private Boolean answer03;
 
     @Column(name = "answer_04")
-    private String answer_04;
+    private Boolean answer04;
 }
