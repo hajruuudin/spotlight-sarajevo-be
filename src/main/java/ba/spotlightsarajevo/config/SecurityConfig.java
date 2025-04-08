@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Configure CSRF
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Configure Session Management
                 .authorizeHttpRequests(auth -> auth // Configure Authorization
-                        .requestMatchers("/api/public/**", "/swagger-ui/**", "/v3/api-docs/**", "/spotlight-sarajevo-api/**").permitAll()
+                        .requestMatchers("/api/public/**", "/category", "/swagger-ui/**", "/v3/api-docs/**", "/spotlight-sarajevo-api/**", "/auth/google/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception // Configure Exception Handling
