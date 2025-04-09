@@ -26,7 +26,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Configure CSRF
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Configure Session Management
                 .authorizeHttpRequests(auth -> auth // Configure Authorization
-                        .requestMatchers("/api/public/**", "/category", "/swagger-ui/**", "/v3/api-docs/**", "/spotlight-sarajevo-api/**", "/auth/google/**").permitAll()
+                        .requestMatchers(
+                                "/api/public/**",
+                                "/category",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/spotlight-sarajevo-api/**",
+                                "/auth/register",
+                                "/auth/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception // Configure Exception Handling
@@ -43,9 +51,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200")); // Replace with your Angular app's origin
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://192.168.0.27:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

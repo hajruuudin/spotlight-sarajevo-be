@@ -1,5 +1,9 @@
 package ba.spotlightsarajevo.rest;
 
+import ba.spotlightsarajevo.dao.models.intermediate.GoogleUserModel;
+import ba.spotlightsarajevo.dao.models.intermediate.PreferencesModel;
+import ba.spotlightsarajevo.dao.models.intermediate.SystemUserModel;
+import ba.spotlightsarajevo.service.definition.service.AuthService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -10,6 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,14 +31,19 @@ import java.util.Map;
 @AllArgsConstructor
 @RestController
 public class AuthRestController {
+    private AuthService authService;
+
     private final GsonFactory jsonFactory = new GsonFactory();
     private final NetHttpTransport transport = new NetHttpTransport();
 
     private static final String GOOGLE_USER_INFO_SESSION_KEY = "googleUserInfo";
+    private static final String SYSTEM_USER_INFO_SESSION_KEY = "systemUserInfo";
 
-    @Operation(description = "Register using Google Credentials")
+    @Operation(description = "Register the users Google Credentials into the session")
     @PostMapping(value = "/google/register")
-    public ResponseEntity<?> registerWithGoogle(@RequestBody Map<String, String> payload, HttpSession session) {
+    public ResponseEntity<?> registerSessionWithGoogle(
+            @RequestBody Map<String, String> payload, HttpSession session)
+    {
         String idTokenString = payload.get("idToken");
 
         if (idTokenString == null) {
@@ -58,19 +68,18 @@ public class AuthRestController {
                 String locale = (String) tokenPayload.get("locale");
 
                 // Store this information in the session temporarily
-                Map<String, Object> googleUserInfo = new HashMap<>();
-                googleUserInfo.put("googleId", googleId);
-                googleUserInfo.put("email", email);
-                googleUserInfo.put("firstName", firstName);
-                googleUserInfo.put("lastName", lastName);
-                googleUserInfo.put("googlePictureUrl", pictureUrl);
-                googleUserInfo.put("locale", locale);
+                GoogleUserModel googleUserInfo = new GoogleUserModel();
+                googleUserInfo.setGoogleId(googleId);
+                googleUserInfo.setEmail(email);
+                googleUserInfo.setFirstName(firstName);
+                googleUserInfo.setLastName(lastName);
+                googleUserInfo.setGooglePictureUrl(pictureUrl);
+                googleUserInfo.setLocale(locale);
 
                 session.setAttribute(GOOGLE_USER_INFO_SESSION_KEY, googleUserInfo);
 
-                for(String info : googleUserInfo.keySet()){
-                    System.out.println(googleUserInfo.get(info));
-                }
+
+                System.out.println(session.getAttribute(GOOGLE_USER_INFO_SESSION_KEY));
                 return ResponseEntity.ok(Map.of(
                         "success", true,
                         "message", "Google authentication successful. User data stored temporarily. Proceed with survey.",
@@ -89,5 +98,49 @@ public class AuthRestController {
                     "message", "Error verifying Google ID token."
             ), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Operation(description = "Register the users personal Credentials into the session")
+    @PostMapping(value = "/system/register")
+    public ResponseEntity<?> registerSessionWithSystem(
+            @RequestBody SystemUserModel payload, HttpSession session
+    ){
+        if(payload == null){
+            throw new IllegalArgumentException("The register payload cannot be null");
+        }
+
+        String hashedPassword = BCrypt.hashpw(payload.getPassword(), BCrypt.gensalt());
+        payload.setPassword(hashedPassword);
+
+        session.setAttribute(SYSTEM_USER_INFO_SESSION_KEY, payload);
+        System.out.println(session.getAttribute(SYSTEM_USER_INFO_SESSION_KEY));
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "System authentication successful. User data stored temporarily. Proceed with survey.",
+                "payload", payload
+        ));
+    };
+
+    @Operation(description = "Register a user with their respective Credentials along with the survey data")
+    @PostMapping(value = "/register")
+    public ResponseEntity<?> register(
+            @RequestBody PreferencesModel request, HttpSession session
+    ){
+        if(session.getAttribute(GOOGLE_USER_INFO_SESSION_KEY) != null){
+            GoogleUserModel googleData = (GoogleUserModel) session.getAttribute(GOOGLE_USER_INFO_SESSION_KEY);
+
+            return authService.registerByGoogle(googleData, request);
+        }
+
+        if(session.getAttribute(SYSTEM_USER_INFO_SESSION_KEY) != null){
+            SystemUserModel systemData = (SystemUserModel) session.getAttribute(SYSTEM_USER_INFO_SESSION_KEY);
+
+            return authService.registerBySystem(systemData, request);
+        }
+
+
+        System.out.println(session.getAttribute(GOOGLE_USER_INFO_SESSION_KEY));
+        return null;
     }
 }
