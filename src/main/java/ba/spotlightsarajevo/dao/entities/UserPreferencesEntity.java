@@ -25,9 +25,6 @@ public class UserPreferencesEntity implements Serializable {
     @Column(name = "language")
     private String language;
 
-    @Column(name = "favourites_id")
-    private String favouritesId;
-
     @Column(name = "answer_01")
     private Boolean answer01;
 
