@@ -34,13 +34,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             roles.add("USER");
         }
 
-        System.out.println("Before getting details: user is: " + user);
 
         String detailPassword = user.getRegistrationType().equals("google") ? "GOOGLE-USER" : user.getPassword();
         String detailEmail = user.getRegistrationType().equals("google") ? user.getGoogleEmail() : user.getEmail();
 
-        System.out.println(detailEmail);
-        System.out.println(detailPassword);
         return new User(
                 detailEmail,
                 detailPassword,

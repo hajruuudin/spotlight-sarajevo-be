@@ -12,9 +12,6 @@ public class UserCreate implements Serializable {
     @Serial
     private static final long versionUUId = 1L;
 
-    @Schema(description = "Username")
-    private String username;
-
     @Schema(description = "Email address")
     private String email;
 

@@ -3,11 +3,8 @@ package ba.spotlightsarajevo.rest;
 import ba.spotlightsarajevo.dao.models.intermediate.GoogleUserModel;
 import ba.spotlightsarajevo.dao.models.intermediate.PreferencesModel;
 import ba.spotlightsarajevo.dao.models.intermediate.SystemUserModel;
-import ba.spotlightsarajevo.dao.models.user.AuthenticatedUser;
 import ba.spotlightsarajevo.dao.models.user.SystemLogin;
 import ba.spotlightsarajevo.service.definition.service.AuthService;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,14 +13,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.util.InternalException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
 import java.util.Map;
 
 @Tag(name = "Authentication", description = "Authentication API")
@@ -71,7 +65,6 @@ public class AuthRestController {
         } else {
             throw new InternalException("Internal server error");
         }
-
     }
 
     @Operation(description = "Login a user using Google Credentials")

@@ -29,7 +29,6 @@ public class UserDAO extends AbstractDAO<UserEntity, Integer> {
         query.setParameter("email", email);
 
         try {
-            System.out.println("User gotten via:" + email + " is: " + query.getSingleResult());
             return query.getSingleResult();
         } catch (NoResultException e) {
             return null;

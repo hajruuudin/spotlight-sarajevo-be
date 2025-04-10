@@ -20,7 +20,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -52,11 +51,11 @@ public class AuthServiceImpl implements AuthService {
     private static final int JWT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24; //1 HOUR
 
     @Override
-    public ResponseEntity<?> storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
+    public ResponseEntity<Map<String, Object>> storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
         String idTokenString = payload.get("idToken");
 
         if (idTokenString == null) {
-            return new ResponseEntity<>(Map.of("success", false, "message", "ID token missing."), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(400).body(Map.of("message", "There was an error with the google request"));
         }
         GoogleIdToken idToken = verifyGoogleToken(idTokenString);
 
@@ -71,6 +70,11 @@ public class AuthServiceImpl implements AuthService {
                 String pictureUrl = (String) tokenPayload.get("picture");
                 String locale = (String) tokenPayload.get("locale");
 
+                UserEntity checkUserEntity = userDAO.findByGoogleId(googleId);
+
+                if(checkUserEntity != null){
+                    return ResponseEntity.status(400).body(Map.of("message", "An account is already registered to that email. Please log in!"));
+                }
                 // Store this information in the session temporarily
                 GoogleUserModel googleUserInfo = new GoogleUserModel();
                 googleUserInfo.setGoogleId(googleId);
@@ -82,7 +86,6 @@ public class AuthServiceImpl implements AuthService {
 
                 session.setAttribute(GOOGLE_USER_INFO_SESSION_KEY, googleUserInfo);
 
-
                 System.out.println(session.getAttribute(GOOGLE_USER_INFO_SESSION_KEY));
                 return ResponseEntity.ok(Map.of(
                         "success", true,
@@ -90,20 +93,16 @@ public class AuthServiceImpl implements AuthService {
                         "firstName", firstName
                 ));
             } else {
-                return new ResponseEntity<>(Map.of(
-                        "success", false,
-                        "message", "Invalid Google ID token."
-                ), HttpStatus.UNAUTHORIZED);
+                return ResponseEntity.status(500).body(Map.of("message", "There was an error with the google request"));
             }
 
     }
 
     @Override
-    public ResponseEntity<?> storeSystemCredentials(SystemUserModel payload, HttpSession session){
+    public ResponseEntity<Map<String, Object>> storeSystemCredentials(SystemUserModel payload, HttpSession session){
         if(payload == null){
-            throw new IllegalArgumentException("The register payload cannot be null");
+            return ResponseEntity.status(400).body(Map.of("message", "The credentials cannot be null!"));
         }
-
 
         String hashedPassword = BCrypt.hashpw(payload.getPassword(), BCrypt.gensalt());
         payload.setPassword(hashedPassword);
@@ -121,7 +120,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<?> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferences) {
+    public ResponseEntity<Map<String, Object>> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferences) {
 
         /* USER ENTITY */
         UserEntity userEntity = new UserEntity();
@@ -133,7 +132,7 @@ public class AuthServiceImpl implements AuthService {
         userEntity.setLocale(googleData.getLocale());
         userEntity.setIsAdmin(false);
         userEntity.setIsPremium(false);
-        userEntity.setRegistrationType("system");
+        userEntity.setRegistrationType("google");
         userEntity.setCreatedAt(LocalDateTime.now());
 
         try {
@@ -141,7 +140,6 @@ public class AuthServiceImpl implements AuthService {
         } catch (Error e){
             throw new IllegalArgumentException("Error while persisting User Entity");
         }
-
 
         /* USER FAVOURITE CATEGORIES ENTITIES */
         UserFavouriteCategoriesEntity userCategory01 = new UserFavouriteCategoriesEntity();
@@ -234,7 +232,7 @@ public class AuthServiceImpl implements AuthService {
         String idTokenString = payload.get("idToken");
 
         if (idTokenString == null) {
-            throw new IllegalArgumentException("ID Token cannot be null");
+            return ResponseEntity.status(400).body(Map.of("message", "There was an error with the google request"));
         }
 
         GoogleIdToken token = verifyGoogleToken(idTokenString);
@@ -252,17 +250,17 @@ public class AuthServiceImpl implements AuthService {
                 setJwtCookie(servletResponse, jwt);
                 return ResponseEntity.ok(Map.of("token", jwt));
             } else {
-                return ResponseEntity.status(404).body(Map.of("message", "Google user not found"));
+                return ResponseEntity.status(400).body(Map.of("message", "Google user not registered! Please register"));
             }
         } else {
-            throw new GeneralSecurityException("Error ovo treba skontat kasnije");
+            return ResponseEntity.status(400).body(Map.of("message", "There was an error with the google request"));
         }
     }
 
     @Override
     public ResponseEntity<?> loginSystem(SystemLogin request, HttpServletResponse servletResponse) {
         if(request == null){
-            return ResponseEntity.status(403).body(Map.of("message", "Credentials invalid!"));
+            return ResponseEntity.status(403).body(Map.of("message", "Invalid credentials!"));
         }
         UserEntity entity = userDAO.findBySystemEmail(request.getEmail());
 
@@ -270,14 +268,12 @@ public class AuthServiceImpl implements AuthService {
         String providedPassword = request.getPassword();
 
         if (BCrypt.checkpw(providedPassword, storedPassword)) {
-            System.out.println("Password match, in method");
-            System.out.println(request.getEmail());
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
             String jwt = jwtUtil.generateToken(userDetails);
             setJwtCookie(servletResponse, jwt);
             return ResponseEntity.ok(Map.of("token", jwt));
         } else {
-            return ResponseEntity.status(403).body(Map.of("message", "Password do not match"));
+            return ResponseEntity.status(403).body(Map.of("message", "Invalid credentials!"));
 
         }
     }
@@ -287,7 +283,7 @@ public class AuthServiceImpl implements AuthService {
         UserEntity userEntity = userDAO.findByEmail(email);
 
         if(userEntity != null){
-            return  ResponseEntity.status(409).body(Map.of("message", "Email already taken"));
+            return  ResponseEntity.status(409).body(Map.of("message", "Email already taken!"));
         } else {
             return ResponseEntity.status(200).body(Map.of("message", "Email not taken. Proceed"));
         }

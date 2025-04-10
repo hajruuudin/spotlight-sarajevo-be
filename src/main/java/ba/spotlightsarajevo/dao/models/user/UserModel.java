@@ -16,9 +16,6 @@ public class UserModel implements Serializable {
     @Schema(description = "Unique identifier")
     private Integer id;
 
-    @Schema(description = "Username")
-    private String username;
-
     @Schema(description = "Email address")
     private String email;
 
