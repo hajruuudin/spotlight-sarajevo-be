@@ -4,9 +4,8 @@ import ba.spotlightsarajevo.dao.models.intermediate.GoogleUserModel;
 import ba.spotlightsarajevo.dao.models.intermediate.PreferencesModel;
 import ba.spotlightsarajevo.dao.models.intermediate.SystemUserModel;
 import ba.spotlightsarajevo.dao.models.user.SystemLogin;
+import ba.spotlightsarajevo.dao.models.user.UserModel;
 import ba.spotlightsarajevo.service.definition.service.AuthService;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,34 +25,24 @@ import java.util.Map;
 @RestController
 public class AuthRestController {
     private AuthService authService;
-
-    private final GsonFactory jsonFactory = new GsonFactory();
-    private final NetHttpTransport transport = new NetHttpTransport();
-
     private static final String GOOGLE_USER_INFO_SESSION_KEY = "googleUserInfo";
     private static final String SYSTEM_USER_INFO_SESSION_KEY = "systemUserInfo";
 
     @Operation(description = "Register the users Google Credentials into the session")
     @PostMapping(value = "/google/register")
-    public ResponseEntity<?> storeGoogleCredentials(
-            @RequestBody Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
-        return authService.storeGoogleCredentials(payload, session);
+    public void storeGoogleCredentials(@RequestBody Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
+        authService.storeGoogleCredentials(payload, session);
     }
 
     @Operation(description = "Register the users personal Credentials into the session")
     @PostMapping(value = "/system/register")
-    public ResponseEntity<?> storeSystemCredentials(
-            @RequestBody SystemUserModel payload, HttpSession session
-    ){
-        System.out.println("IS THIS ROUTE EVEN TARGETED");
-        return authService.storeSystemCredentials(payload, session);
-    };
+    public void storeSystemCredentials(@RequestBody SystemUserModel payload, HttpSession session){
+        authService.storeSystemCredentials(payload, session);
+    }
 
     @Operation(description = "Register a user with their respective Credentials along with the survey data")
     @PostMapping(value = "/register")
-    public ResponseEntity<?> register(
-            @RequestBody PreferencesModel request, HttpSession session
-    ){
+    public ResponseEntity<UserModel> register(@RequestBody PreferencesModel request, HttpSession session){
         if(session.getAttribute(GOOGLE_USER_INFO_SESSION_KEY) != null){
             GoogleUserModel googleData = (GoogleUserModel) session.getAttribute(GOOGLE_USER_INFO_SESSION_KEY);
 

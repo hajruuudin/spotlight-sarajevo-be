@@ -1,9 +1,9 @@
 package ba.spotlightsarajevo.dao;
 
 import ba.spotlightsarajevo.dao.entities.UserVisitedSpotsEntity;
-import ba.spotlightsarajevo.utils.AbstractDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserVisitedSpotsDAO extends AbstractDAO<UserVisitedSpotsEntity, Integer> {
+public interface UserVisitedSpotsDAO extends JpaRepository<UserVisitedSpotsEntity, Integer> {
 }

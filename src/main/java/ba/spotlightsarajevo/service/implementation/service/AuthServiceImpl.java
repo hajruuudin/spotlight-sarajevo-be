@@ -10,6 +10,8 @@ import ba.spotlightsarajevo.dao.models.intermediate.GoogleUserModel;
 import ba.spotlightsarajevo.dao.models.intermediate.PreferencesModel;
 import ba.spotlightsarajevo.dao.models.intermediate.SystemUserModel;
 import ba.spotlightsarajevo.dao.models.user.SystemLogin;
+import ba.spotlightsarajevo.dao.models.user.UserModel;
+import ba.spotlightsarajevo.service.definition.mapper.UserMapper;
 import ba.spotlightsarajevo.service.definition.service.AuthService;
 import ba.spotlightsarajevo.utils.JwtUtil;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
@@ -36,6 +38,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
     UserDAO userDAO;
+    UserMapper userMapper;
     UserPreferencesDAO userPreferencesDAO;
     UserFavouriteCategoriesDAO userFavouriteCategoriesDAO;
     UserDetailsService userDetailsService;
@@ -51,11 +54,12 @@ public class AuthServiceImpl implements AuthService {
     private static final int JWT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24; //1 HOUR
 
     @Override
-    public ResponseEntity<Map<String, Object>> storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
+    public void storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
         String idTokenString = payload.get("idToken");
 
         if (idTokenString == null) {
-            return ResponseEntity.status(400).body(Map.of("message", "There was an error with the google request"));
+            ResponseEntity.status(400).body(Map.of("message", "There was an error with the google request"));
+            return;
         }
         GoogleIdToken idToken = verifyGoogleToken(idTokenString);
 
@@ -73,7 +77,8 @@ public class AuthServiceImpl implements AuthService {
                 UserEntity checkUserEntity = userDAO.findByGoogleId(googleId);
 
                 if(checkUserEntity != null){
-                    return ResponseEntity.status(400).body(Map.of("message", "An account is already registered to that email. Please log in!"));
+                    ResponseEntity.status(400).body(Map.of("message", "An account is already registered to that email. Please log in!"));
+                    return;
                 }
                 // Store this information in the session temporarily
                 GoogleUserModel googleUserInfo = new GoogleUserModel();
@@ -85,44 +90,28 @@ public class AuthServiceImpl implements AuthService {
                 googleUserInfo.setLocale(locale);
 
                 session.setAttribute(GOOGLE_USER_INFO_SESSION_KEY, googleUserInfo);
-
-                System.out.println(session.getAttribute(GOOGLE_USER_INFO_SESSION_KEY));
-                return ResponseEntity.ok(Map.of(
-                        "success", true,
-                        "message", "Google authentication successful. User data stored temporarily. Proceed with survey.",
-                        "firstName", firstName
-                ));
-            } else {
-                return ResponseEntity.status(500).body(Map.of("message", "There was an error with the google request"));
-            }
+        } else {
+            ResponseEntity.status(500).body(Map.of("message", "There was an error with the google request"));
+        }
 
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> storeSystemCredentials(SystemUserModel payload, HttpSession session){
+    public void storeSystemCredentials(SystemUserModel payload, HttpSession session){
         if(payload == null){
-            return ResponseEntity.status(400).body(Map.of("message", "The credentials cannot be null!"));
+            ResponseEntity.status(400).body(Map.of("message", "The credentials cannot be null!"));
+            return;
         }
 
         String hashedPassword = BCrypt.hashpw(payload.getPassword(), BCrypt.gensalt());
         payload.setPassword(hashedPassword);
 
-        System.out.println("Payload should be: " + payload);
-
         session.setAttribute(SYSTEM_USER_INFO_SESSION_KEY, payload);
-        System.out.println(session.getAttribute(SYSTEM_USER_INFO_SESSION_KEY));
-
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "System authentication successful. User data stored temporarily. Proceed with survey.",
-                "payload", payload
-        ));
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferences) {
-
-        /* USER ENTITY */
+    public ResponseEntity<UserModel> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferences) {
+        /* Setting the database properties for a Google user entity */
         UserEntity userEntity = new UserEntity();
         userEntity.setGoogleId(googleData.getGoogleId());
         userEntity.setFirstName(googleData.getFirstName());
@@ -136,47 +125,20 @@ public class AuthServiceImpl implements AuthService {
         userEntity.setCreatedAt(LocalDateTime.now());
 
         try {
-            userDAO.persist(userEntity);
+            userDAO.save(userEntity);
         } catch (Error e){
             throw new IllegalArgumentException("Error while persisting User Entity");
         }
 
-        /* USER FAVOURITE CATEGORIES ENTITIES */
-        UserFavouriteCategoriesEntity userCategory01 = new UserFavouriteCategoriesEntity();
-        userCategory01.setUserId(userEntity.getId());
-        userCategory01.setCategoryId(preferences.getCategory_id_1());
-        userFavouriteCategoriesDAO.persist(userCategory01);
+        /* Setting the favourite categories and preferences of the user */
+        setUserFavouriteCategoriesAndPreferences(userEntity, preferences);
 
-        UserFavouriteCategoriesEntity userCategory02 = new UserFavouriteCategoriesEntity();
-        userCategory02.setUserId(userEntity.getId());
-        userCategory02.setCategoryId(preferences.getCategory_id_2());
-        userFavouriteCategoriesDAO.persist(userCategory02);
-
-        UserFavouriteCategoriesEntity userCategory03 = new UserFavouriteCategoriesEntity();
-        userCategory03.setUserId(userEntity.getId());
-        userCategory03.setCategoryId(preferences.getCategory_id_3());
-        userFavouriteCategoriesDAO.persist(userCategory03);
-
-        /* USER PREFERENCES MODEL */
-        UserPreferencesEntity userPreferences = new UserPreferencesEntity();
-        userPreferences.setUserId(userEntity.getId());
-        userPreferences.setLanguage(preferences.getLanguage());
-        userPreferences.setAnswer01(preferences.getAnswer01());
-        userPreferences.setAnswer02(preferences.getAnswer02());
-        userPreferences.setAnswer03(preferences.getAnswer03());
-        userPreferences.setAnswer04(preferences.getAnswer04());
-        userPreferencesDAO.persist(userPreferences);
-
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Data stored! USER - USER PREFERENCES - USER CATEGORIES",
-                "payload", userEntity
-        ));
+        return ResponseEntity.ok(userMapper.entityToDto(userEntity));
     }
 
     @Override
-    public ResponseEntity<?> registerBySystem(SystemUserModel systemData, PreferencesModel preferences) {
-        /* USER ENTITY */
+    public ResponseEntity<UserModel> registerBySystem(SystemUserModel systemData, PreferencesModel preferences) {
+        /* Setting the database properties for a system user entity */
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail(systemData.getEmail());
         userEntity.setPassword(systemData.getPassword());
@@ -188,47 +150,19 @@ public class AuthServiceImpl implements AuthService {
         userEntity.setCreatedAt(LocalDateTime.now());
 
         try {
-            userDAO.persist(userEntity);
+            userDAO.save(userEntity);
         } catch (Error e){
             throw new IllegalArgumentException("Error while persisting User Entity");
         }
 
+        /* Setting the favourite categories and preferences of the user */
+        setUserFavouriteCategoriesAndPreferences(userEntity, preferences);
 
-        /* USER FAVOURITE CATEGORIES ENTITIES */
-        UserFavouriteCategoriesEntity userCategory01 = new UserFavouriteCategoriesEntity();
-        userCategory01.setUserId(userEntity.getId());
-        userCategory01.setCategoryId(preferences.getCategory_id_1());
-        userFavouriteCategoriesDAO.persist(userCategory01);
-
-        UserFavouriteCategoriesEntity userCategory02 = new UserFavouriteCategoriesEntity();
-        userCategory02.setUserId(userEntity.getId());
-        userCategory02.setCategoryId(preferences.getCategory_id_2());
-        userFavouriteCategoriesDAO.persist(userCategory02);
-
-        UserFavouriteCategoriesEntity userCategory03 = new UserFavouriteCategoriesEntity();
-        userCategory03.setUserId(userEntity.getId());
-        userCategory03.setCategoryId(preferences.getCategory_id_3());
-        userFavouriteCategoriesDAO.persist(userCategory03);
-
-        /* USER PREFERENCES MODEL */
-        UserPreferencesEntity userPreferences = new UserPreferencesEntity();
-        userPreferences.setUserId(userEntity.getId());
-        userPreferences.setLanguage(preferences.getLanguage());
-        userPreferences.setAnswer01(preferences.getAnswer01());
-        userPreferences.setAnswer02(preferences.getAnswer02());
-        userPreferences.setAnswer03(preferences.getAnswer03());
-        userPreferences.setAnswer04(preferences.getAnswer04());
-        userPreferencesDAO.persist(userPreferences);
-
-        return ResponseEntity.ok(Map.of(
-                "success", true,
-                "message", "Data stored! USER - USER PREFERENCES - USER CATEGORIES",
-                "payload", userEntity
-        ));
+        return ResponseEntity.ok(userMapper.entityToDto(userEntity));
     }
 
     @Override
-    public ResponseEntity<?> loginGoogle(Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException {
+    public ResponseEntity<Map<String, Object>> loginGoogle(Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException {
         String idTokenString = payload.get("idToken");
 
         if (idTokenString == null) {
@@ -258,7 +192,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<?> loginSystem(SystemLogin request, HttpServletResponse servletResponse) {
+    public ResponseEntity<Map<String, Object>> loginSystem(SystemLogin request, HttpServletResponse servletResponse) {
         if(request == null){
             return ResponseEntity.status(403).body(Map.of("message", "Invalid credentials!"));
         }
@@ -274,12 +208,11 @@ public class AuthServiceImpl implements AuthService {
             return ResponseEntity.ok(Map.of("token", jwt));
         } else {
             return ResponseEntity.status(403).body(Map.of("message", "Invalid credentials!"));
-
         }
     }
 
     @Override
-    public ResponseEntity<?> checkEmail(String email){
+    public ResponseEntity<Map<String, Object>> checkEmail(String email){
         UserEntity userEntity = userDAO.findByEmail(email);
 
         if(userEntity != null){
@@ -304,5 +237,33 @@ public class AuthServiceImpl implements AuthService {
         jwtCookie.setPath("/");
         // jwtCookie.setSecure(true); ako se odlucim za HTTPS kasnije
         response.addCookie(jwtCookie);
+    }
+
+    private void setUserFavouriteCategoriesAndPreferences(UserEntity entity, PreferencesModel preferences){
+        /* USER FAVOURITE CATEGORIES ENTITIES */
+        UserFavouriteCategoriesEntity userCategory01 = new UserFavouriteCategoriesEntity();
+        userCategory01.setUserId(entity.getId());
+        userCategory01.setCategoryId(preferences.getCategory_id_1());
+        userFavouriteCategoriesDAO.save(userCategory01);
+
+        UserFavouriteCategoriesEntity userCategory02 = new UserFavouriteCategoriesEntity();
+        userCategory02.setUserId(entity.getId());
+        userCategory02.setCategoryId(preferences.getCategory_id_2());
+        userFavouriteCategoriesDAO.save(userCategory02);
+
+        UserFavouriteCategoriesEntity userCategory03 = new UserFavouriteCategoriesEntity();
+        userCategory03.setUserId(entity.getId());
+        userCategory03.setCategoryId(preferences.getCategory_id_3());
+        userFavouriteCategoriesDAO.save(userCategory03);
+
+        /* USER PREFERENCES MODEL */
+        UserPreferencesEntity userPreferences = new UserPreferencesEntity();
+        userPreferences.setUserId(entity.getId());
+        userPreferences.setLanguage(preferences.getLanguage());
+        userPreferences.setAnswer01(preferences.getAnswer01());
+        userPreferences.setAnswer02(preferences.getAnswer02());
+        userPreferences.setAnswer03(preferences.getAnswer03());
+        userPreferences.setAnswer04(preferences.getAnswer04());
+        userPreferencesDAO.save(userPreferences);
     }
 }

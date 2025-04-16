@@ -1,9 +1,9 @@
 package ba.spotlightsarajevo.dao;
 
 import ba.spotlightsarajevo.dao.entities.CommunityRequestEntity;
-import ba.spotlightsarajevo.utils.AbstractDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CommunityRequestDAO extends AbstractDAO<CommunityRequestEntity, Integer> {
+public interface CommunityRequestDAO extends JpaRepository<CommunityRequestEntity, Integer> {
 }

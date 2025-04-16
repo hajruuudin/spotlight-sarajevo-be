@@ -12,12 +12,12 @@ import java.time.LocalDateTime;
  * @param <T> The entity model of the request
  */
 @Data
-public class EntityRequest<T extends Serializable> {
+public class SSEntityRequest<T extends Serializable> {
     private String user = "hajrudin.imamovic";
     private LocalDateTime requestTimestamp = LocalDateTime.now();
     private T data;
 
-    public EntityRequest(T data){
+    public SSEntityRequest(T data){
         this.data = data;
     }
 }

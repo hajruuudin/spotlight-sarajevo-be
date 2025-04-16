@@ -1,9 +1,9 @@
 package ba.spotlightsarajevo.dao;
 
 import ba.spotlightsarajevo.dao.entities.MediaStoreEntity;
-import ba.spotlightsarajevo.utils.AbstractDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class MediaStoreDAO extends AbstractDAO<MediaStoreEntity, Integer> {
+public interface MediaStoreDAO extends JpaRepository<MediaStoreEntity, Integer> {
 }

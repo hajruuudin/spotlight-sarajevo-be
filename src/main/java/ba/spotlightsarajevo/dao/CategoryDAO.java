@@ -1,9 +1,13 @@
 package ba.spotlightsarajevo.dao;
 
 import ba.spotlightsarajevo.dao.entities.CategoryEntity;
-import ba.spotlightsarajevo.utils.AbstractDAO;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CategoryDAO extends AbstractDAO<CategoryEntity, Integer> {
+public interface CategoryDAO extends JpaRepository<CategoryEntity, Integer> {
+    @NotNull Page<CategoryEntity> findAll(@NotNull Pageable request);
 }
