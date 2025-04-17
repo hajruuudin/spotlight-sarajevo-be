@@ -14,8 +14,8 @@ import java.security.GeneralSecurityException;
 import java.util.Map;
 
 public interface AuthService {
-    void storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException;
-    void storeSystemCredentials(SystemUserModel payload, HttpSession session);
+    ResponseEntity<Map<String, Object>> storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException;
+    ResponseEntity<Map<String, Object>> storeSystemCredentials(SystemUserModel payload, HttpSession session);
     ResponseEntity<UserModel> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferences);
     ResponseEntity<UserModel> registerBySystem(SystemUserModel systemData, PreferencesModel preferencesModel);
     ResponseEntity<Map<String, Object>> loginGoogle(Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException;

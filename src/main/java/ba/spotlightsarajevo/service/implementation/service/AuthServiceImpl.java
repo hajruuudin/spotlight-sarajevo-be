@@ -9,6 +9,7 @@ import ba.spotlightsarajevo.dao.entities.UserPreferencesEntity;
 import ba.spotlightsarajevo.dao.models.intermediate.GoogleUserModel;
 import ba.spotlightsarajevo.dao.models.intermediate.PreferencesModel;
 import ba.spotlightsarajevo.dao.models.intermediate.SystemUserModel;
+import ba.spotlightsarajevo.dao.models.user.LoggedUserModel;
 import ba.spotlightsarajevo.dao.models.user.SystemLogin;
 import ba.spotlightsarajevo.dao.models.user.UserModel;
 import ba.spotlightsarajevo.service.definition.mapper.UserMapper;
@@ -54,13 +55,13 @@ public class AuthServiceImpl implements AuthService {
     private static final int JWT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24; //1 HOUR
 
     @Override
-    public void storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
+    public ResponseEntity<Map<String, Object>> storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
         String idTokenString = payload.get("idToken");
 
         if (idTokenString == null) {
-            ResponseEntity.status(400).body(Map.of("message", "There was an error with the google request"));
-            return;
+            return ResponseEntity.status(400).body(Map.of("message", "There was an error with the google request"));
         }
+
         GoogleIdToken idToken = verifyGoogleToken(idTokenString);
 
         if (idToken != null) {
@@ -77,9 +78,9 @@ public class AuthServiceImpl implements AuthService {
                 UserEntity checkUserEntity = userDAO.findByGoogleId(googleId);
 
                 if(checkUserEntity != null){
-                    ResponseEntity.status(400).body(Map.of("message", "An account is already registered to that email. Please log in!"));
-                    return;
+                    return ResponseEntity.status(400).body(Map.of("message", "An account is already registered to that email. Please log in!"));
                 }
+
                 // Store this information in the session temporarily
                 GoogleUserModel googleUserInfo = new GoogleUserModel();
                 googleUserInfo.setGoogleId(googleId);
@@ -90,23 +91,26 @@ public class AuthServiceImpl implements AuthService {
                 googleUserInfo.setLocale(locale);
 
                 session.setAttribute(GOOGLE_USER_INFO_SESSION_KEY, googleUserInfo);
+
+            return ResponseEntity.status(200).body(Map.of("message", "Successfully stored Google data to session", "firstName", googleUserInfo.getFirstName()));
         } else {
-            ResponseEntity.status(500).body(Map.of("message", "There was an error with the google request"));
+            return ResponseEntity.status(500).body(Map.of("message", "There was an error with the google request"));
         }
 
     }
 
     @Override
-    public void storeSystemCredentials(SystemUserModel payload, HttpSession session){
+    public ResponseEntity<Map<String, Object>> storeSystemCredentials(SystemUserModel payload, HttpSession session){
         if(payload == null){
-            ResponseEntity.status(400).body(Map.of("message", "The credentials cannot be null!"));
-            return;
+            return ResponseEntity.status(400).body(Map.of("message", "The credentials cannot be null!"));
         }
 
         String hashedPassword = BCrypt.hashpw(payload.getPassword(), BCrypt.gensalt());
         payload.setPassword(hashedPassword);
 
         session.setAttribute(SYSTEM_USER_INFO_SESSION_KEY, payload);
+
+        return ResponseEntity.status(200).body(Map.of("message", "Successfully stored System data to session", "firstName", payload.getFirstName()));
     }
 
     @Override
@@ -182,7 +186,19 @@ public class AuthServiceImpl implements AuthService {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 String jwt = jwtUtil.generateToken(userDetails);
                 setJwtCookie(servletResponse, jwt);
-                return ResponseEntity.ok(Map.of("token", jwt));
+                System.out.println(userEntity);
+                return ResponseEntity.ok(Map.of(
+                        "token", jwt,
+                        "user", new LoggedUserModel(
+                                userEntity.getId(),
+                                userEntity.getFirstName(),
+                                userEntity.getLastName(),
+                                userEntity.getGoogleEmail(),
+                                userEntity.getIsAdmin(),
+                                userEntity.getIsPremium(),
+                                userEntity.getGooglePictureUrl()
+                        )
+                ));
             } else {
                 return ResponseEntity.status(400).body(Map.of("message", "Google user not registered! Please register"));
             }
@@ -205,7 +221,19 @@ public class AuthServiceImpl implements AuthService {
             UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
             String jwt = jwtUtil.generateToken(userDetails);
             setJwtCookie(servletResponse, jwt);
-            return ResponseEntity.ok(Map.of("token", jwt));
+            System.out.println(entity);
+            return ResponseEntity.ok(Map.of(
+                    "token", jwt,
+                    "user", new LoggedUserModel(
+                            entity.getId(),
+                            entity.getFirstName(),
+                            entity.getLastName(),
+                            entity.getEmail(),
+                            entity.getIsAdmin(),
+                            entity.getIsPremium(),
+                            "null" //REPLACE WITH LOOKUP IMAGE SERVICE
+                    )
+            ));
         } else {
             return ResponseEntity.status(403).body(Map.of("message", "Invalid credentials!"));
         }

@@ -9,7 +9,6 @@ import ba.spotlightsarajevo.dao.models.tag.TagModel;
 import ba.spotlightsarajevo.service.definition.mapper.SpotMapper;
 import ba.spotlightsarajevo.service.definition.service.SpotService;
 import ba.spotlightsarajevo.service.definition.validator.SpotValidator;
-import ba.spotlightsarajevo.utils.EntityResponse;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
