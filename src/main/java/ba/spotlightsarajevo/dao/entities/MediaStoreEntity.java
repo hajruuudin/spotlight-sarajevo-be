@@ -28,6 +28,12 @@ public class MediaStoreEntity implements Serializable {
     @Column(name = "item_category")
     private ObjectType itemCategory;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "is_thumbnail")
+    private Boolean isThumbnail;
+
     @Column(name = "created")
     private LocalDateTime created;
 

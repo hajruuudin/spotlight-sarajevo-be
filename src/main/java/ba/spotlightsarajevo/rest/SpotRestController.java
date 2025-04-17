@@ -2,6 +2,7 @@ package ba.spotlightsarajevo.rest;
 
 import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
 import ba.spotlightsarajevo.dao.models.spot.SpotModel;
+import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
 import ba.spotlightsarajevo.service.definition.service.SpotService;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,12 @@ public class SpotRestController {
     @GetMapping
     public ResponseEntity<Page<SpotModel>> getSpotsPaginated(int pageNumber, int pageSize){
         return spotService.getSpotsPaginated(PageRequest.of(0, 10));
+    }
+
+    @Operation(description = "Gets a shorthand headline(random spot) from the database")
+    @GetMapping(value = "shorthand/headline")
+    public ResponseEntity<SpotShorthand> getSpotHeadline(){
+        return spotService.getSpotHeadline();
     }
 
     @Operation(description = "Get spot by slug")
