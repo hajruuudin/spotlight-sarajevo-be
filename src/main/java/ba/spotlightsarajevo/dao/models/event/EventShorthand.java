@@ -1,4 +1,4 @@
-package ba.spotlightsarajevo.dao.models.spot;
+package ba.spotlightsarajevo.dao.models.event;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -9,10 +9,9 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "Properties for a shorthand spot entity, used wherever we have spot search results")
-public class SpotShorthand implements Serializable {
+public class EventShorthand implements Serializable {
     @Serial
-    private static final Long versionUUid = 1L;
+    private static final Long versionUUId = 1L;
 
     @Schema(description = "Unique identifier")
     private Integer id;
@@ -31,5 +30,6 @@ public class SpotShorthand implements Serializable {
 
     @Schema(description = "Image URL of the category")
     private String imageUrl;
-
 }
+
+
