@@ -1,9 +1,9 @@
 package ba.spotlightsarajevo.dao;
 
 import ba.spotlightsarajevo.dao.entities.ReviewEntity;
-import ba.spotlightsarajevo.utils.AbstractDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ReviewDAO extends AbstractDAO<ReviewEntity, Integer> {
+public interface ReviewDAO extends JpaRepository<ReviewEntity, Integer> {
 }

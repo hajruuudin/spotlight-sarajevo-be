@@ -1,10 +1,10 @@
 package ba.spotlightsarajevo.service.definition.service;
 
 import ba.spotlightsarajevo.dao.models.tag.TagModel;
-import ba.spotlightsarajevo.utils.EntityRequest;
-import ba.spotlightsarajevo.utils.EntityResponse;
-import ba.spotlightsarajevo.utils.ListEntityResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 
 public interface TagService {
-    ListEntityResponse<TagModel> findAll();
+    ResponseEntity<Page<TagModel>> findAll(PageRequest request);
 }

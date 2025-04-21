@@ -1,9 +1,9 @@
 package ba.spotlightsarajevo.dao;
 
 import ba.spotlightsarajevo.dao.entities.UserFavouriteCategoriesEntity;
-import ba.spotlightsarajevo.utils.AbstractDAO;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserFavouriteCategoriesDAO extends AbstractDAO<UserFavouriteCategoriesEntity, Integer> {
+public interface UserFavouriteCategoriesDAO extends JpaRepository<UserFavouriteCategoriesEntity, Integer> {
 }

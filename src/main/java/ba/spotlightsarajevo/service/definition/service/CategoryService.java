@@ -1,8 +1,10 @@
 package ba.spotlightsarajevo.service.definition.service;
 
 import ba.spotlightsarajevo.dao.models.category.CategoryModel;
-import ba.spotlightsarajevo.utils.ListEntityResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 
 public interface CategoryService {
-    ListEntityResponse<CategoryModel> findAll();
+    ResponseEntity<Page<CategoryModel>> findAll(PageRequest request);
 }
