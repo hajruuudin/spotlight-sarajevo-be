@@ -1,6 +1,7 @@
 package ba.spotlightsarajevo.dao;
 
 import ba.spotlightsarajevo.dao.entities.SpotEntity;
+import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
