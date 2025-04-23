@@ -2,8 +2,9 @@ package ba.spotlightsarajevo.service.implementation.service;
 
 import ba.spotlightsarajevo.dao.CategoryDAO;
 import ba.spotlightsarajevo.dao.EventDAO;
-import ba.spotlightsarajevo.dao.entities.CategoryEntity;
-import ba.spotlightsarajevo.dao.entities.EventEntity;
+import ba.spotlightsarajevo.dao.EventTagDAO;
+import ba.spotlightsarajevo.dao.TagDAO;
+import ba.spotlightsarajevo.dao.entities.*;
 import ba.spotlightsarajevo.dao.models.event.EventCreate;
 import ba.spotlightsarajevo.dao.models.event.EventModel;
 import ba.spotlightsarajevo.dao.models.event.EventShorthand;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -27,6 +29,8 @@ public class EventServiceImpl implements EventService {
     EventDAO eventDAO;
     EventMapper eventMapper;
     CategoryDAO categoryDAO;
+    EventTagDAO eventTagDAO;
+    TagDAO tagDAO;
     LookupImagesService lookupImagesService;
 
     @Override
@@ -47,12 +51,20 @@ public class EventServiceImpl implements EventService {
 
         EventEntity entity = entities.get(rand.nextInt(totalItems));
 
-        EventShorthand response = eventMapper.entityToShorthandDto(entity);
         Optional<CategoryEntity> eventCategory = categoryDAO.findById(entity.getCategoryId());
-        if(eventCategory.isPresent()){
-            response.setCategoryName(eventCategory.get().getCategoryName());
+        eventCategory.ifPresent(categoryEntity -> entity.setCategoryName(categoryEntity.getCategoryName()));
+
+        List<EventTagEntity> eventTags = eventTagDAO.findAllTagsById(entity.getId());
+        List<String> tagNames = new ArrayList<>();
+
+        for(EventTagEntity eventTag : eventTags){
+            Optional<TagEntity> tag = tagDAO.findById(eventTag.getTagId());
+            tag.ifPresent(tagEntity -> tagNames.add(tagEntity.getTagName()));
         }
 
+        entity.setTagNames(tagNames);
+
+        EventShorthand response = eventMapper.entityToShorthandDto(entity);
         lookupImagesService.lookupThumbnailImage(response, ObjectType.EVENT, response.getId());
 
         return ResponseEntity.status(200).body(response);

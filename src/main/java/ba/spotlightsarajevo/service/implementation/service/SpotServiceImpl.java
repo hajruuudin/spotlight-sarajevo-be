@@ -1,9 +1,7 @@
 package ba.spotlightsarajevo.service.implementation.service;
 
-import ba.spotlightsarajevo.dao.CategoryDAO;
-import ba.spotlightsarajevo.dao.SpotDAO;
-import ba.spotlightsarajevo.dao.entities.CategoryEntity;
-import ba.spotlightsarajevo.dao.entities.SpotEntity;
+import ba.spotlightsarajevo.dao.*;
+import ba.spotlightsarajevo.dao.entities.*;
 import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
 import ba.spotlightsarajevo.dao.models.spot.SpotModel;
 import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
@@ -19,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -28,6 +27,10 @@ import java.util.Random;
 public class SpotServiceImpl implements SpotService {
     SpotDAO spotDAO;
     CategoryDAO categoryDAO;
+    TagDAO tagDAO;
+    SpotTagDAO spotTagDAO;
+    SpotReviewStatsDAO spotReviewStatsDAO;
+    SpotWorkHoursDAO spotWorkHoursDAO;
     SpotMapper spotMapper;
     SpotValidator spotValidator;
     LookupImagesService lookupImagesService;
@@ -49,10 +52,59 @@ public class SpotServiceImpl implements SpotService {
 
         List<SpotModel> spotModelList = spotMapper.entitiesToDtos(pagedSpotResponse.getContent());
 
+        for(SpotModel spot : spotModelList){
+            lookupImagesService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
+        }
+
         Page<SpotModel> spotResponse = new PageImpl<>(
                 spotModelList,
                 pageRequest,
                 pagedSpotResponse.getTotalElements()
+        );
+
+        return ResponseEntity.ok(spotResponse);
+    }
+
+    @Override
+    public ResponseEntity<Page<SpotShorthand>> getSpotsPaginatedShorthand(PageRequest request) {
+        Page<SpotEntity> pagedSpotShorthandResponse = spotDAO.findAll(request);
+
+        List<SpotEntity> spotEntities = pagedSpotShorthandResponse.getContent();
+
+
+        for(SpotEntity entity : spotEntities){
+
+            /* SETTING THE SPOT CATEGORIES */
+            Optional<CategoryEntity> categoryEntity = categoryDAO.findById(entity.getCategoryId());
+            categoryEntity.ifPresent(category -> entity.setCategoryName(category.getCategoryName()));
+
+            /* SETTING THE SPOT REVIEW */
+            Optional<SpotReviewStatsEntity> spotReviewStatsEntity = spotReviewStatsDAO.findById(entity.getId());
+            spotReviewStatsEntity.ifPresent(reviewStatsEntity -> entity.setRating(reviewStatsEntity.getCombinedRating()));
+
+            /* SETTING THE SPOT TAGS */
+            List<SpotTagEntity> spotTags = spotTagDAO.findAllTagsById(entity.getId());
+            List<String> tagNames = new ArrayList<>();
+
+            for(SpotTagEntity spotTag : spotTags){
+                Optional<TagEntity> tag = tagDAO.findById(spotTag.getTagId());
+                tag.ifPresent(tagEntity -> tagNames.add(tagEntity.getTagName()));
+            }
+
+            entity.setTagNames(tagNames);
+        }
+
+        List<SpotShorthand> spotShorthandsList = spotMapper.entitiesToShorthandDtos(pagedSpotShorthandResponse.getContent());
+
+
+        for(SpotShorthand spot : spotShorthandsList){
+            lookupImagesService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
+        }
+
+        Page<SpotShorthand> spotResponse = new PageImpl<>(
+                spotShorthandsList,
+                request,
+                pagedSpotShorthandResponse.getTotalElements()
         );
 
         return ResponseEntity.ok(spotResponse);
@@ -66,12 +118,22 @@ public class SpotServiceImpl implements SpotService {
 
         SpotEntity entity = entities.get(rand.nextInt(totalItems));
 
-        SpotShorthand response = spotMapper.entityToShorthandDto(entity);
+        /* SETTING THE CATEGORY */
         Optional<CategoryEntity> spotCategory = categoryDAO.findById(entity.getCategoryId());
-        if(spotCategory.isPresent()){
-            response.setCategoryName(spotCategory.get().getCategoryName());
+        spotCategory.ifPresent(categoryEntity -> entity.setCategoryName(categoryEntity.getCategoryName()));
+
+        /* SETTING THE TAGS */
+        List<SpotTagEntity> spotTags = spotTagDAO.findAllTagsById(entity.getId());
+        List<String> tagNames = new ArrayList<>();
+
+        for(SpotTagEntity spotTag : spotTags){
+            Optional<TagEntity> tag = tagDAO.findById(spotTag.getTagId());
+            tag.ifPresent(tagEntity -> tagNames.add(tagEntity.getTagName()));
         }
 
+        entity.setTagNames(tagNames);
+
+        SpotShorthand response = spotMapper.entityToShorthandDto(entity);
         lookupImagesService.lookupThumbnailImage(response, ObjectType.SPOT, response.getId());
 
         return ResponseEntity.status(200).body(response);

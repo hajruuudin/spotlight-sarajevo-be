@@ -30,8 +30,14 @@ public class SpotRestController {
 
     @Operation(description = "Get all spots from the database with pagination")
     @GetMapping
-    public ResponseEntity<Page<SpotModel>> getSpotsPaginated(int pageNumber, int pageSize){
+    public ResponseEntity<Page<SpotModel>> getSpotsPaginated(){
         return spotService.getSpotsPaginated(PageRequest.of(0, 10));
+    }
+
+    @Operation(description = "Get all spot shorthands from the database with pagination")
+    @GetMapping(value = "shorthands")
+    public ResponseEntity<Page<SpotShorthand>> getSpotsPaginatedShorthand(){
+        return spotService.getSpotsPaginatedShorthand(PageRequest.of(0, 10));
     }
 
     @Operation(description = "Gets a shorthand headline(random spot) from the database")

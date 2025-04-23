@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -72,6 +73,10 @@ public class EventEntity implements Serializable {
     @Column(name = "modified_by")
     private String modifiedBy;
 
+    @Transient
+    private String categoryName;
 
+    @Transient
+    private List<String> tagNames;
 
 }

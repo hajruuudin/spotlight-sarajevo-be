@@ -23,6 +23,9 @@ public class SpotReviewStatsEntity implements Serializable {
     @Column(name = "spot_id")
     private Integer spotId;
 
+    @Column(name = "combined_rating")
+    private BigDecimal combinedRating;
+
     @Column(name = "combined_cleanliness")
     private BigDecimal combinedCleanliness;
 

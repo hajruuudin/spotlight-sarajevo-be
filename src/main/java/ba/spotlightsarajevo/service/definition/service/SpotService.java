@@ -13,6 +13,8 @@ public interface SpotService {
 
     ResponseEntity<Page<SpotModel>> getSpotsPaginated(PageRequest request);
 
+    ResponseEntity<Page<SpotShorthand>> getSpotsPaginatedShorthand(PageRequest request);
+
     ResponseEntity<SpotShorthand> getSpotHeadline();
 
     ResponseEntity<SpotModel> findBySlug(final SSEntityRequest<String> request);

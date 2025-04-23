@@ -3,6 +3,7 @@ package ba.spotlightsarajevo.dao.entities;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -74,4 +75,10 @@ public class SpotEntity implements Serializable {
 
     @Column(name = "modified_by")
     private String modifiedBy;
+
+    @Transient
+    private String categoryName;
+
+    @Transient
+    private List<String> tagNames;
 }

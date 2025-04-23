@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -27,6 +28,9 @@ public class EventShorthand implements Serializable {
 
     @Schema(description = "Name of the category")
     private String categoryName;
+
+    @Schema(description = "Tags names of the event")
+    private List<String> tagNames;
 
     @Schema(description = "Image URL of the category")
     private String imageUrl;

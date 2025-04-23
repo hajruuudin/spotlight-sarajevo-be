@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,6 +30,12 @@ public class SpotShorthand implements Serializable {
 
     @Schema(description = "Name of the category")
     private String categoryName;
+
+    @Schema(description = "Tags of the spot")
+    private List<String> tagNames;
+
+    @Schema(description = "Overall rating of the Spot")
+    private BigDecimal rating;
 
     @Schema(description = "Image URL of the category")
     private String imageUrl;
