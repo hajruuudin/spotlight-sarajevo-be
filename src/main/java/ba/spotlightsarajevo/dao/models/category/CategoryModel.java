@@ -21,4 +21,7 @@ public class CategoryModel implements Serializable {
 
     @Schema(description = "Description of the category")
     private String categoryDescription;
+
+    @Schema(description = "Color code for displaying the category in a unique style")
+    private String colorCode;
 }

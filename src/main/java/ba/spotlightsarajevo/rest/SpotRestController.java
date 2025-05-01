@@ -46,6 +46,12 @@ public class SpotRestController {
         return spotService.getSpotHeadline();
     }
 
+    @Operation(description = "Get spots based on a certain category")
+    @GetMapping(value = "category/{categoryId}")
+    public ResponseEntity<Page<SpotShorthand>> getCategorisedSpots(@PathVariable Integer categoryId){
+        return spotService.getCategorisedSpots(PageRequest.of(0, 3),categoryId);
+    }
+
     @Operation(description = "Get spot by slug")
     @GetMapping(value = "{slug}")
     public ResponseEntity<SpotModel> findBySlug(@RequestParam String slug){

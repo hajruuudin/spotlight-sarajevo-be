@@ -24,4 +24,7 @@ public class CategoryEntity implements Serializable {
 
     @Column(name = "category_description")
     private String categoryDescription;
+
+    @Column(name = "color_code")
+    private String colorCode;
 }

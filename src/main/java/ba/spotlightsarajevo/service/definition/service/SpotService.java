@@ -17,5 +17,7 @@ public interface SpotService {
 
     ResponseEntity<SpotShorthand> getSpotHeadline();
 
+    ResponseEntity<Page<SpotShorthand>> getCategorisedSpots(PageRequest request, Integer categoryId);
+
     ResponseEntity<SpotModel> findBySlug(final SSEntityRequest<String> request);
 }
