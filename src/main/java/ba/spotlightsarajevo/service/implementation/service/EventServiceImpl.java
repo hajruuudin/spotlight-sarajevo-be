@@ -8,16 +8,22 @@ import ba.spotlightsarajevo.dao.entities.*;
 import ba.spotlightsarajevo.dao.models.event.EventCreate;
 import ba.spotlightsarajevo.dao.models.event.EventModel;
 import ba.spotlightsarajevo.dao.models.event.EventShorthand;
+import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
 import ba.spotlightsarajevo.enums.ObjectType;
 import ba.spotlightsarajevo.service.definition.mapper.EventMapper;
 import ba.spotlightsarajevo.service.definition.service.EventService;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +38,8 @@ public class EventServiceImpl implements EventService {
     EventTagDAO eventTagDAO;
     TagDAO tagDAO;
     LookupImagesService lookupImagesService;
+
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     public ResponseEntity<EventModel> create(SSEntityRequest<EventCreate> request) {
@@ -69,6 +77,50 @@ public class EventServiceImpl implements EventService {
 
         return ResponseEntity.status(200).body(response);
     }
+
+    @Override
+    public ResponseEntity<Page<EventShorthand>> getEventsByDate(PageRequest request, String selectedQueryDate) {
+        LocalDate date = LocalDate.parse(selectedQueryDate, dateFormatter);
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+        Page<EventEntity> eventShorthandResponse = eventDAO.findByStartDate(request, startOfDay, endOfDay);
+
+        List<EventEntity> eventEntities = eventShorthandResponse.getContent();
+
+        for(EventEntity entity : eventEntities){
+
+            /* SETTING THE EVENT CATEGORIES */
+            Optional<CategoryEntity> categoryEntity = categoryDAO.findById(entity.getCategoryId());
+            categoryEntity.ifPresent(category -> entity.setCategoryName(category.getCategoryName()));
+
+            /* SETTING THE EVENT TAGS */
+            List<EventTagEntity> eventTags = eventTagDAO.findAllTagsById(entity.getId());
+            List<String> tagNames = new ArrayList<>();
+
+            for(EventTagEntity eventTag : eventTags){
+                Optional<TagEntity> tag = tagDAO.findById(eventTag.getTagId());
+                tag.ifPresent(tagEntity -> tagNames.add(tagEntity.getTagName()));
+            }
+
+            entity.setTagNames(tagNames);
+        }
+
+        List<EventShorthand> eventShorthandList = eventMapper.entitiesToShorthandDtos(eventShorthandResponse.getContent());
+
+        for(EventShorthand eventShorthand : eventShorthandList){
+            lookupImagesService.lookupThumbnailImage(eventShorthand, ObjectType.EVENT, eventShorthand.getId());
+        }
+
+        Page<EventShorthand> response = new PageImpl<>(
+                eventShorthandList,
+                request,
+                eventShorthandResponse.getTotalElements()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @Override
     public ResponseEntity<EventModel> findBySlug(SSEntityRequest<String> request) {
