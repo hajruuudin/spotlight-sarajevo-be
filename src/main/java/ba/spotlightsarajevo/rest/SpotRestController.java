@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "Spot", description = "Sample API")
@@ -31,13 +32,19 @@ public class SpotRestController {
     @Operation(description = "Get all spots from the database with pagination")
     @GetMapping
     public ResponseEntity<Page<SpotModel>> getSpotsPaginated(){
-        return spotService.getSpotsPaginated(PageRequest.of(0, 10));
+        return spotService.getSpotsPaginated(PageRequest.of(0, 5));
     }
 
-    @Operation(description = "Get all spot shorthands from the database with pagination")
+    @Operation(description = "Get spot shorthands from the database with pagination and an optional filtering (using search, sort and categories)")
     @GetMapping(value = "shorthands")
-    public ResponseEntity<Page<SpotShorthand>> getSpotsPaginatedShorthand(){
-        return spotService.getSpotsPaginatedShorthand(PageRequest.of(0, 10));
+    public ResponseEntity<Page<SpotShorthand>> getSpotsShorthand(
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "sort", required = false) String sort,
+            @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "categories", required = false) List<Integer> categoryIds
+            ){
+        return spotService.getSpotsShorthand(PageRequest.of(pageNumber, pageSize), search, sort, categoryIds);
     }
 
     @Operation(description = "Gets a shorthand headline(random spot) from the database")

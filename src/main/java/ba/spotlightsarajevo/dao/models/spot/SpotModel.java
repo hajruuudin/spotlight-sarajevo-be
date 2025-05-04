@@ -70,4 +70,7 @@ public class SpotModel implements Serializable {
 
     @Schema(description = "User who last modified the record")
     private String modifiedBy;
+
+    @Schema(description = "Image URL of the category")
+    private String imageUrl;
 }
