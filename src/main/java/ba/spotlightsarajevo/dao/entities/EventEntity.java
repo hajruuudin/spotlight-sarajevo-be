@@ -79,4 +79,7 @@ public class EventEntity implements Serializable {
     @Transient
     private List<String> tagNames;
 
+    @Transient
+    private String startDateFormatted;
+
 }

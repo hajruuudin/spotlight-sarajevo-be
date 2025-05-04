@@ -13,6 +13,8 @@ import java.util.List;
 public interface EventService {
     ResponseEntity<EventModel> create(final SSEntityRequest<EventCreate> request);
 
+    ResponseEntity<Page<EventShorthand>> getEventsShorthand(PageRequest request, String search, String sort, List<Integer> categoryIds);
+
     ResponseEntity<Page<EventModel>> getEventsPaginated(PageRequest request);
 
     ResponseEntity<EventShorthand> getEventHeadline();
