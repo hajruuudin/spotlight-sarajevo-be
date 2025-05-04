@@ -8,12 +8,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 public interface SpotService {
     ResponseEntity<SpotModel> create(final SSEntityRequest<SpotCreate> request);
 
     ResponseEntity<Page<SpotModel>> getSpotsPaginated(PageRequest request);
 
-    ResponseEntity<Page<SpotShorthand>> getSpotsPaginatedShorthand(PageRequest request);
+    ResponseEntity<Page<SpotShorthand>> getSpotsShorthand(PageRequest request, String search, String sort, List<Integer> categoryIds);
 
     ResponseEntity<SpotShorthand> getSpotHeadline();
 

@@ -2,6 +2,7 @@ package ba.spotlightsarajevo.service.implementation.service;
 
 import ba.spotlightsarajevo.dao.*;
 import ba.spotlightsarajevo.dao.entities.*;
+import ba.spotlightsarajevo.dao.models.category.CategoryModel;
 import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
 import ba.spotlightsarajevo.dao.models.spot.SpotModel;
 import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
@@ -17,10 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -66,9 +64,12 @@ public class SpotServiceImpl implements SpotService {
     }
 
     @Override
-    public ResponseEntity<Page<SpotShorthand>> getSpotsPaginatedShorthand(PageRequest request) {
-        Page<SpotEntity> pagedSpotShorthandResponse = spotDAO.findAll(request);
+    public ResponseEntity<Page<SpotShorthand>> getSpotsShorthand(PageRequest request, String search, String sort, List<Integer> categoryIds) {
+        if (categoryIds != null && categoryIds.isEmpty()) {
+            categoryIds = null;
+        }
 
+        Page<SpotEntity> pagedSpotShorthandResponse = spotDAO.findAll(request, search, categoryIds, sort);
         List<SpotEntity> spotEntities = pagedSpotShorthandResponse.getContent();
 
 
@@ -100,6 +101,15 @@ public class SpotServiceImpl implements SpotService {
         for(SpotShorthand spot : spotShorthandsList){
             lookupImagesService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
         }
+
+//        /* SORTING BASED ON THE OPTIONS */
+//        if(sort != null) {
+//            if (sort.equals("alphabetical") && spotShorthandsList.size() >= 2) {
+//                spotShorthandsList.sort(Comparator.comparing(SpotShorthand::getOfficialName));
+//            } else if (sort.equals("rating") && spotShorthandsList.size() >= 2) {
+//                spotShorthandsList.sort(Comparator.comparing(SpotShorthand::getRating).reversed());
+//            }
+//        }
 
         Page<SpotShorthand> spotResponse = new PageImpl<>(
                 spotShorthandsList,
