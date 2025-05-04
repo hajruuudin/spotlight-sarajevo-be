@@ -102,15 +102,6 @@ public class SpotServiceImpl implements SpotService {
             lookupImagesService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
         }
 
-//        /* SORTING BASED ON THE OPTIONS */
-//        if(sort != null) {
-//            if (sort.equals("alphabetical") && spotShorthandsList.size() >= 2) {
-//                spotShorthandsList.sort(Comparator.comparing(SpotShorthand::getOfficialName));
-//            } else if (sort.equals("rating") && spotShorthandsList.size() >= 2) {
-//                spotShorthandsList.sort(Comparator.comparing(SpotShorthand::getRating).reversed());
-//            }
-//        }
-
         Page<SpotShorthand> spotResponse = new PageImpl<>(
                 spotShorthandsList,
                 request,

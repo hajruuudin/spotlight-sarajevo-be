@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -25,6 +26,9 @@ public class EventShorthand implements Serializable {
 
     @Schema(description = "Short description")
     private String smallDescription;
+
+    @Schema(description = "Start date of the event")
+    private String startDateFormatted;
 
     @Schema(description = "Name of the category")
     private String categoryName;

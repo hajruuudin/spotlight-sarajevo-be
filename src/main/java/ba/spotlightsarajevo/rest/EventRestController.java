@@ -9,10 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,5 +30,17 @@ public class EventRestController {
     @GetMapping(value = "{selectedQueryDate}")
     public ResponseEntity<Page<EventShorthand>> getEventsByDate(@PathVariable String selectedQueryDate){
         return eventService.getEventsByDate(PageRequest.of(0, 2), selectedQueryDate);
+    }
+
+    @Operation(description = "Get event shorthands from the database paginated based with search & filtering available")
+    @GetMapping(value = "shorthand")
+    public ResponseEntity<Page<EventShorthand>> getEventsShorthand(
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "sort", required = false) String sort,
+            @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "categories", required = false) List<Integer> categoryIds
+    ){
+        return eventService.getEventsShorthand(PageRequest.of(pageNumber, pageSize), search,  sort, categoryIds);
     }
 }
