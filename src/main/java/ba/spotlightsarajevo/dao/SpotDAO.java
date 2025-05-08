@@ -14,11 +14,14 @@ import java.util.List;
 public interface SpotDAO extends JpaRepository<SpotEntity, Integer> {
     @Query("SELECT se FROM SpotEntity se " +
             "JOIN SpotReviewStatsEntity sr ON sr.spotId = se.id " +
-            "WHERE (:searchTerm IS NULL OR :searchTerm = '' OR LOWER(se.officialName) LIKE %:searchTerm%) " +
+            "WHERE (:searchTerm IS NULL OR :searchTerm = '' OR LOWER(se.officialName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
             "AND (:categoryIds IS NULL OR se.categoryId IN :categoryIds) " +
             "ORDER BY " +
             "CASE :sortOption " +
             "   WHEN 'rating' THEN sr.combinedRating " +
+            "END DESC, " +
+            "CASE :sortOption " +
+            "   WHEN 'date' THEN se.created " +
             "END DESC, " +
             "CASE :sortOption " +
             "   WHEN 'alphabetical' THEN se.officialName " +

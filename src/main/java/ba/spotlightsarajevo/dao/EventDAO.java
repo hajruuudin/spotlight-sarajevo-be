@@ -15,7 +15,7 @@ import java.util.List;
 @Repository
 public interface EventDAO extends JpaRepository<EventEntity, Integer> {
     @Query("SELECT ee FROM EventEntity ee " +
-            "WHERE (:searchTerm IS NULL OR :searchTerm = '' OR LOWER(ee.officialName) LIKE %:searchTerm%) " +
+            "WHERE (:searchTerm IS NULL OR :searchTerm = '' OR LOWER(ee.officialName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
             "AND (:categoryIds IS NULL OR ee.categoryId IN :categoryIds) " +
             "ORDER BY " +
             "CASE :sortOption " +
