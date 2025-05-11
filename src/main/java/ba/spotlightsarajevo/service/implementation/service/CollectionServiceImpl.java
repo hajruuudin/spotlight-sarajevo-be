@@ -2,16 +2,18 @@ package ba.spotlightsarajevo.service.implementation.service;
 
 import ba.spotlightsarajevo.dao.*;
 import ba.spotlightsarajevo.dao.entities.*;
+import ba.spotlightsarajevo.dao.models.collection.CollectionCreateModel;
+import ba.spotlightsarajevo.dao.models.collection.CollectionModel;
 import ba.spotlightsarajevo.dao.models.collection.CollectionWithItemsModel;
 import ba.spotlightsarajevo.dao.models.event.EventShorthand;
 import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
 import ba.spotlightsarajevo.enums.ObjectType;
+import ba.spotlightsarajevo.service.definition.mapper.CollectionMapper;
 import ba.spotlightsarajevo.service.definition.mapper.EventMapper;
 import ba.spotlightsarajevo.service.definition.mapper.SpotMapper;
 import ba.spotlightsarajevo.service.definition.service.CollectionService;
 import ba.spotlightsarajevo.utils.ObjectShorthand;
 import ba.spotlightsarajevo.utils.ObjectUtils;
-import jdk.jfr.Event;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,7 @@ public class CollectionServiceImpl implements CollectionService {
     CollectionSpotDAO collectionSpotDAO;
     SpotMapper spotMapper;
     EventMapper eventMapper;
+    CollectionMapper collectionMapper;
     LookupImagesService lookupImagesService;
     ObjectUtils objectUtils;
 
@@ -102,5 +105,30 @@ public class CollectionServiceImpl implements CollectionService {
         collectionWithItemsModel.setCollectionItems(collectionObjects);
 
         return ResponseEntity.ok(collectionWithItemsModel);
+    }
+
+    @Override
+    public ResponseEntity<CollectionModel> addCustomCollection(CollectionCreateModel request, Principal principal) {
+        if(principal == null) {
+            return ResponseEntity.status(401).body(null);
+        }
+
+        UserEntity user = userDAO.findByEmail(principal.getName());
+
+        if(user == null) {
+            return ResponseEntity.status(400).body(null);
+        }
+
+        CollectionEntity collectionEntity = new CollectionEntity();
+        collectionEntity.setCollectionName(request.getCollectionName());
+        collectionEntity.setCollectionType(request.getCollectionType());
+        collectionEntity.setUserId(user.getId());
+
+        try{
+            collectionDAO.save(collectionEntity);
+            return ResponseEntity.ok(collectionMapper.entityToDto(collectionEntity));
+        } catch (Exception e){
+            return ResponseEntity.status(400).body(null);
+        }
     }
 }

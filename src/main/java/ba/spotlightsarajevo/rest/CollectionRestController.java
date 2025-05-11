@@ -1,15 +1,14 @@
 package ba.spotlightsarajevo.rest;
 
+import ba.spotlightsarajevo.dao.models.collection.CollectionCreateModel;
+import ba.spotlightsarajevo.dao.models.collection.CollectionModel;
 import ba.spotlightsarajevo.dao.models.collection.CollectionWithItemsModel;
 import ba.spotlightsarajevo.service.definition.service.CollectionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -28,5 +27,11 @@ public class CollectionRestController {
             Principal principal
     ){
         return this.collectionService.getCollectionByName(collectionName, principal);
+    }
+
+    @Operation(description = "Add a new custom collection for the user")
+    @PostMapping(value = "custom")
+    public ResponseEntity<CollectionModel> addCustomCollection(@RequestBody CollectionCreateModel request, Principal principal){
+        return this.collectionService.addCustomCollection(request, principal);
     }
 }
