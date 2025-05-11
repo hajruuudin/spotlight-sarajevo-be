@@ -11,6 +11,7 @@ import ba.spotlightsarajevo.dao.models.event.EventShorthand;
 import ba.spotlightsarajevo.enums.ObjectType;
 import ba.spotlightsarajevo.service.definition.mapper.EventMapper;
 import ba.spotlightsarajevo.service.definition.service.EventService;
+import ba.spotlightsarajevo.utils.ObjectUtils;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
 import com.google.api.client.util.DateTime;
 import lombok.AllArgsConstructor;
@@ -38,6 +39,7 @@ public class EventServiceImpl implements EventService {
     EventTagDAO eventTagDAO;
     TagDAO tagDAO;
     LookupImagesService lookupImagesService;
+    ObjectUtils objectUtils;
 
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter reverseDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d");
@@ -58,26 +60,7 @@ public class EventServiceImpl implements EventService {
 
 
         for(EventEntity entity : eventEntities){
-
-            /* SETTING THE EVENT CATEGORIES */
-            Optional<CategoryEntity> categoryEntity = categoryDAO.findById(entity.getCategoryId());
-            categoryEntity.ifPresent(category -> entity.setCategoryName(category.getCategoryName()));
-
-            /* SETTING THE EVENT TAGS */
-            List<EventTagEntity> eventTags = eventTagDAO.findAllTagsById(entity.getId());
-            List<String> tagNames = new ArrayList<>();
-
-            for(EventTagEntity eventTag : eventTags){
-                Optional<TagEntity> tag = tagDAO.findById(eventTag.getTagId());
-                tag.ifPresent(tagEntity -> tagNames.add(tagEntity.getTagName()));
-            }
-
-            /* FORMATTING THE EVENT DATE */
-            LocalDateTime eventStartDate = entity.getStartDate();
-            String formattedEventStartDate = eventStartDate.format(reverseDateFormatter);
-            entity.setStartDateFormatted(formattedEventStartDate);
-
-            entity.setTagNames(tagNames);
+            objectUtils.setEventInformation(categoryDAO, eventTagDAO, tagDAO, reverseDateFormatter, entity);
         }
 
         List<EventShorthand> eventShorthandsList = eventMapper.entitiesToShorthandDtos(pagedEventShorthandResponse.getContent());
@@ -134,21 +117,7 @@ public class EventServiceImpl implements EventService {
         List<EventEntity> eventEntities = eventShorthandResponse.getContent();
 
         for(EventEntity entity : eventEntities){
-
-            /* SETTING THE EVENT CATEGORIES */
-            Optional<CategoryEntity> categoryEntity = categoryDAO.findById(entity.getCategoryId());
-            categoryEntity.ifPresent(category -> entity.setCategoryName(category.getCategoryName()));
-
-            /* SETTING THE EVENT TAGS */
-            List<EventTagEntity> eventTags = eventTagDAO.findAllTagsById(entity.getId());
-            List<String> tagNames = new ArrayList<>();
-
-            for(EventTagEntity eventTag : eventTags){
-                Optional<TagEntity> tag = tagDAO.findById(eventTag.getTagId());
-                tag.ifPresent(tagEntity -> tagNames.add(tagEntity.getTagName()));
-            }
-
-            entity.setTagNames(tagNames);
+            objectUtils.setEventInformation(categoryDAO, eventTagDAO, tagDAO, reverseDateFormatter, entity);
         }
 
         List<EventShorthand> eventShorthandList = eventMapper.entitiesToShorthandDtos(eventShorthandResponse.getContent());

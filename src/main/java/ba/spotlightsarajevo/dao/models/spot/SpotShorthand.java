@@ -1,5 +1,6 @@
 package ba.spotlightsarajevo.dao.models.spot;
 
+import ba.spotlightsarajevo.utils.ObjectShorthand;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Schema(description = "Properties for a shorthand spot entity, used wherever we have spot search results")
-public class SpotShorthand implements Serializable {
+public class SpotShorthand implements Serializable, ObjectShorthand {
     @Serial
     private static final Long versionUUid = 1L;
 

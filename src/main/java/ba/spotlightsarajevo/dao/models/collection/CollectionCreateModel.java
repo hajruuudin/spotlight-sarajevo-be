@@ -19,8 +19,4 @@ public class CollectionCreateModel implements Serializable {
 
     @Schema(description = "The type of objects the collection takes in")
     private ObjectType collectionType;
-
-    @Schema(description = "The user the collection is associated with")
-    private Integer userId;
-
 }
