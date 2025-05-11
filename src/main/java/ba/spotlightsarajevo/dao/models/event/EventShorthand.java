@@ -1,5 +1,6 @@
 package ba.spotlightsarajevo.dao.models.event;
 
+import ba.spotlightsarajevo.utils.ObjectShorthand;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class EventShorthand implements Serializable {
+public class EventShorthand implements Serializable, ObjectShorthand {
     @Serial
     private static final Long versionUUId = 1L;
 
