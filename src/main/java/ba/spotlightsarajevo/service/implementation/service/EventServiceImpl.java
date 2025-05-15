@@ -13,7 +13,6 @@ import ba.spotlightsarajevo.service.definition.mapper.EventMapper;
 import ba.spotlightsarajevo.service.definition.service.EventService;
 import ba.spotlightsarajevo.utils.ObjectUtils;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
-import com.google.api.client.util.DateTime;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -60,7 +59,7 @@ public class EventServiceImpl implements EventService {
 
 
         for(EventEntity entity : eventEntities){
-            objectUtils.setEventInformation(categoryDAO, eventTagDAO, tagDAO, reverseDateFormatter, entity);
+            objectUtils.setEventShorthandInformation(categoryDAO, eventTagDAO, tagDAO, reverseDateFormatter, entity);
         }
 
         List<EventShorthand> eventShorthandsList = eventMapper.entitiesToShorthandDtos(pagedEventShorthandResponse.getContent());
@@ -117,7 +116,7 @@ public class EventServiceImpl implements EventService {
         List<EventEntity> eventEntities = eventShorthandResponse.getContent();
 
         for(EventEntity entity : eventEntities){
-            objectUtils.setEventInformation(categoryDAO, eventTagDAO, tagDAO, reverseDateFormatter, entity);
+            objectUtils.setEventShorthandInformation(categoryDAO, eventTagDAO, tagDAO, reverseDateFormatter, entity);
         }
 
         List<EventShorthand> eventShorthandList = eventMapper.entitiesToShorthandDtos(eventShorthandResponse.getContent());

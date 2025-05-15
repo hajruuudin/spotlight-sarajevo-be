@@ -30,4 +30,6 @@ public interface SpotDAO extends JpaRepository<SpotEntity, Integer> {
     Page<SpotEntity> findAll(Pageable pageable, @Param("searchTerm") String searchTerm, @Param("categoryIds") List<Integer> categoryIds, @Param("sortOption") String sortOption);
 
     Page<SpotEntity> findAllByCategoryId(Pageable request, Integer categoryId);
+
+    SpotEntity findBySlug(String slug);
 }

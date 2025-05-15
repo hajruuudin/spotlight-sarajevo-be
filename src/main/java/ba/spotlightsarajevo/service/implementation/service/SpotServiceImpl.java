@@ -2,7 +2,6 @@ package ba.spotlightsarajevo.service.implementation.service;
 
 import ba.spotlightsarajevo.dao.*;
 import ba.spotlightsarajevo.dao.entities.*;
-import ba.spotlightsarajevo.dao.models.category.CategoryModel;
 import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
 import ba.spotlightsarajevo.dao.models.spot.SpotModel;
 import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
@@ -27,8 +26,10 @@ public class SpotServiceImpl implements SpotService {
     SpotDAO spotDAO;
     CategoryDAO categoryDAO;
     TagDAO tagDAO;
+    ReviewDAO reviewDAO;
     SpotTagDAO spotTagDAO;
     SpotReviewStatsDAO spotReviewStatsDAO;
+    SpotReviewDAO spotReviewDAO;
     SpotWorkHoursDAO spotWorkHoursDAO;
     SpotMapper spotMapper;
     SpotValidator spotValidator;
@@ -76,7 +77,7 @@ public class SpotServiceImpl implements SpotService {
 
 
         for(SpotEntity entity : spotEntities){
-            objectUtils.setSpotInformation(categoryDAO, spotReviewStatsDAO, spotTagDAO, tagDAO, entity);
+            objectUtils.setSpotShorthandInformation(categoryDAO, spotReviewStatsDAO, spotTagDAO, tagDAO, entity);
         }
 
         List<SpotShorthand> spotShorthandsList = spotMapper.entitiesToShorthandDtos(pagedSpotShorthandResponse.getContent());
@@ -103,21 +104,8 @@ public class SpotServiceImpl implements SpotService {
 
         SpotEntity entity = entities.get(rand.nextInt(totalItems));
 
-        objectUtils.setSpotInformation(categoryDAO, spotReviewStatsDAO, spotTagDAO, tagDAO, entity);
-//        /* SETTING THE CATEGORY */
-//        Optional<CategoryEntity> spotCategory = categoryDAO.findById(entity.getCategoryId());
-//        spotCategory.ifPresent(categoryEntity -> entity.setCategoryName(categoryEntity.getCategoryName()));
-//
-//        /* SETTING THE TAGS */
-//        List<SpotTagEntity> spotTags = spotTagDAO.findAllTagsById(entity.getId());
-//        List<String> tagNames = new ArrayList<>();
-//
-//        for(SpotTagEntity spotTag : spotTags){
-//            Optional<TagEntity> tag = tagDAO.findById(spotTag.getTagId());
-//            tag.ifPresent(tagEntity -> tagNames.add(tagEntity.getTagName()));
-//        }
-//
-//        entity.setTagNames(tagNames);
+        objectUtils.setSpotShorthandInformation(categoryDAO, spotReviewStatsDAO, spotTagDAO, tagDAO, entity);
+
 
         SpotShorthand response = spotMapper.entityToShorthandDto(entity);
         lookupImagesService.lookupThumbnailImage(response, ObjectType.SPOT, response.getId());
@@ -132,7 +120,7 @@ public class SpotServiceImpl implements SpotService {
         List<SpotEntity> spotEntities = pagedSpotEntities.getContent();
 
         for(SpotEntity entity : spotEntities){
-            objectUtils.setSpotInformation(categoryDAO, spotReviewStatsDAO, spotTagDAO, tagDAO, entity);
+            objectUtils.setSpotShorthandInformation(categoryDAO, spotReviewStatsDAO, spotTagDAO, tagDAO, entity);
         }
 
         List<SpotShorthand> spotShorthandsList = spotMapper.entitiesToShorthandDtos(pagedSpotEntities.getContent());
@@ -152,7 +140,35 @@ public class SpotServiceImpl implements SpotService {
     }
 
     @Override
-    public ResponseEntity<SpotModel> findBySlug(SSEntityRequest<String> request) {
-        return null;
+    public ResponseEntity<SpotModel> getSpotOverviewBySlug(SSEntityRequest<String> request) {
+        try{
+            String slug = request.getData();
+
+            if(slug.isEmpty()){
+                throw new IllegalArgumentException("Slug of the spot not found!");
+            } else {
+                SpotEntity spotEntity = spotDAO.findBySlug(slug);
+
+                objectUtils.setSpotFullInformation(
+                        categoryDAO,
+                        spotReviewStatsDAO,
+                        spotReviewDAO,
+                        spotTagDAO,
+                        spotWorkHoursDAO,
+                        tagDAO,
+                        reviewDAO,
+                        spotEntity
+                );
+
+                SpotModel spotModel = spotMapper.entityToDto(spotEntity);
+
+                lookupImagesService.lookupThumbnailImage(spotModel, ObjectType.SPOT, spotModel.getId());
+
+                return ResponseEntity.ok(spotModel);
+            }
+        } catch (Exception e){
+            return ResponseEntity.status(400).body(null);
+        }
     }
+
 }

@@ -59,10 +59,10 @@ public class SpotRestController {
         return spotService.getCategorisedSpots(PageRequest.of(0, 3),categoryId);
     }
 
-    @Operation(description = "Get spot by slug")
-    @GetMapping(value = "{slug}")
-    public ResponseEntity<SpotModel> findBySlug(@RequestParam String slug){
-        return null;
+    @Operation(description = "Get spot overview by slug")
+    @GetMapping(value = "overview/{slug}")
+    public ResponseEntity<SpotModel> getSpotOverviewBySlug(@PathVariable String slug){
+        return spotService.getSpotOverviewBySlug(new SSEntityRequest<>(slug));
     }
 
     @Operation(description = "Delete a spot from the database")
