@@ -37,8 +37,8 @@ public class SpotEntity implements Serializable {
     @Column(name = "rating")
     private BigDecimal rating;
 
-    @Column(name = "lattitude")
-    private BigDecimal lattitude;
+    @Column(name = "latitude")
+    private BigDecimal latitude;
 
     @Column(name = "longitude")
     private BigDecimal longitude;
@@ -76,9 +76,17 @@ public class SpotEntity implements Serializable {
     @Column(name = "modified_by")
     private String modifiedBy;
 
+    /* Transient fields for transformation */
+
     @Transient
     private String categoryName;
 
     @Transient
     private List<String> tagNames;
+
+    @Transient
+    private List<SpotWorkHoursEntity> workHours;
+
+    @Transient
+    private List<ReviewEntity> reviews;
 }

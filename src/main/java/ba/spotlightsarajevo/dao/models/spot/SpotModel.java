@@ -1,5 +1,8 @@
 package ba.spotlightsarajevo.dao.models.spot;
 
+import ba.spotlightsarajevo.dao.entities.ReviewEntity;
+import ba.spotlightsarajevo.dao.entities.SpotWorkHoursEntity;
+import ba.spotlightsarajevo.enums.WeekDay;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -7,6 +10,8 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 
 @Data
 @Schema(description = "Model for all properties of a spot entity")
@@ -38,8 +43,11 @@ public class SpotModel implements Serializable {
     @Schema(description = "Longitude coordinate")
     private BigDecimal longitude;
 
-    @Schema(description = "Identifier of the category")
-    private Integer categoryId;
+    @Schema(description = "Name of the category")
+    private String categoryName;
+
+    @Schema(description = "List of all tags of the spot")
+    private List<String> tagNames;
 
     @Schema(description = "Initial cleanliness score placed by the admin")
     private BigDecimal cleanliness;
@@ -58,6 +66,12 @@ public class SpotModel implements Serializable {
 
     @Schema(description = "Initial atmosphere score placed by the admin")
     private BigDecimal atmosphere;
+
+    @Schema(description = "Map which includes the work hours of the spot")
+    private List<SpotWorkHoursEntity> workHours;
+
+    @Schema(description = "List of all reviews for the Spot")
+    private List<ReviewEntity> reviews;
 
     @Schema(description = "Creation timestamp")
     private LocalDateTime created;

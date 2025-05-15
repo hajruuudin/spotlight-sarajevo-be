@@ -69,7 +69,7 @@ public class CollectionServiceImpl implements CollectionService {
                     Optional<SpotEntity> spotEntity = this.spotDAO.findById(entity.getSpotId());
 
                     if(spotEntity.isPresent()){
-                        objectUtils.setSpotInformation(categoryDAO, spotReviewStatsDAO, spotTagDAO, tagDAO, spotEntity.get());
+                        objectUtils.setSpotShorthandInformation(categoryDAO, spotReviewStatsDAO, spotTagDAO, tagDAO, spotEntity.get());
                         SpotShorthand spotShorthand = spotMapper.entityToShorthandDto(spotEntity.get());
 
                         lookupImagesService.lookupThumbnailImage(spotShorthand, ObjectType.SPOT, spotShorthand.getId());
@@ -85,7 +85,7 @@ public class CollectionServiceImpl implements CollectionService {
                     Optional<EventEntity> eventEntity = this.eventDAO.findById(entity.getEventId());
 
                     if (eventEntity.isPresent()) {
-                        objectUtils.setEventInformation(categoryDAO, eventTagDAO, tagDAO, objectUtils.reverseDateFormatter, eventEntity.get());
+                        objectUtils.setEventShorthandInformation(categoryDAO, eventTagDAO, tagDAO, objectUtils.reverseDateFormatter, eventEntity.get());
                         EventShorthand eventShorthand = eventMapper.entityToShorthandDto(eventEntity.get());
 
                         lookupImagesService.lookupThumbnailImage(eventShorthand, ObjectType.EVENT, eventShorthand.getId());
