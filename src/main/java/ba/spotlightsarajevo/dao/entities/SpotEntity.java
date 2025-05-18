@@ -46,6 +46,9 @@ public class SpotEntity implements Serializable {
     @Column(name = "category_id")
     private Integer categoryId;
 
+    @Column(name = "address")
+    private String address;
+
     @Column(name = "cleanliness")
     private BigDecimal cleanliness;
 
