@@ -59,7 +59,7 @@ public class EventServiceImpl implements EventService {
 
 
         for(EventEntity entity : eventEntities){
-            objectUtils.setEventShorthandInformation(categoryDAO, eventTagDAO, tagDAO, reverseDateFormatter, entity);
+            objectUtils.setEventInformation(categoryDAO, eventTagDAO, tagDAO, entity);
         }
 
         List<EventShorthand> eventShorthandsList = eventMapper.entitiesToShorthandDtos(pagedEventShorthandResponse.getContent());
@@ -116,7 +116,7 @@ public class EventServiceImpl implements EventService {
         List<EventEntity> eventEntities = eventShorthandResponse.getContent();
 
         for(EventEntity entity : eventEntities){
-            objectUtils.setEventShorthandInformation(categoryDAO, eventTagDAO, tagDAO, reverseDateFormatter, entity);
+            objectUtils.setEventInformation(categoryDAO, eventTagDAO, tagDAO, entity);
         }
 
         List<EventShorthand> eventShorthandList = eventMapper.entitiesToShorthandDtos(eventShorthandResponse.getContent());
@@ -135,12 +135,20 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ResponseEntity<EventModel> findBySlug(SSEntityRequest<String> request) {
-        return null;
+    public ResponseEntity<EventModel> getEventOverview(SSEntityRequest<String> request) {
+        try {
+            EventEntity entity = eventDAO.findBySlug(request.getData());
+
+            objectUtils.setEventInformation(categoryDAO, eventTagDAO, tagDAO, entity);
+
+            EventModel eventModel = eventMapper.entityToDto(entity);
+
+            lookupImagesService.lookupThumbnailImage(eventModel, ObjectType.EVENT, eventModel.getId());
+
+            return ResponseEntity.ok(eventModel);
+        } catch (Exception e){
+            return ResponseEntity.status(400).body(null);
+        }
     }
 
-    @Override
-    public ResponseEntity<Page<EventModel>> getEventsPaginated(PageRequest request) {
-        return null;
-    }
 }

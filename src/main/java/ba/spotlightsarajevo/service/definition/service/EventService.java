@@ -15,11 +15,9 @@ public interface EventService {
 
     ResponseEntity<Page<EventShorthand>> getEventsShorthand(PageRequest request, String search, String sort, List<Integer> categoryIds);
 
-    ResponseEntity<Page<EventModel>> getEventsPaginated(PageRequest request);
-
     ResponseEntity<EventShorthand> getEventHeadline();
 
     ResponseEntity<Page<EventShorthand>> getEventsByDate(PageRequest request, String date);
 
-    ResponseEntity<EventModel> findBySlug(final SSEntityRequest<String> request);
+    ResponseEntity<EventModel> getEventOverview(SSEntityRequest<String>request);
 }

@@ -1,8 +1,10 @@
 package ba.spotlightsarajevo.rest;
 
+import ba.spotlightsarajevo.dao.models.event.EventModel;
 import ba.spotlightsarajevo.dao.models.event.EventShorthand;
 import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
 import ba.spotlightsarajevo.service.definition.service.EventService;
+import ba.spotlightsarajevo.utils.SSEntityRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -42,5 +44,11 @@ public class EventRestController {
             @RequestParam(value = "categories", required = false) List<Integer> categoryIds
     ){
         return eventService.getEventsShorthand(PageRequest.of(pageNumber, pageSize), search,  sort, categoryIds);
+    }
+
+    @Operation(description = "Gets an event overview")
+    @GetMapping(value = "overview/{slug}")
+    public ResponseEntity<EventModel> getEventOverview(@PathVariable String slug){
+        return eventService.getEventOverview(new SSEntityRequest<>(slug));
     }
 }
