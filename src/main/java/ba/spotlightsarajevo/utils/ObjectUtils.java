@@ -87,7 +87,7 @@ public class ObjectUtils {
         entity.setWorkHours(spotWorkHoursEntityList);
     }
 
-    public void setEventShorthandInformation(CategoryDAO categoryDAO, EventTagDAO eventTagDAO, TagDAO tagDAO, DateTimeFormatter reverseDateFormatter, EventEntity entity){
+    public void setEventInformation(CategoryDAO categoryDAO, EventTagDAO eventTagDAO, TagDAO tagDAO, EventEntity entity){
         /* SETTING THE EVENT CATEGORIES */
         Optional<CategoryEntity> categoryEntity = categoryDAO.findById(entity.getCategoryId());
         categoryEntity.ifPresent(category -> entity.setCategoryName(category.getCategoryName()));
@@ -105,7 +105,6 @@ public class ObjectUtils {
         LocalDateTime eventStartDate = entity.getStartDate();
         String formattedEventStartDate = eventStartDate.format(reverseDateFormatter);
         entity.setStartDateFormatted(formattedEventStartDate);
-
         entity.setTagNames(tagNames);
     }
 }

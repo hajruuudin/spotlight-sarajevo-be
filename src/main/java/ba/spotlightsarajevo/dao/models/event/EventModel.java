@@ -11,6 +11,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Schema(description = "Model of all properties for an Event entity")
@@ -33,8 +34,11 @@ public class EventModel implements Serializable {
     @Schema(description = "Full description of the event")
     private String fullDescription;
 
-    @Schema(description = "Category identifier of the event")
-    private Integer categoryId;
+    @Schema(description = "Category name of the event")
+    private String categoryName;
+
+    @Schema(description = "List of tags for the event")
+    private List<String> tagNames;
 
     @Schema(description = "Start date and time of the event")
     private LocalDateTime startDate;
@@ -59,6 +63,15 @@ public class EventModel implements Serializable {
 
     @Schema(description = "Predominant language/s of the event")
     private String eventLanguage;
+
+    @Schema(description = "Event address or location where it will take place")
+    private String address;
+
+    @Schema(description = "Additional notes about the location of the event")
+    private String locationDescription;
+
+    @Schema(description = "Thumbnail Image url")
+    private String imageUrl;
 
     @Schema(description = "Date of creation")
     private LocalDateTime created;

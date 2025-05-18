@@ -61,6 +61,12 @@ public class EventEntity implements Serializable {
     @Column(name = "event_language")
     private String eventLanguage;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "location_description")
+    private String locationDescription;
+
     @Column(name = "created")
     private LocalDateTime created;
 

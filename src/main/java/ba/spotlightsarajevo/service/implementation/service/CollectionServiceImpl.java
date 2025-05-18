@@ -85,7 +85,7 @@ public class CollectionServiceImpl implements CollectionService {
                     Optional<EventEntity> eventEntity = this.eventDAO.findById(entity.getEventId());
 
                     if (eventEntity.isPresent()) {
-                        objectUtils.setEventShorthandInformation(categoryDAO, eventTagDAO, tagDAO, objectUtils.reverseDateFormatter, eventEntity.get());
+                        objectUtils.setEventInformation(categoryDAO, eventTagDAO, tagDAO, eventEntity.get());
                         EventShorthand eventShorthand = eventMapper.entityToShorthandDto(eventEntity.get());
 
                         lookupImagesService.lookupThumbnailImage(eventShorthand, ObjectType.EVENT, eventShorthand.getId());

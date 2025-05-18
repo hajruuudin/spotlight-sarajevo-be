@@ -28,4 +28,6 @@ public interface EventDAO extends JpaRepository<EventEntity, Integer> {
 
     @Query("SELECT ee FROM EventEntity ee WHERE ee.startDate <= :endOfDate AND ee.endDate >= :startOfDate")
     Page<EventEntity> findByStartDate(Pageable pageable, LocalDateTime startOfDate, LocalDateTime endOfDate);
+
+    EventEntity findBySlug(String slug);
 }
