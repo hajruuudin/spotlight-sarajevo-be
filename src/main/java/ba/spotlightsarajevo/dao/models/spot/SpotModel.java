@@ -46,6 +46,9 @@ public class SpotModel implements Serializable {
     @Schema(description = "Name of the category")
     private String categoryName;
 
+    @Schema(description = "Address of the spot")
+    private String address;
+
     @Schema(description = "List of all tags of the spot")
     private List<String> tagNames;
 

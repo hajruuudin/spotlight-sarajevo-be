@@ -13,9 +13,6 @@ public class ReviewCreate implements Serializable {
     @Serial
     public static final long versionUUId = 1L;
 
-    @Schema(description = "Identifier of the user")
-    private Integer userId;
-
     @Schema(description = "Header or title")
     private String header;
 
