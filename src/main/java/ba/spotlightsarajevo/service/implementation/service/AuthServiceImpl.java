@@ -1,8 +1,10 @@
 package ba.spotlightsarajevo.service.implementation.service;
 
+import ba.spotlightsarajevo.dao.CollectionDAO;
 import ba.spotlightsarajevo.dao.UserDAO;
 import ba.spotlightsarajevo.dao.UserFavouriteCategoriesDAO;
 import ba.spotlightsarajevo.dao.UserPreferencesDAO;
+import ba.spotlightsarajevo.dao.entities.CollectionEntity;
 import ba.spotlightsarajevo.dao.entities.UserEntity;
 import ba.spotlightsarajevo.dao.entities.UserFavouriteCategoriesEntity;
 import ba.spotlightsarajevo.dao.entities.UserPreferencesEntity;
@@ -12,6 +14,7 @@ import ba.spotlightsarajevo.dao.models.intermediate.SystemUserModel;
 import ba.spotlightsarajevo.dao.models.user.LoggedUserModel;
 import ba.spotlightsarajevo.dao.models.user.SystemLogin;
 import ba.spotlightsarajevo.dao.models.user.UserModel;
+import ba.spotlightsarajevo.enums.ObjectType;
 import ba.spotlightsarajevo.service.definition.mapper.UserMapper;
 import ba.spotlightsarajevo.service.definition.service.AuthService;
 import ba.spotlightsarajevo.utils.JwtUtil;
@@ -43,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     UserPreferencesDAO userPreferencesDAO;
     UserFavouriteCategoriesDAO userFavouriteCategoriesDAO;
     UserDetailsService userDetailsService;
+    CollectionDAO collectionDAO;
     JwtUtil jwtUtil;
 
     private final GsonFactory jsonFactory = new GsonFactory();
@@ -137,6 +141,9 @@ public class AuthServiceImpl implements AuthService {
         /* Setting the favourite categories and preferences of the user */
         setUserFavouriteCategoriesAndPreferences(userEntity, preferences);
 
+        /* Creating the two default collections for the user  */
+        createUserDefaultCollections(userEntity);
+
         return ResponseEntity.ok(userMapper.entityToDto(userEntity));
     }
 
@@ -161,6 +168,9 @@ public class AuthServiceImpl implements AuthService {
 
         /* Setting the favourite categories and preferences of the user */
         setUserFavouriteCategoriesAndPreferences(userEntity, preferences);
+
+        /* Creating the two default collections for the user  */
+        createUserDefaultCollections(userEntity);
 
         return ResponseEntity.ok(userMapper.entityToDto(userEntity));
     }
@@ -293,5 +303,24 @@ public class AuthServiceImpl implements AuthService {
         userPreferences.setAnswer03(preferences.getAnswer03());
         userPreferences.setAnswer04(preferences.getAnswer04());
         userPreferencesDAO.save(userPreferences);
+    }
+
+    private void createUserDefaultCollections(UserEntity entity){
+        CollectionEntity collectionEventEntity = new CollectionEntity();
+        collectionEventEntity.setUserId(entity.getId());
+        collectionEventEntity.setCollectionType(ObjectType.EVENT);
+        collectionEventEntity.setCollectionName("All Events");
+
+        CollectionEntity collectionSpotEntity = new CollectionEntity();
+        collectionSpotEntity.setUserId(entity.getId());
+        collectionSpotEntity.setCollectionType(ObjectType.SPOT);
+        collectionSpotEntity.setCollectionName("All Spots");
+
+        try{
+            collectionDAO.save(collectionEventEntity);
+            collectionDAO.save(collectionSpotEntity);
+        } catch (Exception e){
+            throw new RuntimeException("ERROR: Collection Create");
+        }
     }
 }

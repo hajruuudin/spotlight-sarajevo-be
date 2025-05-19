@@ -1,7 +1,9 @@
 package ba.spotlightsarajevo.rest;
 
+import ba.spotlightsarajevo.dao.entities.CollectionEntity;
 import ba.spotlightsarajevo.dao.models.collection.CollectionCreateModel;
 import ba.spotlightsarajevo.dao.models.collection.CollectionModel;
+import ba.spotlightsarajevo.dao.models.collection.CollectionStatus;
 import ba.spotlightsarajevo.dao.models.collection.CollectionWithItemsModel;
 import ba.spotlightsarajevo.service.definition.service.CollectionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,12 +28,48 @@ public class CollectionRestController {
             @RequestParam(value = "collectionName", required = true) String collectionName,
             Principal principal
     ){
-        return this.collectionService.getCollectionByName(collectionName, principal);
+        return collectionService.getCollectionByName(collectionName, principal);
     }
 
     @Operation(description = "Add a new custom collection for the user")
     @PostMapping(value = "custom")
     public ResponseEntity<CollectionModel> addCustomCollection(@RequestBody CollectionCreateModel request, Principal principal){
-        return this.collectionService.addCustomCollection(request, principal);
+        return collectionService.addCustomCollection(request, principal);
+    }
+
+    @Operation(description = "Get all custom collections for the user")
+    @GetMapping(value = "custom")
+    public ResponseEntity<List<CollectionModel>> getAllCustomCollections(Principal principal){
+        return collectionService.getAllCustomCollections(principal);
+    }
+
+    @Operation(description = "Gets all the collections for a user and the status of the selected spot within it")
+    @GetMapping(value = "all")
+    public ResponseEntity<List<CollectionStatus>> getCollectionsWithItemPresence(
+            @RequestParam(value = "objectId", required = true) Integer objectId,
+            @RequestParam(value = "objectType", required = true) String objectType,
+            Principal principal
+    ){
+        return collectionService.getCollectionsWithItemPresence(objectId, objectType, principal);
+    }
+
+    @Operation(description = "Add an item to its respective collection")
+    @PostMapping(value = "addObject")
+    public ResponseEntity<CollectionStatus> addObjectToCollection(
+            @RequestParam(value = "collectionName", required = true) String collectionName,
+            @RequestParam(value = "objectId", required = true) Integer objectId,
+            Principal principal
+    ){
+        return collectionService.addObjectToCollection(collectionName, objectId, principal);
+    }
+
+    @Operation(description = "Removes and item from its respective collection")
+    @DeleteMapping(value = "removeObject")
+    public ResponseEntity<CollectionStatus> removeObjectToCollection(
+            @RequestParam(value = "collectionName", required = true) String collectionName,
+            @RequestParam(value = "objectId", required = true) Integer objectId,
+            Principal principal
+    ){
+        return collectionService.removeObjectToCollection(collectionName, objectId, principal);
     }
 }
