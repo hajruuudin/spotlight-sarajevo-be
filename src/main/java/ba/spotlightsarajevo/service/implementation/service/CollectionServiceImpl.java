@@ -183,6 +183,25 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    public ResponseEntity<List<CollectionModel>> getAllCustomCollections(Principal principal) {
+        try{
+            UserEntity currentUser = userDAO.findByEmail(principal.getName());
+
+            if(currentUser == null){
+                throw new IllegalAccessException("User not found or access denied");
+            } else {
+                List<CollectionEntity> collectionEntities = collectionDAO.findCustomCollectionsByUserId(currentUser.getId());
+
+                List<CollectionModel> collectionModels = collectionMapper.entitiesToDtos(collectionEntities);
+
+                return ResponseEntity.ok(collectionModels);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(null);
+        }
+    }
+
+    @Override
     public ResponseEntity<CollectionStatus> addObjectToCollection(String collectionName, Integer objectId, Principal principal) {
         try{
             UserEntity currentUser = userDAO.findByEmail(principal.getName());

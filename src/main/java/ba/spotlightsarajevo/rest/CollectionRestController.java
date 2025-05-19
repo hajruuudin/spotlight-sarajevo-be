@@ -37,6 +37,12 @@ public class CollectionRestController {
         return collectionService.addCustomCollection(request, principal);
     }
 
+    @Operation(description = "Get all custom collections for the user")
+    @GetMapping(value = "custom")
+    public ResponseEntity<List<CollectionModel>> getAllCustomCollections(Principal principal){
+        return collectionService.getAllCustomCollections(principal);
+    }
+
     @Operation(description = "Gets all the collections for a user and the status of the selected spot within it")
     @GetMapping(value = "all")
     public ResponseEntity<List<CollectionStatus>> getCollectionsWithItemPresence(

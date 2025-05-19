@@ -14,4 +14,7 @@ public interface CollectionDAO extends JpaRepository<CollectionEntity, Integer> 
     CollectionEntity findByColletionName(String collectionName, Integer userId);
     CollectionEntity findByUserIdAndCollectionName(Integer userId, String collectionName);
     List<CollectionEntity> findByUserIdAndCollectionType(Integer userId, ObjectType collectionType);
+
+    @Query("SELECT ce FROM CollectionEntity ce WHERE ce.userId = :userId AND ce.collectionName NOT IN ('All Spots', 'All Events')")
+    List<CollectionEntity> findCustomCollectionsByUserId(Integer userId);
 }

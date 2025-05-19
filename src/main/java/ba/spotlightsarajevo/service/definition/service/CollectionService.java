@@ -13,6 +13,7 @@ public interface CollectionService {
     ResponseEntity<CollectionWithItemsModel> getCollectionByName(String collectionName, Principal principal);
     ResponseEntity<CollectionModel> addCustomCollection(CollectionCreateModel request, Principal principal);
     ResponseEntity<List<CollectionStatus>> getCollectionsWithItemPresence(Integer objectId, String objectType, Principal principal);
+    ResponseEntity<List<CollectionModel>> getAllCustomCollections(Principal principal);
     ResponseEntity<CollectionStatus> addObjectToCollection(String collectionName, Integer objectId, Principal principal);
     ResponseEntity<CollectionStatus> removeObjectToCollection(String collectionName, Integer objectId, Principal principal);
 }
