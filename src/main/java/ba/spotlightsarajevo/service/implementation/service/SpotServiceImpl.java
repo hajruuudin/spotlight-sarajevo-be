@@ -81,8 +81,7 @@ public class SpotServiceImpl implements SpotService {
         }
 
         List<SpotShorthand> spotShorthandsList = spotMapper.entitiesToShorthandDtos(pagedSpotShorthandResponse.getContent());
-
-
+        
         for(SpotShorthand spot : spotShorthandsList){
             lookupImagesService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
         }

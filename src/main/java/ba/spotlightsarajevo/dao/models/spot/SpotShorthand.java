@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -40,5 +41,11 @@ public class SpotShorthand implements Serializable, ObjectShorthand {
 
     @Schema(description = "Image URL of the category")
     private String imageUrl;
+
+    @Schema(description = "Date of creation")
+    private LocalDateTime created;
+
+    @Schema(description = "Date of last modification")
+    private LocalDateTime modified;
 
 }
