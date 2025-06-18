@@ -69,7 +69,7 @@ public class SecurityConfig {
                                 "/auth/system/register",
                                 "/auth/check-email"
                         ).permitAll()
-                        .requestMatchers("/**").hasRole("USER")
+                        .requestMatchers("/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
