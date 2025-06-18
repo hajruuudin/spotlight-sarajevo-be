@@ -29,12 +29,6 @@ public class SpotRestController {
         return spotService.create(new SSEntityRequest<SpotCreate>(request));
     }
 
-    @Operation(description = "Get all spots from the database with pagination")
-    @GetMapping
-    public ResponseEntity<Page<SpotModel>> getSpotsPaginated(){
-        return spotService.getSpotsPaginated(PageRequest.of(0, 5));
-    }
-
     @Operation(description = "Get spot shorthands from the database with pagination and an optional filtering (using search, sort and categories)")
     @GetMapping(value = "shorthands")
     public ResponseEntity<Page<SpotShorthand>> getSpotsShorthand(
@@ -65,9 +59,9 @@ public class SpotRestController {
         return spotService.getSpotOverviewBySlug(new SSEntityRequest<>(slug));
     }
 
+    /**=========== ADMIN ROUTES ============**/
+
     @Operation(description = "Delete a spot from the database")
     @DeleteMapping("/admin/{id}")
-    public void deleteSpot(@RequestParam Long id){
-
-    }
+    public void deleteSpot(@RequestParam Long id){}
 }
