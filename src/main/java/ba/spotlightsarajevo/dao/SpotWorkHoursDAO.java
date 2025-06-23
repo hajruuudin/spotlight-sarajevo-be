@@ -11,4 +11,5 @@ import java.util.List;
 public interface SpotWorkHoursDAO extends JpaRepository<SpotWorkHoursEntity, Integer> {
     @Query("SELECT swhe FROM SpotWorkHoursEntity swhe WHERE spotId = :id")
     List<SpotWorkHoursEntity> findAllBySpotId(Integer id);
+    void deleteAllBySpotId(Integer id);
 }

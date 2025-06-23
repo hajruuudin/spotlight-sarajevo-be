@@ -3,6 +3,7 @@ package ba.spotlightsarajevo.rest;
 import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
 import ba.spotlightsarajevo.dao.models.spot.SpotModel;
 import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
+import ba.spotlightsarajevo.dao.models.spot.SpotUpdate;
 import ba.spotlightsarajevo.service.definition.service.SpotService;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -63,5 +65,14 @@ public class SpotRestController {
 
     @Operation(description = "Delete a spot from the database")
     @DeleteMapping("/admin/{id}")
-    public void deleteSpot(@RequestParam Long id){}
+    public void deleteSpot(@RequestParam Long id){
+
+    }
+
+    @Operation(description = "Update a spot from the database")
+    @PutMapping(value = "/admin")
+    public ResponseEntity<SpotModel> updateSpot(@RequestBody SpotUpdate request, Principal principal){
+        System.out.println("THIS IS BEING CALLED");
+        return spotService.updateSpot(request, principal);
+    }
 }

@@ -5,12 +5,14 @@ import ba.spotlightsarajevo.dao.entities.*;
 import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
 import ba.spotlightsarajevo.dao.models.spot.SpotModel;
 import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
+import ba.spotlightsarajevo.dao.models.spot.SpotUpdate;
 import ba.spotlightsarajevo.enums.ObjectType;
 import ba.spotlightsarajevo.service.definition.mapper.SpotMapper;
 import ba.spotlightsarajevo.service.definition.service.SpotService;
 import ba.spotlightsarajevo.service.definition.validator.SpotValidator;
 import ba.spotlightsarajevo.utils.ObjectUtils;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.rmi.NoSuchObjectException;
+import java.security.Principal;
 import java.util.*;
 
 @AllArgsConstructor
@@ -26,6 +30,7 @@ public class SpotServiceImpl implements SpotService {
     SpotDAO spotDAO;
     CategoryDAO categoryDAO;
     TagDAO tagDAO;
+    UserDAO userDAO;
     ReviewDAO reviewDAO;
     SpotTagDAO spotTagDAO;
     SpotReviewStatsDAO spotReviewStatsDAO;
@@ -167,6 +172,46 @@ public class SpotServiceImpl implements SpotService {
             }
         } catch (Exception e){
             return ResponseEntity.status(400).body(null);
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<SpotModel> updateSpot(SpotUpdate request, Principal principal) {
+        try {
+            UserEntity adminUser = userDAO.findByEmail(principal.getName());
+
+            if(!adminUser.getIsAdmin()){
+                throw new IllegalAccessException();
+            } else {
+                Optional<SpotEntity> existingSpot = spotDAO.findById(request.getId());
+
+                if(!existingSpot.isPresent()){
+                    throw new NoSuchObjectException("");
+                } else {
+                    objectUtils.formatSpotUpdate
+                            (request,
+                            existingSpot.get(),
+                            adminUser,
+                            categoryDAO,
+                            tagDAO,
+                            spotTagDAO,
+                            spotWorkHoursDAO
+                    );
+
+                    SpotEntity updatedSpot = spotDAO.save(existingSpot.get());
+
+                    return ResponseEntity.ok(spotMapper.entityToDto(updatedSpot));
+                }
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Spot Update ERROR");
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("User cannot access this function");
+        } catch (NoSuchObjectException e) {
+            throw new RuntimeException("No Spot Object Found");
         }
     }
 
