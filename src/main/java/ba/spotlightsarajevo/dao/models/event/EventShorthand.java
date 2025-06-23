@@ -4,6 +4,7 @@ import ba.spotlightsarajevo.utils.ObjectShorthand;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -36,6 +37,12 @@ public class EventShorthand implements Serializable, ObjectShorthand {
 
     @Schema(description = "Tags names of the event")
     private List<String> tagNames;
+
+    @Schema(description = "Date of creation of the event")
+    private LocalDateTime created;
+
+    @Schema(description = "Date of modification")
+    private LocalDateTime modified;
 
     @Schema(description = "Image URL of the category")
     private String imageUrl;

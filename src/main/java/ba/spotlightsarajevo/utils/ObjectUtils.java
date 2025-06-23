@@ -2,12 +2,14 @@ package ba.spotlightsarajevo.utils;
 
 import ba.spotlightsarajevo.dao.*;
 import ba.spotlightsarajevo.dao.entities.*;
+import ba.spotlightsarajevo.dao.models.event.EventUpdate;
 import ba.spotlightsarajevo.dao.models.spot.SpotUpdate;
 import ba.spotlightsarajevo.dao.models.tag.TagUpdateModel;
 import ba.spotlightsarajevo.enums.WeekDay;
 import org.springframework.context.annotation.Configuration;
 
 import javax.swing.text.html.Option;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -229,5 +231,52 @@ public class ObjectUtils {
         String formattedEventStartDate = eventStartDate.format(reverseDateFormatter);
         entity.setStartDateFormatted(formattedEventStartDate);
         entity.setTagNames(tagNames);
+    }
+
+    public void formatEventUpdate(
+            EventUpdate update,
+            EventEntity entity,
+            UserEntity adminUser,
+            CategoryDAO categoryDAO,
+            TagDAO tagDAO,
+            EventTagDAO eventTagDAO
+    ){
+        /* NO FORMAT INFORMATION */
+        entity.setSlug(update.getSlug());
+        entity.setOfficialName(update.getOfficialName());
+        entity.setSmallDescription(update.getSmallDescription());
+        entity.setFullDescription(update.getFullDescription());
+        entity.setAddress(update.getAddress());
+
+        entity.setStartDate(LocalDateTime.parse(update.getStartDate()));
+        entity.setEndDate(LocalDateTime.parse(update.getEndDate()));
+
+        entity.setLocationDescription(update.getLocationDescription());
+
+        entity.setAgeLimit(update.getAgeLimit());
+        entity.setCancelRefund(update.getCancelRefund());
+        entity.setEventLanguage(update.getEventLanguage());
+        entity.setReservation(update.getReservation());
+        entity.setEntryPrice(BigDecimal.valueOf(update.getEntryPrice()));
+        entity.setOpenStatus(update.getOpenStatus());
+
+        entity.setModified(LocalDateTime.now());
+        entity.setModifiedBy(adminUser.getEmail());
+
+        /* UPDATING THE CATEGORY NAME */
+        Optional<CategoryEntity> categoryEntity = categoryDAO.findByCategoryName(update.getCategoryName());
+        categoryEntity.ifPresent(category -> entity.setCategoryId(category.getId()));
+
+        /* UPDATING THE TAG NAME / SEPARATE TABLE ACTION */
+        eventTagDAO.deleteAllByEventId(update.getId());
+        for (TagUpdateModel element : update.getTags()){
+            Optional<TagEntity> tagEntity = tagDAO.findByTagName(element.getTagName());
+            tagEntity.ifPresent(tag -> {
+                EventTagEntity eventTagEntity = new EventTagEntity();
+                eventTagEntity.setTagId(tag.getId());
+                eventTagEntity.setEventId(entity.getId());
+                eventTagDAO.save(eventTagEntity);
+            });
+        }
     }
 }
