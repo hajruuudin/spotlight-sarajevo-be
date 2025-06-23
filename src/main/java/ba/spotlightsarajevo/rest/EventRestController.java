@@ -2,6 +2,7 @@ package ba.spotlightsarajevo.rest;
 
 import ba.spotlightsarajevo.dao.models.event.EventModel;
 import ba.spotlightsarajevo.dao.models.event.EventShorthand;
+import ba.spotlightsarajevo.dao.models.event.EventUpdate;
 import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
 import ba.spotlightsarajevo.service.definition.service.EventService;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @Tag(name = "Event", description = "Event API")
@@ -50,5 +52,12 @@ public class EventRestController {
     @GetMapping(value = "overview/{slug}")
     public ResponseEntity<EventModel> getEventOverview(@PathVariable String slug){
         return eventService.getEventOverview(new SSEntityRequest<>(slug));
+    }
+
+    /*======= ADMIN ROUTES =======*/
+    @Operation(description = "Update an event object within the database")
+    @PutMapping(value = "/admin")
+    public ResponseEntity<EventModel> updateEvent(@RequestBody EventUpdate request, Principal principal){
+        return eventService.updateEvent(request, principal);
     }
 }

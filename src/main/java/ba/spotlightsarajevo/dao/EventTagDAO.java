@@ -13,4 +13,5 @@ import java.util.List;
 public interface EventTagDAO extends JpaRepository<EventTagEntity, Integer> {
     @Query("SELECT ee FROM EventTagEntity ee WHERE ee.eventId = :id")
     List<EventTagEntity> findAllTagsById(Integer id);
+    void deleteAllByEventId(Integer id);
 }

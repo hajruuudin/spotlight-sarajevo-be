@@ -11,4 +11,5 @@ import java.util.List;
 public interface SpotTagDAO extends JpaRepository<SpotTagEntity, Integer> {
     @Query("SELECT se FROM SpotTagEntity se WHERE se.spotId = :id")
     List<SpotTagEntity> findAllTagsById(Integer id);
+    void deleteAllBySpotId(Integer id);
 }

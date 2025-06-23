@@ -7,7 +7,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface CategoryDAO extends JpaRepository<CategoryEntity, Integer> {
     @NotNull Page<CategoryEntity> findAll(@NotNull Pageable request);
+    Optional<CategoryEntity> findByCategoryName(String categoryName);
 }
