@@ -1,5 +1,6 @@
 package ba.spotlightsarajevo.rest;
 
+import ba.spotlightsarajevo.dao.models.event.EventCreate;
 import ba.spotlightsarajevo.dao.models.event.EventModel;
 import ba.spotlightsarajevo.dao.models.event.EventShorthand;
 import ba.spotlightsarajevo.dao.models.event.EventUpdate;
@@ -55,6 +56,12 @@ public class EventRestController {
     }
 
     /*======= ADMIN ROUTES =======*/
+    @Operation(description = "Add a new event to the database")
+    @PostMapping(value = "/admin")
+    public ResponseEntity<EventModel> addEvent(@RequestBody EventCreate request, Principal principal){
+        return eventService.create(request, principal);
+    }
+
     @Operation(description = "Update an event object within the database")
     @PutMapping(value = "/admin")
     public ResponseEntity<EventModel> updateEvent(@RequestBody EventUpdate request, Principal principal){

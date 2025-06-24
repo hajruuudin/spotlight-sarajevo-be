@@ -1,6 +1,7 @@
 package ba.spotlightsarajevo.dao.models.event;
 
 import ba.spotlightsarajevo.dao.models.tag.TagUpdateModel;
+import ba.spotlightsarajevo.utils.EventModificator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Data
 @Schema(description = "Properties for an Event update request")
-public class EventUpdate implements Serializable {
+public class EventUpdate implements Serializable, EventModificator {
     @Serial
     private static final long serialVersionUID = 1L;
 

@@ -21,7 +21,13 @@ public class MediaStoreModel implements Serializable {
     private Integer itemId;
 
     @Schema(description = "Category of the object that needs the image (event, spot or system registered user)")
-    private ObjectType itemCategory;
+    private String itemCategory;
+
+    @Schema(description = "Image url of the object")
+    private String imageUrl;
+
+    @Schema(description = "Thumbnail status")
+    private Boolean isThumbnail;
 
     @Schema(description = "Date of creation of the object")
     private LocalDateTime created;

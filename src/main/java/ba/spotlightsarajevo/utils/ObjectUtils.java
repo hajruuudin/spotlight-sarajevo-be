@@ -2,6 +2,7 @@ package ba.spotlightsarajevo.utils;
 
 import ba.spotlightsarajevo.dao.*;
 import ba.spotlightsarajevo.dao.entities.*;
+import ba.spotlightsarajevo.dao.models.event.EventCreate;
 import ba.spotlightsarajevo.dao.models.event.EventUpdate;
 import ba.spotlightsarajevo.dao.models.spot.SpotUpdate;
 import ba.spotlightsarajevo.dao.models.tag.TagUpdateModel;
@@ -275,6 +276,55 @@ public class ObjectUtils {
                 EventTagEntity eventTagEntity = new EventTagEntity();
                 eventTagEntity.setTagId(tag.getId());
                 eventTagEntity.setEventId(entity.getId());
+                eventTagDAO.save(eventTagEntity);
+            });
+        }
+    }
+    public void addEventBase(
+            EventCreate create,
+            EventEntity entity,
+            UserEntity adminUser,
+            CategoryDAO categoryDAO
+    ){
+        /* NO FORMAT INFORMATION */
+        entity.setSlug(create.getSlug());
+        entity.setOfficialName(create.getOfficialName());
+        entity.setSmallDescription(create.getSmallDescription());
+        entity.setFullDescription(create.getFullDescription());
+        entity.setAddress(create.getAddress());
+
+        entity.setStartDate(LocalDateTime.parse(create.getStartDate()));
+        entity.setEndDate(LocalDateTime.parse(create.getEndDate()));
+
+        entity.setLocationDescription(create.getLocationDescription());
+
+        entity.setAgeLimit(create.getAgeLimit());
+        entity.setCancelRefund(create.getCancelRefund());
+        entity.setEventLanguage(create.getEventLanguage());
+        entity.setReservation(create.getReservation());
+        entity.setEntryPrice(BigDecimal.valueOf(create.getEntryPrice()));
+        entity.setOpenStatus(create.getOpenStatus());
+
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy(adminUser.getEmail());
+
+        /* CREATING THE CATEGORY NAME */
+        Optional<CategoryEntity> categoryEntity = categoryDAO.findByCategoryName(create.getCategoryName());
+        categoryEntity.ifPresent(category -> entity.setCategoryId(category.getId()));
+    }
+
+    public void addEventTags(
+            EventCreate create,
+            EventEntity newEntity,
+            TagDAO tagDAO,
+            EventTagDAO eventTagDAO
+    ){
+        for (TagUpdateModel element : create.getTags()){
+            Optional<TagEntity> tagEntity = tagDAO.findByTagName(element.getTagName());
+            tagEntity.ifPresent(tag -> {
+                EventTagEntity eventTagEntity = new EventTagEntity();
+                eventTagEntity.setTagId(tag.getId());
+                eventTagEntity.setEventId(newEntity.getId());
                 eventTagDAO.save(eventTagEntity);
             });
         }
