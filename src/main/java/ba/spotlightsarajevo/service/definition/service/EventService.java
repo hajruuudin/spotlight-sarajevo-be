@@ -13,7 +13,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface EventService {
-    ResponseEntity<EventModel> create(final SSEntityRequest<EventCreate> request);
+    ResponseEntity<EventModel> create(EventCreate request, Principal principal);
 
     ResponseEntity<Page<EventShorthand>> getEventsShorthand(PageRequest request, String search, String sort, List<Integer> categoryIds);
 

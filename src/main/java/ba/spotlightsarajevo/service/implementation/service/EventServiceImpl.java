@@ -46,8 +46,30 @@ public class EventServiceImpl implements EventService {
     private static final DateTimeFormatter reverseDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d");
 
     @Override
-    public ResponseEntity<EventModel> create(SSEntityRequest<EventCreate> request) {
-        return null;
+    @Transactional
+    public ResponseEntity<EventModel> create(EventCreate request, Principal principal) {
+        try {
+            UserEntity adminUser = userDAO.findByEmail(principal.getName());
+
+            if(!adminUser.getIsAdmin()){
+                throw new IllegalAccessException();
+            } else {
+                EventEntity newEvent = new EventEntity();
+                objectUtils.addEventBase(request, newEvent, adminUser, categoryDAO);
+
+                EventEntity addedEvent = eventDAO.save(newEvent);
+
+                objectUtils.addEventTags(request, addedEvent, tagDAO, eventTagDAO);
+
+                return ResponseEntity.ok(eventMapper.entityToDto(addedEvent));
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Event Create ERROR");
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("User cannot access this function");
+        }
     }
 
     @Override
@@ -167,14 +189,7 @@ public class EventServiceImpl implements EventService {
                 if(!existingEvent.isPresent()){
                     throw new NoSuchObjectException("");
                 } else {
-                    objectUtils.formatEventUpdate
-                            (request,
-                                    existingEvent.get(),
-                                    adminUser,
-                                    categoryDAO,
-                                    tagDAO,
-                                    eventTagDAO
-                            );
+                    objectUtils.formatEventUpdate(request, existingEvent.get(), adminUser, categoryDAO, tagDAO, eventTagDAO);
 
                     EventEntity updatedEvent = eventDAO.save(existingEvent.get());
 

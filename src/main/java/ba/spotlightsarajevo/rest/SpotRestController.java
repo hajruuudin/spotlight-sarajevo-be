@@ -25,12 +25,6 @@ import java.util.Map;
 public class SpotRestController {
     SpotService spotService;
 
-    @Operation(description = "Add a new spot to the system")
-    @PostMapping
-    public ResponseEntity<SpotModel> create(@RequestBody SpotCreate request){
-        return spotService.create(new SSEntityRequest<SpotCreate>(request));
-    }
-
     @Operation(description = "Get spot shorthands from the database with pagination and an optional filtering (using search, sort and categories)")
     @GetMapping(value = "shorthands")
     public ResponseEntity<Page<SpotShorthand>> getSpotsShorthand(
@@ -67,6 +61,12 @@ public class SpotRestController {
     @DeleteMapping("/admin/{id}")
     public void deleteSpot(@RequestParam Long id){
 
+    }
+
+    @Operation(description = "Add a spot to the database")
+    @PostMapping(value = "/admin")
+    public ResponseEntity<SpotModel> createSpot(@RequestBody SpotCreate request, Principal principal){
+        return spotService.create(request, principal);
     }
 
     @Operation(description = "Update a spot from the database")
