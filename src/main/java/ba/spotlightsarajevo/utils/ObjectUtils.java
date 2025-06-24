@@ -4,6 +4,7 @@ import ba.spotlightsarajevo.dao.*;
 import ba.spotlightsarajevo.dao.entities.*;
 import ba.spotlightsarajevo.dao.models.event.EventCreate;
 import ba.spotlightsarajevo.dao.models.event.EventUpdate;
+import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
 import ba.spotlightsarajevo.dao.models.spot.SpotUpdate;
 import ba.spotlightsarajevo.dao.models.tag.TagUpdateModel;
 import ba.spotlightsarajevo.enums.WeekDay;
@@ -210,8 +211,132 @@ public class ObjectUtils {
             sunday.setEndTime(LocalTime.parse(update.getSundayEndTime()));
             spotWorkHoursDAO.save(sunday);
         }
-
     }
+
+    public void addSpotBase(
+            SpotCreate create,
+            SpotEntity entity,
+            UserEntity adminUser,
+            CategoryDAO categoryDAO
+    ){
+        entity.setSlug(create.getSlug());
+        entity.setOfficialName(create.getOfficialName());
+        entity.setSmallDescription(create.getSmallDescription());
+        entity.setFullDescription(create.getFullDescription());
+        entity.setLatitude(create.getLat());
+        entity.setLongitude(create.getLon());
+        entity.setAddress(create.getAddress());
+
+        entity.setCleanliness(create.getCleanliness());
+        entity.setAffordability(create.getAffordability());
+        entity.setAccessibility(create.getAccessibility());
+        entity.setStaffKindness(create.getStaffKindness());
+        entity.setQuality(create.getOverallQuality());
+        entity.setAtmosphere(create.getAtmosphere());
+
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy(adminUser.getEmail());
+
+        /* UPDATING THE CATEGORY NAME */
+        Optional<CategoryEntity> categoryEntity = categoryDAO.findByCategoryName(create.getCategoryName());
+        categoryEntity.ifPresent(category -> entity.setCategoryId(category.getId()));
+    }
+
+    public void addSpotTags(
+            SpotCreate create,
+            SpotEntity entity,
+            UserEntity adminUser,
+            TagDAO tagDAO,
+            SpotTagDAO spotTagDAO
+    ){
+        for (TagUpdateModel element : create.getTags()){
+            Optional<TagEntity> tagEntity = tagDAO.findByTagName(element.getTagName());
+            tagEntity.ifPresent(tag -> {
+                SpotTagEntity spotTagEntity = new SpotTagEntity();
+                spotTagEntity.setTagId(tag.getId());
+                spotTagEntity.setSpotId(entity.getId());
+                spotTagDAO.save(spotTagEntity);
+            });
+        }
+    }
+
+    public void addSpotWorkHours(
+            SpotCreate update,
+            SpotEntity entity,
+            SpotWorkHoursDAO spotWorkHoursDAO
+    ){
+        if (update.getMondayStartTime() != null && update.getMondayEndTime() != null &&
+                !update.getMondayStartTime().isEmpty() && !update.getMondayEndTime().isEmpty()) {
+            SpotWorkHoursEntity monday = new SpotWorkHoursEntity();
+            monday.setDay(WeekDay.MON);
+            monday.setSpotId(entity.getId());
+            monday.setStartTime(LocalTime.parse(update.getMondayStartTime()));
+            monday.setEndTime(LocalTime.parse(update.getMondayEndTime()));
+            spotWorkHoursDAO.save(monday);
+        }
+
+        if (update.getTuesdayStartTime() != null && update.getTuesdayEndTime() != null &&
+                !update.getTuesdayStartTime().isEmpty() && !update.getTuesdayEndTime().isEmpty()) {
+            SpotWorkHoursEntity tuesday = new SpotWorkHoursEntity();
+            tuesday.setDay(WeekDay.TUE);
+            tuesday.setSpotId(entity.getId());
+            tuesday.setStartTime(LocalTime.parse(update.getTuesdayStartTime()));
+            tuesday.setEndTime(LocalTime.parse(update.getTuesdayEndTime()));
+            spotWorkHoursDAO.save(tuesday);
+        }
+
+        if (update.getWednesdayStartTime() != null && update.getWednesdayEndTime() != null &&
+                !update.getWednesdayStartTime().isEmpty() && !update.getWednesdayEndTime().isEmpty()) {
+            SpotWorkHoursEntity wednesday = new SpotWorkHoursEntity();
+            wednesday.setDay(WeekDay.WED);
+            wednesday.setSpotId(entity.getId());
+            wednesday.setStartTime(LocalTime.parse(update.getWednesdayStartTime()));
+            wednesday.setEndTime(LocalTime.parse(update.getWednesdayEndTime()));
+            spotWorkHoursDAO.save(wednesday);
+        }
+
+        if (update.getThursdayStartTime() != null && update.getThursdayEndTime() != null &&
+                !update.getThursdayStartTime().isEmpty() && !update.getThursdayEndTime().isEmpty()) {
+            SpotWorkHoursEntity thursday = new SpotWorkHoursEntity();
+            thursday.setDay(WeekDay.THU);
+            thursday.setSpotId(entity.getId());
+            thursday.setStartTime(LocalTime.parse(update.getThursdayStartTime()));
+            thursday.setEndTime(LocalTime.parse(update.getThursdayEndTime()));
+            spotWorkHoursDAO.save(thursday);
+        }
+
+        if (update.getFridayStartTime() != null && update.getFridayEndTime() != null &&
+                !update.getFridayStartTime().isEmpty() && !update.getFridayEndTime().isEmpty()) {
+            SpotWorkHoursEntity friday = new SpotWorkHoursEntity();
+            friday.setDay(WeekDay.FRI);
+            friday.setSpotId(entity.getId());
+            friday.setStartTime(LocalTime.parse(update.getFridayStartTime()));
+            friday.setEndTime(LocalTime.parse(update.getFridayEndTime()));
+            spotWorkHoursDAO.save(friday);
+        }
+
+        if (update.getSaturdayStartTime() != null && update.getSaturdayEndTime() != null &&
+                !update.getSaturdayStartTime().isEmpty() && !update.getSaturdayEndTime().isEmpty()) {
+            SpotWorkHoursEntity saturday = new SpotWorkHoursEntity();
+            saturday.setDay(WeekDay.SAT);
+            saturday.setSpotId(entity.getId());
+            saturday.setStartTime(LocalTime.parse(update.getSaturdayStartTime()));
+            saturday.setEndTime(LocalTime.parse(update.getSaturdayEndTime()));
+            spotWorkHoursDAO.save(saturday);
+        }
+
+        if (update.getSundayStartTime() != null && update.getSundayEndTime() != null &&
+                !update.getSundayStartTime().isEmpty() && !update.getSundayEndTime().isEmpty()) {
+            SpotWorkHoursEntity sunday = new SpotWorkHoursEntity();
+            sunday.setDay(WeekDay.SUN);
+            sunday.setSpotId(entity.getId());
+            sunday.setStartTime(LocalTime.parse(update.getSundayStartTime()));
+            sunday.setEndTime(LocalTime.parse(update.getSundayEndTime()));
+            spotWorkHoursDAO.save(sunday);
+        }
+    }
+
+
 
     public void setEventInformation(CategoryDAO categoryDAO, EventTagDAO eventTagDAO, TagDAO tagDAO, EventEntity entity){
         /* SETTING THE EVENT CATEGORIES */
@@ -280,6 +405,7 @@ public class ObjectUtils {
             });
         }
     }
+
     public void addEventBase(
             EventCreate create,
             EventEntity entity,

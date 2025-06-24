@@ -13,7 +13,7 @@ import java.security.Principal;
 import java.util.List;
 
 public interface SpotService {
-    ResponseEntity<SpotModel> create(final SSEntityRequest<SpotCreate> request);
+    ResponseEntity<SpotModel> create(SpotCreate request, Principal principal);
 
     ResponseEntity<Page<SpotModel>> getSpotsPaginated(PageRequest request);
 

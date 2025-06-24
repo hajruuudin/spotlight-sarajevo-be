@@ -42,14 +42,30 @@ public class SpotServiceImpl implements SpotService {
     ObjectUtils objectUtils;
 
     @Override
-    public ResponseEntity<SpotModel> create(SSEntityRequest<SpotCreate> request) {
-        SpotCreate spotCreate = request.getData();
-        spotValidator.validateCreateRequest(spotCreate);
+    public ResponseEntity<SpotModel> create(SpotCreate request, Principal principal) {
+        try {
+            UserEntity adminUser = userDAO.findByEmail(principal.getName());
 
-        SpotEntity newEntity = spotMapper.dtoToEntity(spotCreate);
-        spotDAO.save(newEntity);
+            if(!adminUser.getIsAdmin()){
+                throw new IllegalAccessException();
+            } else {
+                SpotEntity newSpot = new SpotEntity();
+                objectUtils.addSpotBase(request, newSpot, adminUser, categoryDAO);
 
-        return ResponseEntity.ok(spotMapper.entityToDto(newEntity));
+                SpotEntity addedSpot = spotDAO.save(newSpot);
+
+                objectUtils.addSpotTags(request, addedSpot, adminUser, tagDAO, spotTagDAO);
+                objectUtils.addSpotWorkHours(request, addedSpot, spotWorkHoursDAO);
+
+                return ResponseEntity.ok(spotMapper.entityToDto(addedSpot));
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Event Create ERROR");
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("User cannot access this function");
+        }
     }
 
     @Override
