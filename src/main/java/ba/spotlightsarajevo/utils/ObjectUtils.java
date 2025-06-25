@@ -227,6 +227,7 @@ public class ObjectUtils {
         entity.setLongitude(create.getLon());
         entity.setAddress(create.getAddress());
 
+        entity.setRating(create.getRating());
         entity.setCleanliness(create.getCleanliness());
         entity.setAffordability(create.getAffordability());
         entity.setAccessibility(create.getAccessibility());

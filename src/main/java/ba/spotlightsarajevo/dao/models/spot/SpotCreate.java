@@ -85,6 +85,9 @@ public class SpotCreate implements Serializable {
     @Schema(description = "Sunday end time")
     private String sundayEndTime;
 
+    @Schema(description = "Admin Initial Rating")
+    private BigDecimal rating;
+
     @Schema(description = "Affordability score")
     private BigDecimal affordability;
 
