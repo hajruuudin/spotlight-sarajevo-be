@@ -38,5 +38,4 @@ public class CommunityRequestModel implements Serializable {
     @Schema(description = "The full description of the request, including its data")
     private String requestDescription;
 
-    // OVDJE TREBA DODAT SPECIFICNE CONFIGURACIJE AS NEEDED U ZAVISNOSTI OD REQUEST I OBJECT TYPE
 }
