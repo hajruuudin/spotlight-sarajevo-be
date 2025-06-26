@@ -75,4 +75,10 @@ public class AuthRestController {
     public ResponseEntity<Map<String, Object>> checkEmail(@RequestParam String email){
         return authService.checkEmail(email);
     }
+
+    @Operation(description = "Log a user out of his sessions")
+    @PostMapping(value = "/logout")
+    public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
+        return authService.logout(response);
+    }
 }

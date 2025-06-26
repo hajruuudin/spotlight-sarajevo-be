@@ -14,23 +14,15 @@ public class CommunityRequestCreate implements Serializable {
     @Serial
     private static final long versionUUId = 1L;
 
-    @Schema(description = "User identifier that the request belongs to")
-    private Integer userId;
-
-    @Schema(description = "User identifier that the request belongs to")
-    private String userName;
-
     @Schema(description = "Type of the request: adding, editing or reporting an error")
-    private CommunityRequestType requestType;
+    private String requestType;
 
     @Schema(description = "Type of the object that is being added or edited")
-    private ObjectType objectType;
+    private String objectType;
 
     @Schema(description = "The name of the request")
     private String requestName;
 
     @Schema(description = "The full description of the request, including its data")
     private String requestDescription;
-
-    // OVDJE TREBA DODAT SPECIFICNE CONFIGURACIJE AS NEEDED U ZAVISNOSTI OD REQUEST I OBJECT TYPE
 }

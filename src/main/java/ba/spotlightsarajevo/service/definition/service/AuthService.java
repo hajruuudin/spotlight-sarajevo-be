@@ -21,4 +21,5 @@ public interface AuthService {
     ResponseEntity<Map<String, Object>> loginGoogle(Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException;
     ResponseEntity<Map<String, Object>> loginSystem(SystemLogin request, HttpServletResponse servletResponse);
     ResponseEntity<Map<String, Object>> checkEmail(String email);
+    ResponseEntity<Map<String, Object>> logout(HttpServletResponse response);
 }

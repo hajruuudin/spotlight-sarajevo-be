@@ -260,6 +260,26 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Override
+    public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
+        Cookie deleteCookie = new Cookie(JWT_COOKIE_NAME, null);
+        deleteCookie.setPath("/");
+        deleteCookie.setHttpOnly(true);
+        deleteCookie.setMaxAge(0);
+
+        String appEnv = System.getenv("APP_ENVIRONMENT");
+        StringBuilder cookieHeader = new StringBuilder(deleteCookie.getName() + "=; Path=" + deleteCookie.getPath() + "; HttpOnly; Max-Age=0");
+
+        if ("production".equals(appEnv)) {
+            cookieHeader.append("; Secure");
+            cookieHeader.append("; SameSite=None");
+        }
+
+        response.setHeader("Set-Cookie", cookieHeader.toString());
+
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+    }
+
     private GoogleIdToken verifyGoogleToken(String idTokenString) throws GeneralSecurityException, IOException {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
                 .setAudience(Collections.singletonList("564056268905-9j2u47hutljdrv2rgepipilpgp2ogh3e.apps.googleusercontent.com"))
