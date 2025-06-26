@@ -14,8 +14,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.rmi.NoSuchObjectException;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -48,12 +50,54 @@ public class CommunityRequestServiceImpl implements CommunityRequestService {
     }
 
     @Override
-    public ResponseEntity<List<CommunityRequestModel>> findAll() {
-        return null;
+    public ResponseEntity<List<CommunityRequestModel>> findAll(Principal principal) {
+        try {
+            UserEntity userEntity = userDAO.findByEmail(principal.getName());
+
+            if(!userEntity.getIsAdmin()){
+                throw new IllegalAccessException();
+            } else {
+                List<CommunityRequestEntity> entities = communityRequestDAO.findAll();
+
+                List<CommunityRequestModel> models = communityRequestMapper.entitiesToDtos(entities);
+
+                return ResponseEntity.ok(models);
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Community Request Find ERROR");
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("User cannot access this function");
+        }
     }
 
     @Override
-    public ResponseEntity<Boolean> delete(Integer requestId) {
-        return null;
+    public ResponseEntity<Boolean> delete(Integer requestId, Principal principal) {
+        try {
+            UserEntity userEntity = userDAO.findByEmail(principal.getName());
+
+            if(!userEntity.getIsAdmin()){
+                throw new IllegalAccessException();
+            } else {
+                Optional<CommunityRequestEntity> entity = communityRequestDAO.findById(requestId);
+
+                if(entity.isPresent()){
+                    communityRequestDAO.delete(entity.get());
+                    return ResponseEntity.ok(true);
+                } else {
+                    throw new NoSuchObjectException("");
+                }
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Community Request Delete ERROR");
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            throw new RuntimeException("User cannot access this function");
+        } catch (NoSuchObjectException e) {
+            e.printStackTrace();
+            throw new RuntimeException("No such community request with specified id");
+        }
     }
 }
