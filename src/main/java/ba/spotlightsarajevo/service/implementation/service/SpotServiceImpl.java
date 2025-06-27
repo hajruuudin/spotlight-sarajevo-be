@@ -2,10 +2,7 @@ package ba.spotlightsarajevo.service.implementation.service;
 
 import ba.spotlightsarajevo.dao.*;
 import ba.spotlightsarajevo.dao.entities.*;
-import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
-import ba.spotlightsarajevo.dao.models.spot.SpotModel;
-import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
-import ba.spotlightsarajevo.dao.models.spot.SpotUpdate;
+import ba.spotlightsarajevo.dao.models.spot.*;
 import ba.spotlightsarajevo.enums.ObjectType;
 import ba.spotlightsarajevo.service.definition.mapper.SpotMapper;
 import ba.spotlightsarajevo.service.definition.service.SpotService;
@@ -85,6 +82,33 @@ public class SpotServiceImpl implements SpotService {
         );
 
         return ResponseEntity.ok(spotResponse);
+    }
+
+    @Override
+    public ResponseEntity<List<SpotLocationModel>> getLocationData(String search) {
+        List<SpotEntity> entities = spotDAO.findAllSearched(search);
+
+        List<SpotLocationModel> locationModels = new ArrayList<>();
+
+        for(SpotEntity entity : entities){
+            SpotLocationModel spotLocationModel = new SpotLocationModel();
+
+            spotLocationModel.setSlug(entity.getSlug());
+            spotLocationModel.setLattitude(entity.getLatitude());
+            spotLocationModel.setLongitude(entity.getLongitude());
+            spotLocationModel.setOfficialName(entity.getOfficialName());
+
+            Optional<CategoryEntity> category = categoryDAO.findById(entity.getCategoryId());
+            if(category.isPresent()){
+                spotLocationModel.setCategoryName(category.get().getCategoryName());
+            }
+
+            lookupImagesService.lookupThumbnailImage(spotLocationModel, ObjectType.SPOT, entity.getId());
+
+            locationModels.add(spotLocationModel);
+        }
+
+        return ResponseEntity.ok(locationModels);
     }
 
     @Override

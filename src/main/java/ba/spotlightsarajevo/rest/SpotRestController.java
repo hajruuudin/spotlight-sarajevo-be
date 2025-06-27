@@ -1,9 +1,6 @@
 package ba.spotlightsarajevo.rest;
 
-import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
-import ba.spotlightsarajevo.dao.models.spot.SpotModel;
-import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
-import ba.spotlightsarajevo.dao.models.spot.SpotUpdate;
+import ba.spotlightsarajevo.dao.models.spot.*;
 import ba.spotlightsarajevo.service.definition.service.SpotService;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +32,12 @@ public class SpotRestController {
             @RequestParam(value = "categories", required = false) List<Integer> categoryIds
             ){
         return spotService.getSpotsShorthand(PageRequest.of(pageNumber, pageSize), search, sort, categoryIds);
+    }
+
+    @Operation(description = "Get spot location data with the slug as well")
+    @GetMapping(value = "location-data")
+    public ResponseEntity<List<SpotLocationModel>> getLocationData(@RequestParam(value = "search", required = false) String search){
+        return spotService.getLocationData(search);
     }
 
     @Operation(description = "Gets a shorthand headline(random spot) from the database")
