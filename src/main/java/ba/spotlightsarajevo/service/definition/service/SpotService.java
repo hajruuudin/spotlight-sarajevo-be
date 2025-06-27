@@ -1,9 +1,6 @@
 package ba.spotlightsarajevo.service.definition.service;
 
-import ba.spotlightsarajevo.dao.models.spot.SpotCreate;
-import ba.spotlightsarajevo.dao.models.spot.SpotModel;
-import ba.spotlightsarajevo.dao.models.spot.SpotShorthand;
-import ba.spotlightsarajevo.dao.models.spot.SpotUpdate;
+import ba.spotlightsarajevo.dao.models.spot.*;
 import ba.spotlightsarajevo.utils.SSEntityRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +13,8 @@ public interface SpotService {
     ResponseEntity<SpotModel> create(SpotCreate request, Principal principal);
 
     ResponseEntity<Page<SpotModel>> getSpotsPaginated(PageRequest request);
+
+    ResponseEntity<List<SpotLocationModel>> getLocationData(String search);
 
     ResponseEntity<Page<SpotShorthand>> getSpotsShorthand(PageRequest request, String search, String sort, List<Integer> categoryIds);
 

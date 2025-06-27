@@ -32,4 +32,7 @@ public interface SpotDAO extends JpaRepository<SpotEntity, Integer> {
     Page<SpotEntity> findAllByCategoryId(Pageable request, Integer categoryId);
 
     SpotEntity findBySlug(String slug);
+
+    @Query("SELECT se FROM SpotEntity se WHERE (:search IS NULL OR :search = '' OR LOWER(se.officialName) LIKE LOWER(CONCAT('%', :search, '%'))) ")
+    List<SpotEntity> findAllSearched(String search);
 }
