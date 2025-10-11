@@ -18,4 +18,4 @@ spring:
     locations: classpath:db/migration
 
 server:
-  port: ${PORT}
+  port: ${PORT:8080}
