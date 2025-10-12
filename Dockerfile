@@ -1,19 +1,19 @@
 FROM ubuntu:latest
 LABEL authors="hajrudin.imamovic"
 
-# Use OpenJDK 23 (match your local Java version)
+# Use OpenJDK 21 and make the application with all the JDK 21 essential tools
 FROM eclipse-temurin:21-jdk-jammy
 
-# Set working directory
+# Set working directory to /app, so all files are locate here
 WORKDIR /app
 
-# Copy Maven wrapper and project files
+# Copy Maven wrapper and project files from the java project.
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
 
-# Build the app
+# Build the app with a standard maven clean command
 RUN ./mvnw clean package -DskipTests
 
 # Expose the port that Render assigns

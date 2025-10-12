@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate  # verify schema consistency
+      ddl-auto: validate
     show-sql: false
 
   flyway:
