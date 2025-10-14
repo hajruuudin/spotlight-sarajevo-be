@@ -24,3 +24,10 @@ logging:
   level:
     org.springframework: INFO
     com.spotlight-sarajevo: DEBUG
+
+springdoc:
+  api-docs:
+    path: /spotlight-sarajevo-api
+  swagger-ui:
+    oauth:
+      app-name: Spotlight Sarajevo
