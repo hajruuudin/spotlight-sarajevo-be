@@ -7,6 +7,7 @@ import com.spotlightsarajevo.dao.models.spot.SpotModel;
 import com.spotlightsarajevo.dao.models.spot.SpotUpdateModel;
 import com.spotlightsarajevo.service.definition.SpotService;
 import com.spotlightsarajevo.service.mappers.SpotMapper;
+import com.spotlightsarajevo.utils.exceptions.SpotExceptions;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.rmi.NoSuchObjectException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +41,7 @@ public class SpotServiceImpl implements SpotService {
 
             return ResponseEntity.status(200).body(responseList);
         } catch (Exception e) {
-            throw new RuntimeException("ERROR: Spot Find All Error");
+            throw new SpotExceptions.SpotNotFoundException("ERROR");
         }
     }
 
@@ -56,7 +56,7 @@ public class SpotServiceImpl implements SpotService {
 
             return ResponseEntity.status(200).body(spotMapper.entityToDto(addedEntity));
         } catch (Exception e){
-            throw new RuntimeException("ERROR - Spot Add Error:" + e);
+            throw new SpotExceptions.SpotCreationException("Could not create spot");
         }
     }
 
@@ -65,7 +65,7 @@ public class SpotServiceImpl implements SpotService {
         try{
             Optional<SpotEntity> existingSpot = spotDAO.findById(spotUpdateModel.getId());
 
-            if(!existingSpot.isPresent()){
+            if(existingSpot.isEmpty()){
                 throw new NoSuchObjectException("No Spot with given ID Found");
             } else {
                 spotMapper.updateEntityFromDto(spotUpdateModel, existingSpot.get());
@@ -77,9 +77,9 @@ public class SpotServiceImpl implements SpotService {
                 return ResponseEntity.status(200).body(spotMapper.entityToDto(existingSpot.get()));
             }
         } catch (NoSuchObjectException e) {
-            throw new RuntimeException("No such spot found");
+            throw new SpotExceptions.SpotNotFoundException(spotUpdateModel.getId().toString());
         } catch (Exception e){
-            throw new RuntimeException("ERROR - Spot Update Error" + e);
+            throw new SpotExceptions.SpotConflictException("Could not update spot");
         }
     }
 
@@ -96,7 +96,7 @@ public class SpotServiceImpl implements SpotService {
                 throw new RuntimeException();
             }
         } catch (Exception e){
-            throw new RuntimeException("ERROR - Spot Delete Error" + e);
+            throw new SpotExceptions.SpotUnauthorizedException("Could not delete spot");
         }
     }
 }

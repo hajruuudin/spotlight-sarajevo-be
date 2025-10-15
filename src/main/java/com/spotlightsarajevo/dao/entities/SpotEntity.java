@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,25 +23,25 @@ public class SpotEntity implements Serializable {
     @Column(name = "slug")
     private String slug;
 
-    @Column(name = "official_name")
+    @Column(name = "official_name", columnDefinition = "VARCHAR", length = 40)
     private String officialName;
 
-    @Column(name = "small_description_bs")
+    @Column(name = "small_description_bs", columnDefinition = "VARCHAR", length = 60)
     private String smallDescriptionBs;
 
-    @Column(name = "small_description_en")
+    @Column(name = "small_description_en", columnDefinition = "VARCHAR", length = 60)
     private String smallDescriptionEn;
 
-    @Column(name = "full_description_bs")
+    @Column(name = "full_description_bs", columnDefinition = "TEXT")
     private String fullDescriptionBs;
 
-    @Column(name = "full_description_en")
+    @Column(name = "full_description_en", columnDefinition = "TEXT")
     private String fullDescriptionEn;
 
-    @Column(name = "latitude")
+    @Column(name = "latitude", columnDefinition = "NUMERIC")
     private BigDecimal latitude;
 
-    @Column(name = "longitude")
+    @Column(name = "longitude", columnDefinition = "NUMERIC")
     private BigDecimal longitude;
 
     @Column(name = "address")
@@ -51,25 +50,25 @@ public class SpotEntity implements Serializable {
     @Column(name = "category_id")
     private Integer categoryId;
 
-    @Column(name = "initial_overall_rating")
+    @Column(name = "initial_overall_rating", columnDefinition = "NUMERIC")
     private BigDecimal initialOverallRating;
 
-    @Column(name = "initial_cleanliness")
+    @Column(name = "initial_cleanliness", columnDefinition = "NUMERIC")
     private BigDecimal initialCleanliness;
 
-    @Column(name = "initial_affordability")
+    @Column(name = "initial_affordability", columnDefinition = "NUMERIC")
     private BigDecimal initialAffordability;
 
-    @Column(name = "initial_accessibility")
+    @Column(name = "initial_accessibility", columnDefinition = "NUMERIC")
     private BigDecimal initialAccessibility;
 
-    @Column(name = "initial_staff_kindness")
+    @Column(name = "initial_staff_kindness", columnDefinition = "NUMERIC")
     private BigDecimal initialStaffKindness;
 
-    @Column(name = "initial_locale_quality")
+    @Column(name = "initial_locale_quality", columnDefinition = "NUMERIC")
     private BigDecimal initialLocaleQuality;
 
-    @Column(name = "initial_atmosphere")
+    @Column(name = "initial_atmosphere", columnDefinition = "NUMERIC")
     private BigDecimal initialAtmosphere;
 
     @Column(name = "created")
