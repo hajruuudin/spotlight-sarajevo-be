@@ -296,7 +296,7 @@ BEFORE INSERT ON ss_event_review
 FOR EACH ROW
 EXECUTE FUNCTION check_event_ended();
 
-create table if not exists ss_transport_method ( -- SHOULD BE IGNORED
+create table if not exists ss_transport_method (
 	id serial primary key,
 	transport_name varchar(255) not null,
 	transport_description_bs text not null,

@@ -68,7 +68,7 @@ public class EventEntity implements Serializable {
     @Column(name = "event_long", columnDefinition = "NUMERIC", nullable = false)
     private BigDecimal eventLong;
 
-    @Column(name = "location", columnDefinition = "VARCHAR", length = 255, nullable = false)
+    @Column(name = "location", columnDefinition = "VARCHAR", nullable = false)
     private String location;
 
     @Column(name = "organiser_id", nullable = false)
