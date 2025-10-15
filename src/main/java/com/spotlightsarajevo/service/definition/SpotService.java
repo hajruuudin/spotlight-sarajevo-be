@@ -1,12 +1,10 @@
 package com.spotlightsarajevo.service.definition;
 
-import com.spotlightsarajevo.dao.entities.SpotEntity;
-import com.spotlightsarajevo.dao.models.spot.SpotCreateModel;
-import com.spotlightsarajevo.dao.models.spot.SpotModel;
-import com.spotlightsarajevo.dao.models.spot.SpotUpdateModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotCreateModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotUpdateModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 public interface SpotService {

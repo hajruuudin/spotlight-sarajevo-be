@@ -1,9 +1,9 @@
 package com.spotlightsarajevo.service.mappers;
 
-import com.spotlightsarajevo.dao.entities.SpotEntity;
-import com.spotlightsarajevo.dao.models.spot.SpotCreateModel;
-import com.spotlightsarajevo.dao.models.spot.SpotModel;
-import com.spotlightsarajevo.dao.models.spot.SpotUpdateModel;
+import com.spotlightsarajevo.dao.entity.SpotEntity;
+import com.spotlightsarajevo.dao.dto.spot.SpotCreateModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotUpdateModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 

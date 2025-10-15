@@ -1,8 +1,8 @@
 package com.spotlightsarajevo.rest;
 
-import com.spotlightsarajevo.dao.models.spot.SpotCreateModel;
-import com.spotlightsarajevo.dao.models.spot.SpotModel;
-import com.spotlightsarajevo.dao.models.spot.SpotUpdateModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotCreateModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotUpdateModel;
 import com.spotlightsarajevo.service.definition.SpotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

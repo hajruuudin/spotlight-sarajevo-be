@@ -1,10 +1,10 @@
 package com.spotlightsarajevo.service.implementation;
 
 import com.spotlightsarajevo.dao.access.SpotDAO;
-import com.spotlightsarajevo.dao.entities.SpotEntity;
-import com.spotlightsarajevo.dao.models.spot.SpotCreateModel;
-import com.spotlightsarajevo.dao.models.spot.SpotModel;
-import com.spotlightsarajevo.dao.models.spot.SpotUpdateModel;
+import com.spotlightsarajevo.dao.entity.SpotEntity;
+import com.spotlightsarajevo.dao.dto.spot.SpotCreateModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotModel;
+import com.spotlightsarajevo.dao.dto.spot.SpotUpdateModel;
 import com.spotlightsarajevo.service.definition.SpotService;
 import com.spotlightsarajevo.service.mappers.SpotMapper;
 import com.spotlightsarajevo.utils.exceptions.SpotExceptions;
