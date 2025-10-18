@@ -1,4 +1,4 @@
-package com.example.spotlight_sarajevo;
+package com.spotlightsarajevo.spotlight_sarajevo;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

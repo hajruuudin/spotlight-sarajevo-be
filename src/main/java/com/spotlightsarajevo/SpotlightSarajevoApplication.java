@@ -1,4 +1,4 @@
-package com.example.spotlight_sarajevo;
+package com.spotlightsarajevo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
