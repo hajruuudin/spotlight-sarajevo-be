@@ -28,20 +28,26 @@ public class UserEntity implements Serializable {
     @Column(name = "last_name", columnDefinition = "VARCHAR", length = 255, nullable = false)
     private String lastName;
 
+    @Column(name = "registration_type", columnDefinition = "VARCHAR", nullable = false)
+    private String registrationType;
+
+    @Column(name = "sys_email", columnDefinition = "VARCHAR", length = 255)
+    private String sysEmail;
+
+    @Column(name = "sys_password", columnDefinition = "VARCHAR", length = 15)
+    private String sysPassword;
+
+    @Column(name = "google_id", columnDefinition = "VARCHAR", length = 255)
+    private String googleId;
+
+    @Column(name = "google_email", columnDefinition = "VARCHAR", length = 255)
+    private String googleEmail;
+
     @Column(name = "is_premium")
     private Boolean isPremium;
 
     @Column(name = "is_admin")
     private Boolean isAdmin;
-
-    @Column(name = "category_01")
-    private Integer category01;
-
-    @Column(name = "category_02")
-    private Integer category02;
-
-    @Column(name = "category_03")
-    private Integer category03;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
