@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
-import java.util.prefs.Preferences;
 
 public interface AuthService {
     ResponseEntity<Map<String, Object>> storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException;

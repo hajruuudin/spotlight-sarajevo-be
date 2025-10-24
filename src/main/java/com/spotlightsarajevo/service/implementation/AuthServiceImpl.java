@@ -1,11 +1,16 @@
 package com.spotlightsarajevo.service.implementation;
 
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.spotlightsarajevo.dao.access.UserDAO;
 import com.spotlightsarajevo.dao.dto.userauth.*;
+import com.spotlightsarajevo.dao.entity.UserEntity;
 import com.spotlightsarajevo.service.definition.AuthService;
+import com.spotlightsarajevo.utils.exceptions.AuthExceptions;
+import com.spotlightsarajevo.utils.helpers.Constants;
+import com.spotlightsarajevo.utils.helpers.UtilsFunctions;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -14,20 +19,48 @@ import java.security.GeneralSecurityException;
 import java.util.Map;
 
 @Service
+@AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private final GsonFactory jsonFactory = new GsonFactory();
-    private final NetHttpTransport transport = new NetHttpTransport();
-
-    private static final String GOOGLE_USER_INFO_SESSION_KEY = "googleUserInfo";
-    private static final String SYSTEM_USER_INFO_SESSION_KEY = "systemUserInfo";
-
-    private static final String JWT_COOKIE_NAME = "spo-sar";
-    private static final int JWT_COOKIE_MAX_AGE_SECONDS = 1000 * 60 * 60 * 24;
-
+    UserDAO userDAO;
 
     @Override
     public ResponseEntity<Map<String, Object>> storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
-        return null;
+        String idTokenString = payload.get("idToken");
+
+        if(idTokenString == null){
+            throw new AuthExceptions.GoogleRegisterException("Id token not found");
+        } else {
+            GoogleIdToken finalIdToken = UtilsFunctions.verifyGoogleToken(idTokenString);
+
+            if(finalIdToken != null){
+                GoogleIdToken.Payload tokenPayload = finalIdToken.getPayload();
+
+                // Extract user information
+                String googleId = tokenPayload.getSubject();
+                String email = tokenPayload.getEmail();
+                String firstName = (String) tokenPayload.get("given_name");
+                String lastName = (String) tokenPayload.get("family_name");
+
+                UserEntity checkUserEntity = userDAO.findByGoogleId(googleId);
+
+                if(checkUserEntity != null){
+                    return ResponseEntity.status(400).body(Map.of("message", "An account is already registered to that email. Please log in!"));
+                }
+
+                // Store this information in the session temporarily
+                GoogleUserModel googleUserInfo = new GoogleUserModel();
+                googleUserInfo.setGoogleId(googleId);
+                googleUserInfo.setEmail(email);
+                googleUserInfo.setFirstName(firstName);
+                googleUserInfo.setLastName(lastName);
+
+                session.setAttribute(Constants.GOOGLE_USER_INFO_SESSION_KEY, googleUserInfo);
+
+                return ResponseEntity.status(200).body(Map.of("message", "Successfully stored Google data to session", "firstName", googleUserInfo.getFirstName()));
+            } else {
+                throw new AuthExceptions.GoogleRegisterException("Google could not verify Your ID token!");
+            }
+        }
     }
 
     @Override
@@ -64,4 +97,6 @@ public class AuthServiceImpl implements AuthService {
     public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
         return null;
     }
+
+
 }
