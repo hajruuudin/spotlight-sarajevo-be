@@ -21,21 +21,6 @@ public class UserAuthDetailsEntity implements Serializable {
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 
-    @Column(name = "registration_type", columnDefinition = "VARCHAR", nullable = false)
-    private String registrationType;
-
-    @Column(name = "sys_email", columnDefinition = "VARCHAR", length = 255)
-    private String sysEmail;
-
-    @Column(name = "sys_password", columnDefinition = "VARCHAR", length = 15)
-    private String sysPassword;
-
-    @Column(name = "google_id", columnDefinition = "VARCHAR", length = 255)
-    private String googleId;
-
-    @Column(name = "google_email", columnDefinition = "VARCHAR", length = 255)
-    private String googleEmail;
-
     @Column(name = "email_verified")
     private Boolean emailVerified;
 

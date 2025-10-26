@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 public class SpotExceptions {
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public static class SpotNotFoundException extends RuntimeException{
+    public static class SpotNotFoundException extends RuntimeException {
         public SpotNotFoundException(String message){
             super("ERROR - Spot with identifier not found: " + message);
         }
