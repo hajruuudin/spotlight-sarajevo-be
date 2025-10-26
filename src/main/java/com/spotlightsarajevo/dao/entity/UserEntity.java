@@ -28,13 +28,16 @@ public class UserEntity implements Serializable {
     @Column(name = "last_name", columnDefinition = "VARCHAR", length = 255, nullable = false)
     private String lastName;
 
+    @Column(name = "username", columnDefinition = "VARCHAR", length = 255, nullable = false, unique = true)
+    private String username;
+
     @Column(name = "registration_type", columnDefinition = "VARCHAR", nullable = false)
     private String registrationType;
 
     @Column(name = "sys_email", columnDefinition = "VARCHAR", length = 255)
     private String sysEmail;
 
-    @Column(name = "sys_password", columnDefinition = "VARCHAR", length = 15)
+    @Column(name = "sys_password", columnDefinition = "VARCHAR", length = 255)
     private String sysPassword;
 
     @Column(name = "google_id", columnDefinition = "VARCHAR", length = 255)
@@ -54,4 +57,16 @@ public class UserEntity implements Serializable {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "question_one")
+    private Boolean questionOne;
+
+    @Column(name = "question_two")
+    private Boolean questionTwo;
+
+    @Column(name = "question_three")
+    private Boolean questionThree;
+
+    @Column(name = "question_four")
+    private Boolean questionFour;
 }

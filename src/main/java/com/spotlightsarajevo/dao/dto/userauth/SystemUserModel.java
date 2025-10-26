@@ -17,6 +17,9 @@ public class SystemUserModel implements Serializable {
     @Schema(description = "Last name")
     private String lastName;
 
+    @Schema(description = "Username of the user. Generated initially by the system")
+    private String username;
+
     @Schema(description = "Email of the user")
     private String email;
 

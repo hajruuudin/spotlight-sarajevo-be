@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.rmi.NoSuchObjectException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 
@@ -16,6 +17,5 @@ public interface AuthService {
     ResponseEntity<UserModel> registerBySystem(SystemUserModel systemData, PreferencesModel preferencesModel);
     ResponseEntity<Map<String, Object>> loginGoogle(Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException;
     ResponseEntity<Map<String, Object>> loginSystem(SystemLoginModel request, HttpServletResponse servletResponse);
-    ResponseEntity<Map<String, Object>> checkEmail(String email);
     ResponseEntity<Map<String, Object>> logout(HttpServletResponse response);
 }

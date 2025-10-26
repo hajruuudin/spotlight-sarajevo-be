@@ -6,10 +6,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserDAO extends JpaRepository<UserEntity, Integer> {
     @Query("SELECT u FROM UserEntity u WHERE u.sysEmail = :email OR u.googleEmail = :email")
-    UserEntity findBySysEmailOrGoogleEmail(@Param("email") String email);
+    Optional<UserEntity> findBySysEmailOrGoogleEmail(@Param("email") String email);
 
-    UserEntity findByGoogleId(String googleId);
+    Optional<UserEntity> findByGoogleId(String googleId);
+
+    Optional<UserEntity> findBySysEmail(String email);
+
+    Optional<UserEntity> findByGoogleEmail(String email);
 }

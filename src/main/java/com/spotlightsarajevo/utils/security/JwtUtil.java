@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "YOUR_SUPER_SECRET_KEY_CHANGE_THIS"; // replace later with env variable
+    private static final String SECRET_KEY = System.getenv("JWT_SECRET_STRING"); // replace later with env variable
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -37,7 +37,7 @@ public class JwtUtil {
     }
 
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64URL.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

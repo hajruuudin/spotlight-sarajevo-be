@@ -19,6 +19,9 @@ public class GoogleUserModel implements Serializable {
     @Schema(description = "User's last name from Google")
     private String lastName;
 
+    @Schema(description = "Username of the user. Generated initially by the system")
+    private String username;
+
     @Schema(description = "User's locale from Google (may be null)")
     private String locale;
 

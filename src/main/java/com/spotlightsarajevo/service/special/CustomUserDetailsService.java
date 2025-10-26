@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
@@ -17,14 +19,22 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         try{
-            UserEntity user = userDAO.findBySysEmailOrGoogleEmail(email);
+            Optional<UserEntity> optionalUser = userDAO.findBySysEmailOrGoogleEmail(email);
             String userUsername;
             String userRole;
             String userPassword;
 
-            if(user.getSysEmail().length() > 1){
+            UserEntity user = new UserEntity();
+
+            if(optionalUser.isPresent()){
+                user = optionalUser.get();
+            } else {
+                throw new RuntimeException("User not found");
+            }
+
+            if(user.getRegistrationType().equals("SYSTEM")){
                 userUsername = user.getSysEmail();
-            } else if (user.getGoogleEmail().length() > 1){
+            } else if (user.getRegistrationType().equals("GOOGLE")){
                 userUsername = user.getGoogleEmail();
             } else {
                 throw new RuntimeException("Email not identified: SPRING SECURITY");
@@ -36,7 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 userRole = "USER";
             }
 
-            if(user.getSysEmail().length() > 1){
+            if(user.getRegistrationType().equals("SYSTEM")){
                 userPassword = user.getSysPassword();
             } else {
                 userPassword = "GOOGLE_AUTH_NO_PASS";
