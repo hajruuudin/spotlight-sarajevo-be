@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = System.getenv("JWT_SECRET_STRING"); // replace later with env variable
+    private static final String SECRET_KEY = System.getenv("JWT_SECRET_STRING");
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
