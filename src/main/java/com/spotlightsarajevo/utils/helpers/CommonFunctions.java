@@ -5,29 +5,28 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.spotlightsarajevo.dao.access.CollectionDAO;
+import com.spotlightsarajevo.dao.access.SpotCategoryDAO;
 import com.spotlightsarajevo.dao.access.UserFavouriteEventsDAO;
 import com.spotlightsarajevo.dao.access.UserFavouriteSpotsDAO;
 import com.spotlightsarajevo.dao.dto.userauth.GoogleUserModel;
 import com.spotlightsarajevo.dao.dto.userauth.PreferencesModel;
 import com.spotlightsarajevo.dao.dto.userauth.SystemUserModel;
-import com.spotlightsarajevo.dao.entity.CollectionEntity;
-import com.spotlightsarajevo.dao.entity.UserEntity;
-import com.spotlightsarajevo.dao.entity.UserFavouriteEventsEntity;
-import com.spotlightsarajevo.dao.entity.UserFavouriteSpotsEntity;
+import com.spotlightsarajevo.dao.entity.*;
 import com.spotlightsarajevo.service.implementation.AuthServiceImpl;
 import com.spotlightsarajevo.utils.enums.ObjectType;
 import com.spotlightsarajevo.utils.exceptions.AuthExceptions;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import com.spotlightsarajevo.dao.entity.CollectionSpotEntity;
-import com.spotlightsarajevo.dao.entity.CollectionEventEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -38,6 +37,7 @@ public class CommonFunctions {
     UserFavouriteSpotsDAO userFavouriteSpotsDAO;
     UserFavouriteEventsDAO userFavouriteEventsDAO;
     CollectionDAO collectionDAO;
+    SpotCategoryDAO spotCategoryDAO;
 
     /**
      * Method to verify google id token received from the frontend upon Google authentication.<br/>
@@ -175,5 +175,16 @@ public class CommonFunctions {
         jwtCookie.setMaxAge(CommonConstants.JWT_COOKIE_MAX_AGE_SECONDS);
         jwtCookie.setPath("/");
         response.addCookie(jwtCookie);
+    }
+
+    public void setSpotCategoriesAndRating(SpotEntity entity){
+        Optional<SpotCategoryEntity> category = spotCategoryDAO.findById(entity.getCategoryId());
+        BigDecimal combinedReview = entity.getReviewStats().getCombinedRating();
+
+        if (category.isPresent()){
+            entity.setCategoryNameBs(category.get().getSpotCategoryNameBs());
+            entity.setCategoryNameEn(category.get().getSpotCategoryNameEn());
+        }
+        entity.setCombinedRating(combinedReview);
     }
 }

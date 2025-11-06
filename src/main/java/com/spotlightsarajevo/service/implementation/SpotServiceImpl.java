@@ -1,22 +1,32 @@
 package com.spotlightsarajevo.service.implementation;
 
 import com.spotlightsarajevo.dao.access.SpotDAO;
+import com.spotlightsarajevo.dao.dto.spot.SpotShorthandModel;
 import com.spotlightsarajevo.dao.entity.SpotEntity;
 import com.spotlightsarajevo.dao.dto.spot.SpotCreateModel;
 import com.spotlightsarajevo.dao.dto.spot.SpotModel;
 import com.spotlightsarajevo.dao.dto.spot.SpotUpdateModel;
 import com.spotlightsarajevo.service.definition.SpotService;
 import com.spotlightsarajevo.service.mappers.SpotMapper;
+import com.spotlightsarajevo.utils.enums.ExceptionCodes;
+import com.spotlightsarajevo.utils.enums.SortingOptions;
 import com.spotlightsarajevo.utils.exceptions.SpotExceptions;
+import com.spotlightsarajevo.utils.helpers.CommonFunctions;
+import com.spotlightsarajevo.utils.specifications.SpotSpecifications;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.rmi.NoSuchObjectException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +35,7 @@ import java.util.Optional;
 public class SpotServiceImpl implements SpotService {
     SpotDAO spotDAO;
     SpotMapper spotMapper;
+    CommonFunctions utils;
 
     @Override
     public ResponseEntity<Page<SpotModel>> findAll(PageRequest pageRequest) {
@@ -43,6 +54,34 @@ public class SpotServiceImpl implements SpotService {
         } catch (Exception e) {
             throw new SpotExceptions.SpotNotFoundException("ERROR");
         }
+    }
+
+    @Override
+    public ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds) {
+        if(pageRequest == null){
+            throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
+        }
+
+        PageRequest endPageRequest = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+
+        Specification<SpotEntity> spec = Specification
+                .allOf(SpotSpecifications.hasSearchTerm(searchTerm))
+                .and(SpotSpecifications.hasCategories(categoryIds));
+
+        Page<SpotEntity> spotEntities = spotDAO.findAll(spec, endPageRequest);
+
+        for(SpotEntity spotEntity : spotEntities.getContent()){
+            utils.setSpotCategoriesAndRating(spotEntity);
+        }
+
+        // IMPLEMENT SORTING
+
+        Page<SpotShorthandModel> responseList = new PageImpl<>(
+                spotMapper.entitiesToShorthandDtos(spotEntities.getContent()),
+                endPageRequest,
+                spotEntities.getTotalElements()
+        );
+        return ResponseEntity.status(200).body(responseList);
     }
 
     @Override

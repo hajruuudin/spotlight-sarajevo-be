@@ -1,9 +1,9 @@
 package com.spotlightsarajevo.utils.exceptions;
 
 import com.spotlightsarajevo.service.implementation.SpotServiceImpl;
+import com.spotlightsarajevo.utils.enums.ExceptionCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
 
 public class SpotExceptions {
     /**
@@ -63,6 +63,21 @@ public class SpotExceptions {
     public static class SpotConflictException extends RuntimeException {
         public SpotConflictException(String message) {
             super(message);
+        }
+    }
+
+    /**
+     * Thrown when an error occurs during any spot operation which could contain invalid input formats.
+     *
+     * <p>This exception is typically thrown from {@link SpotServiceImpl}
+     * when providing parameters which do not conform to the required method specification (e.g. providing null params).</p>
+     *
+     * @see GlobalExceptionHandler
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public static class SpotSystemException extends RuntimeException {
+        public SpotSystemException(ExceptionCodes.SpotExceptionCodes message) {
+            super(message.toString());
         }
     }
 }

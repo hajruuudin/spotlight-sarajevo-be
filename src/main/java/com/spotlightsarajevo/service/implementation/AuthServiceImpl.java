@@ -199,8 +199,8 @@ public class AuthServiceImpl implements AuthService {
                                     userEntity.get().getId(),
                                     userEntity.get().getFirstName(),
                                     userEntity.get().getLastName(),
-                                    userEntity.get().getUsername(),
                                     userEntity.get().getGoogleEmail(),
+                                    userEntity.get().getUsername(),
                                     userEntity.get().getIsAdmin(),
                                     userEntity.get().getIsPremium()
                             )
@@ -236,8 +236,8 @@ public class AuthServiceImpl implements AuthService {
                                 entity.get().getId(),
                                 entity.get().getFirstName(),
                                 entity.get().getLastName(),
-                                entity.get().getUsername(),
                                 entity.get().getSysEmail(),
+                                entity.get().getUsername(),
                                 entity.get().getIsAdmin(),
                                 entity.get().getIsPremium()
                         )

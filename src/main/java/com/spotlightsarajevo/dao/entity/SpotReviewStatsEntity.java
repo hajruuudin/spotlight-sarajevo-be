@@ -1,18 +1,19 @@
 package com.spotlightsarajevo.dao.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import net.jcip.annotations.Immutable;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@ToString
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "ss_spot_review_stats") // DATABASE VIEW REFERENCE, SHOULD NOT BE UPDATABLE / EXTENDED
+@Immutable
+@Table(name = "ss_spot_review_stats")
 public class SpotReviewStatsEntity implements Serializable {
     @Id
     @Column(name = "spot_id")
