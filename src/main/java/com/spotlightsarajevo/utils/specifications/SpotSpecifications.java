@@ -2,7 +2,8 @@ package com.spotlightsarajevo.utils.specifications;
 
 import com.spotlightsarajevo.dao.entity.SpotEntity;
 import com.spotlightsarajevo.utils.enums.SortingOptions;
-import org.springframework.data.domain.Sort;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -24,11 +25,33 @@ public class SpotSpecifications {
 
     public static Specification<SpotEntity> hasCategories(List<Integer> categoryIds){
         return (root, query, criteriaBuilder) -> {
-            if (categoryIds.isEmpty()){
+            if (categoryIds == null){
                 return criteriaBuilder.conjunction();
             }
 
             return root.get("categoryId").in(categoryIds);
+        };
+    }
+
+    public static Specification<SpotEntity> withDynamicSorting(String sortOption) {
+        return (root, query, criteriaBuilder) -> {
+
+            SortingOptions sorting;
+            try {
+                sorting = SortingOptions.valueOf(sortOption.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                sorting = SortingOptions.ALPHABETICAL;
+            }
+
+            switch (sorting) {
+                case ALPHABETICAL -> query.orderBy(criteriaBuilder.asc(root.get("officialName")));
+                case RATING -> {
+                    Join<Object, Object> reviewStatsJoin = root.join("reviewStats", JoinType.LEFT);
+                    query.orderBy(criteriaBuilder.desc(reviewStatsJoin.get("combinedRating")));
+                }
+            }
+
+            return criteriaBuilder.conjunction();
         };
     }
 

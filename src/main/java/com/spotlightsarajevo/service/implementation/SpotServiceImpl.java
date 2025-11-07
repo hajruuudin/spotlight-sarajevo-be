@@ -25,10 +25,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.rmi.NoSuchObjectException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @AllArgsConstructor
 @Service
@@ -66,15 +63,14 @@ public class SpotServiceImpl implements SpotService {
 
         Specification<SpotEntity> spec = Specification
                 .allOf(SpotSpecifications.hasSearchTerm(searchTerm))
-                .and(SpotSpecifications.hasCategories(categoryIds));
+                .and(SpotSpecifications.hasCategories(categoryIds))
+                .and(SpotSpecifications.withDynamicSorting(sortOption));
 
         Page<SpotEntity> spotEntities = spotDAO.findAll(spec, endPageRequest);
 
         for(SpotEntity spotEntity : spotEntities.getContent()){
             utils.setSpotCategoriesAndRating(spotEntity);
         }
-
-        // IMPLEMENT SORTING
 
         Page<SpotShorthandModel> responseList = new PageImpl<>(
                 spotMapper.entitiesToShorthandDtos(spotEntities.getContent()),
