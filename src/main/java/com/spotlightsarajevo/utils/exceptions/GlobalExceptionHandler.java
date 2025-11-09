@@ -16,6 +16,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, "Spot Find Error", ex.getMessage());
     }
 
+    @ExceptionHandler(SpotExceptions.SpotSystemException.class)
+    public ResponseEntity<?> handleSpotSystemException(SpotExceptions.SpotSystemException ex){
+        return buildResponse(HttpStatus.BAD_REQUEST, "Spot System Error", ex.getMessage());
+    }
+
     @ExceptionHandler(SpotExceptions.SpotCreationException.class)
     public ResponseEntity<?> handleSpotCreationException(SpotExceptions.SpotCreationException ex){
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Spot Creation Error", ex.getMessage());

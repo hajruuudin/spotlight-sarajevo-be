@@ -3,7 +3,9 @@ package com.spotlightsarajevo.dao.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.jcip.annotations.Immutable;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -82,4 +84,19 @@ public class SpotEntity implements Serializable {
 
     @Column(name = "modified_by")
     private String modifiedBy;
+
+    // Full Review Stats Object
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName = "spot_id", insertable = false, updatable = false)
+    private SpotReviewStatsEntity reviewStats;
+
+    @Transient
+    private String categoryNameBs;
+
+    @Transient
+    private String categoryNameEn;
+
+    @Transient
+    private BigDecimal combinedRating;
+
 }
