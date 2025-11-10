@@ -35,4 +35,7 @@ public class SpotShorthandModel implements Serializable {
 
     @Schema(description = "The average rating of the spot taken from the spot review stats view")
     private BigDecimal combinedRating;
+
+    @Schema(description = "The thumbnail image of the spot")
+    private String thumbnailImage;
 }

@@ -25,7 +25,7 @@ public class SpotSpecifications {
 
     public static Specification<SpotEntity> hasCategories(List<Integer> categoryIds){
         return (root, query, criteriaBuilder) -> {
-            if (categoryIds == null){
+            if (categoryIds.isEmpty()){
                 return criteriaBuilder.conjunction();
             }
 

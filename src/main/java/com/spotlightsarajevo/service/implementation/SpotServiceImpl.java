@@ -6,9 +6,11 @@ import com.spotlightsarajevo.dao.entity.SpotEntity;
 import com.spotlightsarajevo.dao.dto.spot.SpotCreateModel;
 import com.spotlightsarajevo.dao.dto.spot.SpotModel;
 import com.spotlightsarajevo.dao.dto.spot.SpotUpdateModel;
+import com.spotlightsarajevo.service.definition.LookupImagesService;
 import com.spotlightsarajevo.service.definition.SpotService;
 import com.spotlightsarajevo.service.mappers.SpotMapper;
 import com.spotlightsarajevo.utils.enums.ExceptionCodes;
+import com.spotlightsarajevo.utils.enums.ObjectType;
 import com.spotlightsarajevo.utils.enums.SortingOptions;
 import com.spotlightsarajevo.utils.exceptions.SpotExceptions;
 import com.spotlightsarajevo.utils.helpers.CommonFunctions;
@@ -32,6 +34,7 @@ import java.util.*;
 public class SpotServiceImpl implements SpotService {
     SpotDAO spotDAO;
     SpotMapper spotMapper;
+    LookupImagesService lookupImagesService;
     CommonFunctions utils;
 
     @Override
@@ -70,6 +73,7 @@ public class SpotServiceImpl implements SpotService {
 
         for(SpotEntity spotEntity : spotEntities.getContent()){
             utils.setSpotCategoriesAndRating(spotEntity);
+            lookupImagesService.lookupThumbnailImage(spotEntity, ObjectType.SPOT, spotEntity.getId());
         }
 
         Page<SpotShorthandModel> responseList = new PageImpl<>(

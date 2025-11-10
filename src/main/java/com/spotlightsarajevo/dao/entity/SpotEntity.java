@@ -99,4 +99,7 @@ public class SpotEntity implements Serializable {
     @Transient
     private BigDecimal combinedRating;
 
+    @Transient
+    private String thumbnailImage;
+
 }

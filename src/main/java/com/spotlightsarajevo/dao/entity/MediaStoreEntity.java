@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.dao.entity;
 
+import com.spotlightsarajevo.utils.enums.ObjectType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,8 +23,9 @@ public class MediaStoreEntity implements Serializable {
     @Column(name = "item_id")
     private Integer itemId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "item_category", columnDefinition = "VARCHAR", length = 255, nullable = false)
-    private String itemCategory;
+    private ObjectType itemCategory;
 
     @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
