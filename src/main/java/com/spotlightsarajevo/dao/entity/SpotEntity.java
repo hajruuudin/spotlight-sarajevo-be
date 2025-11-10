@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.dao.entity;
 
+import com.spotlightsarajevo.dao.dto.tag.TagModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import net.jcip.annotations.Immutable;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -101,5 +103,8 @@ public class SpotEntity implements Serializable {
 
     @Transient
     private String thumbnailImage;
+
+    @Transient
+    private List<TagModel> spotTags;
 
 }

@@ -73,6 +73,7 @@ public class SpotServiceImpl implements SpotService {
 
         for(SpotEntity spotEntity : spotEntities.getContent()){
             utils.setSpotCategoriesAndRating(spotEntity);
+            utils.setSpotTags(spotEntity);
             lookupImagesService.lookupThumbnailImage(spotEntity, ObjectType.SPOT, spotEntity.getId());
         }
 

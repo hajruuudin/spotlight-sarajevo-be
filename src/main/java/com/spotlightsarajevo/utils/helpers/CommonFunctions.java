@@ -4,15 +4,13 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
-import com.spotlightsarajevo.dao.access.CollectionDAO;
-import com.spotlightsarajevo.dao.access.SpotCategoryDAO;
-import com.spotlightsarajevo.dao.access.UserFavouriteEventsDAO;
-import com.spotlightsarajevo.dao.access.UserFavouriteSpotsDAO;
+import com.spotlightsarajevo.dao.access.*;
 import com.spotlightsarajevo.dao.dto.userauth.GoogleUserModel;
 import com.spotlightsarajevo.dao.dto.userauth.PreferencesModel;
 import com.spotlightsarajevo.dao.dto.userauth.SystemUserModel;
 import com.spotlightsarajevo.dao.entity.*;
 import com.spotlightsarajevo.service.implementation.AuthServiceImpl;
+import com.spotlightsarajevo.service.mappers.TagMapper;
 import com.spotlightsarajevo.utils.enums.ObjectType;
 import com.spotlightsarajevo.utils.exceptions.AuthExceptions;
 import jakarta.servlet.http.Cookie;
@@ -24,6 +22,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +37,10 @@ public class CommonFunctions {
     UserFavouriteEventsDAO userFavouriteEventsDAO;
     CollectionDAO collectionDAO;
     SpotCategoryDAO spotCategoryDAO;
+    TagDAO tagDAO;
+    SpotTagsDAO spotTagsDAO;
+    EventTagsDAO eventTagsDAO;
+    TagMapper tagMapper;
 
     /**
      * Method to verify google id token received from the frontend upon Google authentication.<br/>
@@ -186,5 +189,22 @@ public class CommonFunctions {
             entity.setCategoryNameEn(category.get().getSpotCategoryNameEn());
         }
         entity.setCombinedRating(combinedReview);
+    }
+
+    public void setSpotTags(SpotEntity entity){
+        List<TagEntity> tagEntities = new ArrayList<>();
+        List<SpotTagsEntity> spotTags = spotTagsDAO.findBySpotId(entity.getId());
+
+        for(SpotTagsEntity spotTag : spotTags){
+            Optional<TagEntity> tag = tagDAO.findById(spotTag.getTagId());
+
+            if(tag.isPresent()){
+                tagEntities.add(tag.get());
+            } else {
+                // Do some logging or something
+            }
+        }
+
+        entity.setSpotTags(tagMapper.entitiesToDtos(tagEntities));
     }
 }

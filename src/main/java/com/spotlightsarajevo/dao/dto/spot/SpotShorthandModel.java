@@ -1,11 +1,13 @@
 package com.spotlightsarajevo.dao.dto.spot;
 
+import com.spotlightsarajevo.dao.dto.tag.TagModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 
 @Data
 @Schema(description = "Properties for a spot shorthand model")
@@ -38,4 +40,7 @@ public class SpotShorthandModel implements Serializable {
 
     @Schema(description = "The thumbnail image of the spot")
     private String thumbnailImage;
+
+    @Schema(description = "Tags related to the spot")
+    private List<TagModel> spotTags;
 }
