@@ -15,7 +15,7 @@ public class SpotSpecifications {
                 return criteriaBuilder.conjunction();
             }
 
-            String pattern = "%" + searchTerm + "%";
+            String pattern = "%" + searchTerm.toLowerCase() + "%";
 
             return criteriaBuilder.or(
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("officialName")), pattern)
