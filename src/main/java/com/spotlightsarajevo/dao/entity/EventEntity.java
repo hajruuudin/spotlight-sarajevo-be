@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.dao.entity;
 
+import com.spotlightsarajevo.dao.dto.tag.TagModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -73,4 +75,19 @@ public class EventEntity implements Serializable {
 
     @Column(name = "organiser_id", nullable = false)
     private Integer organiserId;
+
+    @Transient
+    private String categoryNameBs;
+
+    @Transient
+    private String categoryNameEn;
+
+    @Transient
+    private BigDecimal combinedRating;
+
+    @Transient
+    private String thumbnailImage;
+
+    @Transient
+    private List<TagModel> eventTags;
 }

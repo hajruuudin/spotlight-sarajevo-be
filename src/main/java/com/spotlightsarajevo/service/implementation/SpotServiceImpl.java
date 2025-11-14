@@ -62,6 +62,10 @@ public class SpotServiceImpl implements SpotService {
             throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
         }
 
+        if(categoryIds == null){
+            categoryIds = new ArrayList<>();
+        }
+
         PageRequest endPageRequest = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
 
         Specification<SpotEntity> spec = Specification

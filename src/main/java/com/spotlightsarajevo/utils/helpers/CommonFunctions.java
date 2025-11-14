@@ -37,6 +37,7 @@ public class CommonFunctions {
     UserFavouriteEventsDAO userFavouriteEventsDAO;
     CollectionDAO collectionDAO;
     SpotCategoryDAO spotCategoryDAO;
+    EventCategoryDAO eventCategoryDAO;
     TagDAO tagDAO;
     SpotTagsDAO spotTagsDAO;
     EventTagsDAO eventTagsDAO;
@@ -191,6 +192,15 @@ public class CommonFunctions {
         entity.setCombinedRating(combinedReview);
     }
 
+    public void setEventCategories(EventEntity entity){
+        Optional<EventCategoryEntity> category = eventCategoryDAO.findById(entity.getCategoryId());
+
+        if (category.isPresent()){
+            entity.setCategoryNameBs(category.get().getEventCategoryNameBs());
+            entity.setCategoryNameEn(category.get().getEventCategoryNameBs());
+        }
+    }
+
     public void setSpotTags(SpotEntity entity){
         List<TagEntity> tagEntities = new ArrayList<>();
         List<SpotTagsEntity> spotTags = spotTagsDAO.findBySpotId(entity.getId());
@@ -206,5 +216,22 @@ public class CommonFunctions {
         }
 
         entity.setSpotTags(tagMapper.entitiesToDtos(tagEntities));
+    }
+
+    public void setEventTags(EventEntity entity){
+        List<TagEntity> tagEntities = new ArrayList<>();
+        List<EventTagsEntity> eventTags = eventTagsDAO.findByEventId(entity.getId());
+
+        for(EventTagsEntity eventTag : eventTags){
+            Optional<TagEntity> tag = tagDAO.findById(eventTag.getTagId());
+
+            if(tag.isPresent()){
+                tagEntities.add(tag.get());
+            } else {
+                // Do some logging or something
+            }
+        }
+
+        entity.setEventTags(tagMapper.entitiesToDtos(tagEntities));
     }
 }
