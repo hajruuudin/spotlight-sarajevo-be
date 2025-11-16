@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.utils.exceptions;
 
+import com.spotlightsarajevo.utils.enums.ExceptionCodes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -36,6 +37,33 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.UNAUTHORIZED, "Spot Unauthorised Error", ex.getMessage());
     }
     /*==== SPOT EXCEPTIONS END ====*/
+
+    /*==== EVENT EXCEPTIONS START ====*/
+    @ExceptionHandler(EventExceptions.EventNotFoundException.class)
+    public ResponseEntity<?> handleEventNotFoundException(EventExceptions.EventNotFoundException ex){
+        return buildResponse(HttpStatus.NOT_FOUND, "Event Find Error", ex.getMessage());
+    }
+
+    @ExceptionHandler(EventExceptions.EventSystemException.class)
+    public ResponseEntity<?> handleEventSystemException(EventExceptions.EventSystemException ex){
+        return buildResponse(HttpStatus.BAD_REQUEST, "Event System Error", ex.getMessage());
+    }
+
+    @ExceptionHandler(EventExceptions.EventCreationException.class)
+    public ResponseEntity<?> handleEventCreationException(EventExceptions.EventCreationException ex){
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Event Creation Error", ex.getMessage());
+    }
+
+    @ExceptionHandler(EventExceptions.EventConflictException.class)
+    public ResponseEntity<?> handleEventConflictException(EventExceptions.EventConflictException ex){
+        return buildResponse(HttpStatus.CONFLICT, "Event Conflict Error", ex.getMessage());
+    }
+
+    @ExceptionHandler(EventExceptions.EventUnauthorizedException.class)
+    public ResponseEntity<?> handleEventUnauthorisedException(EventExceptions.EventUnauthorizedException ex){
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Event Unauthorised Error", ex.getMessage());
+    }
+    /*==== EVENT EXCEPTIONS END ====*/
 
     /*==== AUTHENTICATION EXCEPTIONS START ====*/
     @ExceptionHandler(AuthExceptions.UserRegisterException.class)

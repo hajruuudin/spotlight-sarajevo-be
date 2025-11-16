@@ -37,7 +37,7 @@ public class SpotRESTController {
             @RequestParam(required = false) String searchTerm,
             @RequestParam(defaultValue = "ALPHABETICAL", required = false) String sortOption,
             @RequestParam(required = false) List<Integer> categoryIds) {
-        System.out.println("THIS LINE IS BEING HIT");
+        System.out.println(sortOption + " A POR LA 15" + categoryIds);
         return spotService.findSpotsPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption, categoryIds);
     }
 

@@ -7,4 +7,11 @@ public class ExceptionCodes {
         SPOT_UNAUTHORIZED_ACCESS,
         SPOT_UPDATE_EXCEPTION
     }
+
+    public enum EventExceptionCodes {
+        INVALID_REQUEST_CONTENT,
+        EVENT_NOT_FOUND,
+        EVENT_UNAUTHORIZED_ACCESS,
+        EVENT_UPDATE_EXCEPTION
+    }
 }

@@ -15,7 +15,7 @@ public class SpotSpecifications {
                 return criteriaBuilder.conjunction();
             }
 
-            String pattern = "%" + searchTerm + "%";
+            String pattern = "%" + searchTerm.toLowerCase() + "%";
 
             return criteriaBuilder.or(
                     criteriaBuilder.like(criteriaBuilder.lower(root.get("officialName")), pattern)
@@ -25,7 +25,7 @@ public class SpotSpecifications {
 
     public static Specification<SpotEntity> hasCategories(List<Integer> categoryIds){
         return (root, query, criteriaBuilder) -> {
-            if (categoryIds == null){
+            if (categoryIds.isEmpty()){
                 return criteriaBuilder.conjunction();
             }
 
