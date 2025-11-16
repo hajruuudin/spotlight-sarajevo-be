@@ -197,7 +197,7 @@ public class CommonFunctions {
 
         if (category.isPresent()){
             entity.setCategoryNameBs(category.get().getEventCategoryNameBs());
-            entity.setCategoryNameEn(category.get().getEventCategoryNameBs());
+            entity.setCategoryNameEn(category.get().getEventCategoryNameEn());
         }
     }
 

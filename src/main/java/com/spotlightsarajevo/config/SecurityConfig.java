@@ -72,7 +72,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource setCorsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200", "https://spotlight-sarajevo-fe-1-0-0.onrender.com/"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://192.168.0.37:4200", "https://spotlight-sarajevo-fe-1-0-0.onrender.com/"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization"));
         configuration.setAllowCredentials(true);
