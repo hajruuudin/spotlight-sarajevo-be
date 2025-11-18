@@ -8,7 +8,7 @@ spring:
   jpa:
       hibernate:
         ddl-auto: validate
-      show-sql: true
+      show-sql: false
       properties:
         hibernate:
             format_sql: true
@@ -22,6 +22,7 @@ server:
 
 logging:
   level:
+    org.hibernate: INFO
     org.springframework: INFO
     com.spotlight-sarajevo: DEBUG
 
