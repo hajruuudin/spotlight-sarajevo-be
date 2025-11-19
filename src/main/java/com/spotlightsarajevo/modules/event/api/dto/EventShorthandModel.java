@@ -19,8 +19,11 @@ public class EventShorthandModel implements Serializable {
     @Schema(description = "Unique slug identifier of the event")
     private String slug;
 
-    @Schema(description = "Official name of the event")
-    private String officialName;
+    @Schema(description = "Official name of the event in Bosnian")
+    private String officialNameBs;
+
+    @Schema(description = "Official name of the event in English")
+    private String officialNameEn;
 
     @Schema(description = "Small description/headline of the event in Bosnian")
     private String smallDescriptionBs;

@@ -16,7 +16,8 @@ public class EventSpecification {
             String pattern = "%" + searchTerm.toLowerCase() + "%";
 
             return criteriaBuilder.or(
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("officialName")), pattern)
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("officialNameEn")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("officialNameBs")), pattern)
             );
         };
     }
@@ -43,7 +44,7 @@ public class EventSpecification {
             }
 
             switch (sort) {
-                case ALPHABETICAL -> query.orderBy(crieriaBuilder.asc(root.get("officialName")));
+                case ALPHABETICAL -> query.orderBy(crieriaBuilder.asc(root.get("officialNameEn")));
                 case DATE -> query.orderBy(crieriaBuilder.asc(root.get("startDate")));
             };
 

@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.config.security;
 
+import com.spotlightsarajevo.common.utils.CommonFunctions;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -24,11 +25,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final CommonFunctions utils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String jwt = parseJwt(request);
+            String jwt = utils.parseJwt(request);
             if (jwt != null && jwtUtil.validateToken(jwt)) {
                 String email = jwtUtil.extractUsername(jwt);
 
@@ -43,18 +45,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-
-    private String parseJwt(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            Optional<Cookie> jwtCookie = Arrays.stream(cookies)
-                    .filter(cookie -> "spo-sar".equals(cookie.getName()))
-                    .findFirst();
-            if (jwtCookie.isPresent()) {
-                return jwtCookie.get().getValue();
-            }
-        }
-        return null;
-    }
-
 }

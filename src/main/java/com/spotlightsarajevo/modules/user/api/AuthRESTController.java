@@ -6,14 +6,13 @@ import com.spotlightsarajevo.common.exceptions.AuthExceptions;
 import com.spotlightsarajevo.common.utils.CommonConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Map;
@@ -73,5 +72,11 @@ public class AuthRESTController {
     @PostMapping(value = "/logout")
     public ResponseEntity<Map<String, Object>> logout(HttpServletResponse response) {
         return authService.logout(response);
+    }
+
+    @Operation(description = "Check to see if the session is present and return session data if present")
+    @PostMapping(value = "/me")
+    public ResponseEntity<LoggedUserModel> me(HttpServletRequest request, HttpServletResponse response){
+        return authService.me(request, response);
     }
 }

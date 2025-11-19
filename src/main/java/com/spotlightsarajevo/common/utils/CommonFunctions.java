@@ -33,6 +33,7 @@ import com.spotlightsarajevo.modules.tag.mappers.TagMapper;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.AuthExceptions;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -41,10 +42,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @AllArgsConstructor
@@ -61,6 +59,19 @@ public class CommonFunctions {
     SpotTagsDAO spotTagsDAO;
     EventTagsDAO eventTagsDAO;
     TagMapper tagMapper;
+
+    public String parseJwt(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            Optional<Cookie> jwtCookie = Arrays.stream(cookies)
+                    .filter(cookie -> "spo-sar".equals(cookie.getName()))
+                    .findFirst();
+            if (jwtCookie.isPresent()) {
+                return jwtCookie.get().getValue();
+            }
+        }
+        return null;
+    }
 
     /**
      * Method to verify google id token received from the frontend upon Google authentication.<br/>
