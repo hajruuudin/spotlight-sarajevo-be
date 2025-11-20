@@ -14,6 +14,9 @@ public class SpotWorkHoursModel implements Serializable {
     @Schema(description = "Unique identifier of the work hours entry")
     private Integer id;
 
+    @Schema(description = "Index of the day in the regular Week")
+    private Integer dayIndex;
+
     @Schema(description = "Day of the week")
     private String day;
 

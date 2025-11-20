@@ -1,9 +1,6 @@
 package com.spotlightsarajevo.modules.spot.api;
 
-import com.spotlightsarajevo.modules.spot.api.dto.SpotCreateModel;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotModel;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotShorthandModel;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotUpdateModel;
+import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.service.SpotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,6 +35,14 @@ public class SpotRESTController {
             @RequestParam(required = false) List<Integer> categoryIds) {
         System.out.println(sortOption + " A POR LA 15" + categoryIds);
         return spotService.findSpotsPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption, categoryIds);
+    }
+
+    @GetMapping(value = "/find-spot-overview")
+    @Operation(description = "Get a complete spot overview object")
+    public ResponseEntity<SpotOverviewModel> findSpotOverview(
+            @RequestParam(required = true) String spotSlug
+    ){
+        return spotService.findSpotOverview(spotSlug);
     }
 
     @PostMapping

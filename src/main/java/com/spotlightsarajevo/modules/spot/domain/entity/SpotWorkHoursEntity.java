@@ -19,6 +19,9 @@ public class SpotWorkHoursEntity implements Serializable {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "day_index", columnDefinition = "INTEGER")
+    private Integer dayIndex;
+
     @Column(name = "day", columnDefinition = "VARCHAR", length = 255)
     private String day;
 

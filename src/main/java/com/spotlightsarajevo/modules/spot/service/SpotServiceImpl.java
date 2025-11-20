@@ -1,11 +1,8 @@
 package com.spotlightsarajevo.modules.spot.service;
 
+import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.SpotDAO;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotShorthandModel;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotCreateModel;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotModel;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotUpdateModel;
 import com.spotlightsarajevo.modules.media.service.LookupImagesService;
 import com.spotlightsarajevo.modules.spot.mapper.SpotMapper;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
@@ -84,6 +81,29 @@ public class SpotServiceImpl implements SpotService {
         );
         return ResponseEntity.status(200).body(responseList);
     }
+
+    @Override
+    public ResponseEntity<SpotOverviewModel> findSpotOverview(String spotSlug){
+        if(Objects.equals(spotSlug, "")){
+            throw new SpotExceptions.SpotNotFoundException("SLUG_NOT_FOUND");
+        } else {
+            Optional<SpotEntity> entity = spotDAO.findBySlug(spotSlug);
+
+            entity.ifPresent(spotEntity -> {
+                utils.setSpotCategoriesAndRating(spotEntity);
+                utils.setSpotTags(spotEntity);
+                utils.setSpotWorkHours(spotEntity);
+                utils.setSpotReviews(spotEntity);
+            });
+
+            SpotOverviewModel spotOverviewModel = spotMapper.entityOverviewToDto(entity.get());
+
+            lookupImagesService.lookupThumbnailImage(spotOverviewModel, ObjectType.SPOT, entity.get().getId());
+            lookupImagesService.lookupAllImages(spotOverviewModel, ObjectType.SPOT, entity.get().getId());
+
+            return ResponseEntity.status(200).body(spotOverviewModel);
+        }
+    };
 
     @Override
     public ResponseEntity<SpotModel> create(SpotCreateModel spotCreateModel) {

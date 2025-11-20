@@ -1,5 +1,7 @@
 package com.spotlightsarajevo.modules.spot.domain.entity;
 
+import com.spotlightsarajevo.modules.spot.api.dto.SpotReviewModel;
+import com.spotlightsarajevo.modules.spot.api.dto.SpotWorkHoursModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -106,6 +108,14 @@ public class SpotEntity implements Serializable {
     private String thumbnailImage;
 
     @Transient
+    private List<String> images;
+
+    @Transient
     private List<TagModel> spotTags;
 
+    @Transient
+    private List<SpotWorkHoursModel> workHours;
+
+    @Transient
+    private List<SpotReviewModel> reviews;
 }

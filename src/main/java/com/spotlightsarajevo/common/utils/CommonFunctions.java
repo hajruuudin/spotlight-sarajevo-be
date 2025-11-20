@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.modules.collection.domain.CollectionDAO;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEntity;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEventEntity;
@@ -14,10 +15,16 @@ import com.spotlightsarajevo.modules.category.domain.entity.EventCategoryEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventTagsEntity;
 import com.spotlightsarajevo.modules.category.domain.SpotCategoryDAO;
+import com.spotlightsarajevo.modules.spot.api.dto.SpotReviewModel;
+import com.spotlightsarajevo.modules.spot.api.dto.SpotWorkHoursModel;
+import com.spotlightsarajevo.modules.spot.domain.SpotReviewDAO;
+import com.spotlightsarajevo.modules.spot.domain.SpotReviewStatsDAO;
 import com.spotlightsarajevo.modules.spot.domain.SpotTagsDAO;
 import com.spotlightsarajevo.modules.category.domain.entity.SpotCategoryEntity;
-import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
-import com.spotlightsarajevo.modules.spot.domain.entity.SpotTagsEntity;
+import com.spotlightsarajevo.modules.spot.domain.SpotWorkHoursDAO;
+import com.spotlightsarajevo.modules.spot.domain.entity.*;
+import com.spotlightsarajevo.modules.spot.mapper.SpotReviewMapper;
+import com.spotlightsarajevo.modules.spot.mapper.SpotWorkHoursMapper;
 import com.spotlightsarajevo.modules.tag.domain.TagDAO;
 import com.spotlightsarajevo.modules.tag.domain.entity.TagEntity;
 import com.spotlightsarajevo.modules.user.api.dto.GoogleUserModel;
@@ -59,6 +66,11 @@ public class CommonFunctions {
     SpotTagsDAO spotTagsDAO;
     EventTagsDAO eventTagsDAO;
     TagMapper tagMapper;
+    SpotWorkHoursDAO spotWorkHoursDAO;
+    SpotWorkHoursMapper spotWorkHoursMapper;
+    SpotReviewDAO spotReviewDAO;
+    SpotReviewMapper spotReviewMapper;
+    SpotReviewStatsDAO spotReviewStatsDAO;
 
     public String parseJwt(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
@@ -263,5 +275,27 @@ public class CommonFunctions {
         }
 
         entity.setEventTags(tagMapper.entitiesToDtos(tagEntities));
+    }
+
+    public void setSpotWorkHours(SpotEntity entity){
+        if (entity == null){
+            throw new SpotExceptions.SpotNotFoundException("ENTITY_NOT_FOUND");
+        } else {
+            List<SpotWorkHoursEntity> workHoursEntities = spotWorkHoursDAO.findAllBySpotId(entity.getId());
+            List<SpotWorkHoursModel> workHoursModels = spotWorkHoursMapper.entitiesToDtos(workHoursEntities);
+
+            entity.setWorkHours(workHoursModels);
+        }
+    }
+
+    public void setSpotReviews(SpotEntity entity){
+        if(entity == null){
+            throw new SpotExceptions.SpotNotFoundException("ENTITY_NOT_FOUND");
+        } else {
+            List<SpotReviewEntity> reviewEntities = spotReviewDAO.findAllBySpotId(entity.getId());
+            List<SpotReviewModel> reviewModels = spotReviewMapper.entitiesToDto(reviewEntities);
+
+            entity.setReviews(reviewModels);
+        }
     }
 }
