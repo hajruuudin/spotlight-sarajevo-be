@@ -25,8 +25,11 @@ public class SpotEntity implements Serializable {
     @Column(name = "slug")
     private String slug;
 
-    @Column(name = "official_name", columnDefinition = "VARCHAR", length = 40)
-    private String officialName;
+    @Column(name = "official_name_bs", columnDefinition = "VARCHAR", length = 40)
+    private String officialNameBs;
+
+    @Column(name = "official_name_en", columnDefinition = "VARCHAR", length = 40)
+    private String officialNameEn;
 
     @Column(name = "small_description_bs", columnDefinition = "VARCHAR", length = 60)
     private String smallDescriptionBs;

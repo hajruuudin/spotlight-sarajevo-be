@@ -10,21 +10,22 @@ import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.common.utils.CommonConstants;
 import com.spotlightsarajevo.config.security.JwtUtil;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -33,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
     UserMapper userMapper;
     UserDetailsService userDetailsService;
     JwtUtil jwtUtil;
-    CommonFunctions commonFunctions;
+    CommonFunctions utils;
 
     @Override
     public ResponseEntity<Map<String, Object>> storeGoogleCredentials(Map<String, String> payload, HttpSession session) throws GeneralSecurityException, IOException {
@@ -44,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
         } else {
             Random rand = new Random();
 
-            GoogleIdToken finalIdToken = commonFunctions.verifyGoogleToken(idTokenString);
+            GoogleIdToken finalIdToken = utils.verifyGoogleToken(idTokenString);
 
             if(finalIdToken != null){
                 GoogleIdToken.Payload tokenPayload = finalIdToken.getPayload();
@@ -121,16 +122,16 @@ public class AuthServiceImpl implements AuthService {
             UserEntity userEntity = new UserEntity();
 
             // Set the entities authentication details and main data (Google register)
-            commonFunctions.setUserEntityIdentity(userEntity, googleData, null, preferencesModel);
+            utils.setUserEntityIdentity(userEntity, googleData, null, preferencesModel);
 
             // Save it to the database and return the entity
             UserEntity savedUserEntity = userDAO.save(userEntity);
 
             // Using the ID of the new entity, save the users preferences
-            commonFunctions.setUserFavouriteObjects(savedUserEntity, preferencesModel);
+            utils.setUserFavouriteObjects(savedUserEntity, preferencesModel);
 
             // Create a default collection for the user, one for spots, one for events
-            commonFunctions.setUserDefaultCollections(savedUserEntity);
+            utils.setUserDefaultCollections(savedUserEntity);
 
             // Return the saved element
             return ResponseEntity.status(200).body(userMapper.entityToDto(savedUserEntity));
@@ -147,16 +148,16 @@ public class AuthServiceImpl implements AuthService {
             UserEntity userEntity = new UserEntity();
 
             // Set the entities authentication details and main data (Google register)
-            commonFunctions.setUserEntityIdentity(userEntity, null, systemData, preferencesModel);
+            utils.setUserEntityIdentity(userEntity, null, systemData, preferencesModel);
 
             // Save it to the database and return the entity
             UserEntity savedUserEntity = userDAO.save(userEntity);
 
             // Using the ID of the new entity, save the users preferences
-            commonFunctions.setUserFavouriteObjects(savedUserEntity, preferencesModel);
+            utils.setUserFavouriteObjects(savedUserEntity, preferencesModel);
 
             // Create a default collection for the user, one for spots, one for events
-            commonFunctions.setUserDefaultCollections(savedUserEntity);
+            utils.setUserDefaultCollections(savedUserEntity);
 
             // Return the saved element
             return ResponseEntity.status(200).body(userMapper.entityToDto(savedUserEntity));
@@ -173,7 +174,7 @@ public class AuthServiceImpl implements AuthService {
         if (idTokenString == null) {
             throw new AuthExceptions.GoogleRegisterException("Id token not found");
         } else {
-            GoogleIdToken token = commonFunctions.verifyGoogleToken(idTokenString);
+            GoogleIdToken token = utils.verifyGoogleToken(idTokenString);
 
             if (token != null) {
                 GoogleIdToken.Payload tokenPayload = token.getPayload();
@@ -193,7 +194,6 @@ public class AuthServiceImpl implements AuthService {
                     String jwt = jwtUtil.generateToken(userDetails);
                     CommonFunctions.setJwtCookie(servletResponse, jwt);
                     return ResponseEntity.ok(Map.of(
-                            "token", jwt,
                             "user", new LoggedUserModel(
                                     userEntity.get().getId(),
                                     userEntity.get().getFirstName(),
@@ -230,7 +230,6 @@ public class AuthServiceImpl implements AuthService {
                 CommonFunctions.setJwtCookie(servletResponse, jwt);
                 System.out.println(entity);
                 return ResponseEntity.ok(Map.of(
-                        "token", jwt,
                         "user", new LoggedUserModel(
                                 entity.get().getId(),
                                 entity.get().getFirstName(),
@@ -268,4 +267,37 @@ public class AuthServiceImpl implements AuthService {
 
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
+
+    public ResponseEntity<LoggedUserModel> me(HttpServletRequest request, HttpServletResponse response){
+        try {
+            String jwt = utils.parseJwt(request);
+
+            if (jwt != null && jwtUtil.validateToken(jwt)) {
+                String email = jwtUtil.extractUsername(jwt);
+
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
+                Optional<UserEntity> entity = userDAO.findBySysEmailOrGoogleEmail(userDetails.getUsername());
+
+                if(entity.isPresent()){
+                    return ResponseEntity.ok(
+                            new LoggedUserModel(
+                                entity.get().getId(),
+                                entity.get().getFirstName(),
+                                entity.get().getLastName(),
+                                entity.get().getSysEmail(),
+                                entity.get().getUsername(),
+                                entity.get().getIsAdmin(),
+                                entity.get().getIsPremium()
+                            )
+                    );
+                }
+            } else {
+                return ResponseEntity.status(401).body(null);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(null);
+        }
+
+        return ResponseEntity.status(401).body(null);
+    };
 }

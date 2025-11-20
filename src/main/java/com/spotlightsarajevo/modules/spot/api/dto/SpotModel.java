@@ -17,8 +17,11 @@ public class SpotModel implements Serializable {
     @Schema(description = "Unique slug identifier of the spot")
     private String slug;
 
-    @Schema(description = "Official name of the spot")
-    private String officialName;
+    @Schema(description = "Official name of the spot in Bosnian")
+    private String officialNameBs;
+
+    @Schema(description = "Official name of the spot in English")
+    private String officialNameEn;
 
     @Schema(description = "Small description/headline of the spot in Bosnian")
     private String smallDescriptionBs;

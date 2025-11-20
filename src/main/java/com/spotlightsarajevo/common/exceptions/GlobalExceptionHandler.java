@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(Map.of(
                 "timestamp", LocalDateTime.now().toString(),
                 "error", error,
-                "message", message
+                "messageBa", message
         ));
     }
 }

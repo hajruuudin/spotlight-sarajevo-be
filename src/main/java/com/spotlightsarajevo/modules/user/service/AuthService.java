@@ -2,6 +2,7 @@ package com.spotlightsarajevo.modules.user.service;
 
 import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.modules.user.api.dto.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
@@ -117,4 +118,15 @@ public interface AuthService {
      * @param response The HTTP servlet send along with any request from the user.
      */
     ResponseEntity<Map<String, Object>> logout(HttpServletResponse response);
+
+    /**
+     * Checks to see if a session is present for the user that made the request. It extracts
+     * the cookie (if present) from the {@link HttpServletResponse}. In case the cookie is present,
+     * simply return the logged users data to the frontend. In case it is not, it is treated as a
+     * protected route and returns 401.
+     *
+     * @param request The request object from the frontend
+     * @param response The response object from the frontend.
+     */
+    ResponseEntity<LoggedUserModel> me(HttpServletRequest request, HttpServletResponse response);
 }

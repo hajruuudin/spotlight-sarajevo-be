@@ -15,8 +15,11 @@ public class EventUpdateModel implements Serializable {
     @Schema(description = "Slug used in URLs for the event")
     private String slug;
 
-    @Schema(description = "Official name of the event")
-    private String officialName;
+    @Schema(description = "Official name of the event in Bosnian")
+    private String officialNameBs;
+
+    @Schema(description = "Official name of the event in English")
+    private String officialNameEn;
 
     @Schema(description = "Short description of the event in Bosnian")
     private String smallDescriptionBs;

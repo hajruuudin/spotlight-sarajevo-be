@@ -18,7 +18,8 @@ public class SpotSpecifications {
             String pattern = "%" + searchTerm.toLowerCase() + "%";
 
             return criteriaBuilder.or(
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("officialName")), pattern)
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("officialNameEn")), pattern),
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("officialNameBs")), pattern)
             );
         };
     }
@@ -44,7 +45,7 @@ public class SpotSpecifications {
             }
 
             switch (sorting) {
-                case ALPHABETICAL -> query.orderBy(criteriaBuilder.asc(root.get("officialName")));
+                case ALPHABETICAL -> query.orderBy(criteriaBuilder.asc(root.get("officialNameEn")));
                 case RATING -> {
                     Join<Object, Object> reviewStatsJoin = root.join("reviewStats", JoinType.LEFT);
                     query.orderBy(criteriaBuilder.desc(reviewStatsJoin.get("combinedRating")));

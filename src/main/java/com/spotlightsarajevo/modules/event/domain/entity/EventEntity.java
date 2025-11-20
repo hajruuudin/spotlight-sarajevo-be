@@ -25,8 +25,11 @@ public class EventEntity implements Serializable {
     @Column(name = "slug", columnDefinition = "VARCHAR", length = 255, nullable = false, unique = true)
     private String slug;
 
-    @Column(name = "official_name", columnDefinition = "VARCHAR", length = 255, nullable = false)
-    private String officialName;
+    @Column(name = "official_name_bs", columnDefinition = "VARCHAR", length = 255, nullable = false)
+    private String officialNameBs;
+
+    @Column(name = "official_name_en", columnDefinition = "VARCHAR", length = 255, nullable = false)
+    private String officialNameEn;
 
     @Column(name = "small_description_bs", columnDefinition = "VARCHAR", length = 255, nullable = false)
     private String smallDescriptionBs;
