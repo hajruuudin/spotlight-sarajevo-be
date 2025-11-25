@@ -81,4 +81,10 @@ public class SpotOverviewModel implements Serializable {
 
     @Schema(description = "The work hours of th spot, if specified (null if it is a landmark spot)")
     private List<SpotWorkHoursModel> workHours;
+
+    @Schema(description = "Thumbnail image of the spot")
+    private String thumbnailImage;
+
+    @Schema(description = "List of all other images of the spot")
+    private List<String> images;
 }
