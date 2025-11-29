@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -33,7 +34,6 @@ public class SpotRESTController {
             @RequestParam(required = false) String searchTerm,
             @RequestParam(defaultValue = "ALPHABETICAL", required = false) String sortOption,
             @RequestParam(required = false) List<Integer> categoryIds) {
-        System.out.println(sortOption + " A POR LA 15" + categoryIds);
         return spotService.findSpotsPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption, categoryIds);
     }
 
@@ -43,6 +43,41 @@ public class SpotRESTController {
             @RequestParam(required = true) String spotSlug
     ){
         return spotService.findSpotOverview(spotSlug);
+    }
+
+    @GetMapping(value = "/find-spot-reviews")
+    @Operation(description = "Get a page of spot reviews for a spot")
+    public ResponseEntity<Page<SpotReviewModel>> findSpotReviews(
+            @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
+            @RequestParam(defaultValue = "10", required = false) Integer pageSize,
+            @RequestParam(required = true) Integer spotId,
+            @RequestParam(defaultValue = "ALPHABETICAL", required = false) String sortOption
+    ){
+        return spotService.findReviewsForSpot(PageRequest.of(pageNumber, pageSize), spotId, sortOption);
+    }
+
+    @PostMapping(value = "/add-review")
+    @Operation(description = "Add a spot review to the database")
+    public ResponseEntity<SpotReviewModel> addSpotReview(
+        @RequestBody SpotReviewCreateModel createRequest, Principal principal
+    ){
+        return spotService.createSpotReview(createRequest, principal);
+    }
+
+    @PutMapping(value = "/update-review")
+    @Operation(description = "Update a spot review from the database")
+    public ResponseEntity<SpotReviewModel> updateSpotReview(
+            @RequestBody SpotReviewUpdateModel updateRequest, Principal principal
+    ){
+        return spotService.updateSpotReview(updateRequest, principal);
+    }
+
+    @DeleteMapping(value = "/remove-review")
+    @Operation(description = "Remove a spot review from the database")
+    public ResponseEntity<SpotReviewModel> deleteSpotReview(
+            @RequestBody SpotReviewDeleteModel deleteRequest, Principal principal
+    ){
+        return spotService.deleteSpotReview(deleteRequest, principal);
     }
 
     @PostMapping

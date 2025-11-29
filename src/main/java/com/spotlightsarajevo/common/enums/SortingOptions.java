@@ -1,5 +1,5 @@
 package com.spotlightsarajevo.common.enums;
 
 public enum SortingOptions {
-    ALPHABETICAL, POPULARITY, RATING, DATE
+    ALPHABETICAL, ALPHABETICAL_DESC, POPULARITY, POPULARITY_DESC, RATING, RATING_DESC, DATE, DATE_DESC
 }

@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.modules.collection.domain.CollectionDAO;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEntity;
@@ -30,6 +31,7 @@ import com.spotlightsarajevo.modules.tag.domain.entity.TagEntity;
 import com.spotlightsarajevo.modules.user.api.dto.GoogleUserModel;
 import com.spotlightsarajevo.modules.user.api.dto.PreferencesModel;
 import com.spotlightsarajevo.modules.user.api.dto.SystemUserModel;
+import com.spotlightsarajevo.modules.user.domain.UserDAO;
 import com.spotlightsarajevo.modules.user.domain.UserFavouriteEventsDAO;
 import com.spotlightsarajevo.modules.user.domain.UserFavouriteSpotsDAO;
 import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
@@ -48,6 +50,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -71,6 +74,7 @@ public class CommonFunctions {
     SpotReviewDAO spotReviewDAO;
     SpotReviewMapper spotReviewMapper;
     SpotReviewStatsDAO spotReviewStatsDAO;
+    UserDAO userDAO;
 
     public String parseJwt(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
@@ -279,7 +283,7 @@ public class CommonFunctions {
 
     public void setSpotWorkHours(SpotEntity entity){
         if (entity == null){
-            throw new SpotExceptions.SpotNotFoundException("ENTITY_NOT_FOUND");
+            throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND);
         } else {
             List<SpotWorkHoursEntity> workHoursEntities = spotWorkHoursDAO.findAllBySpotId(entity.getId());
             List<SpotWorkHoursModel> workHoursModels = spotWorkHoursMapper.entitiesToDtos(workHoursEntities);
@@ -288,14 +292,36 @@ public class CommonFunctions {
         }
     }
 
-    public void setSpotReviews(SpotEntity entity){
-        if(entity == null){
-            throw new SpotExceptions.SpotNotFoundException("ENTITY_NOT_FOUND");
+    /**
+     * Common method to check if the user that is accessing the API is the same user that made the request to
+     * the database from the frontend UI. It sequentially checks the cases of access by comparing the ID of the
+     * request from the request body and the principal object from security.
+     * <ul>
+     *     <li>If there is no ID sent from the request body or there is no principal, the request is immediately rejected.</li>
+     *     <li>If there are IDs sent from both the request body and principal, but they do not match, it is assumed
+     *      someone else is utilising the API unauthorised and outside the frontend application, which is not allowed.</li>
+     *      <li>If both the IDs from the principal and the request body match, it means the request is authorised</li>
+     * <ul/>
+     *
+     * @param expectedId The ID which is set from the frontend session on the request
+     * @param principal The principal of the request including authorisation data
+     *
+     * @return A boolean value representing if the request is authorised or not
+     */
+    public boolean isAuthorisedUser(Integer expectedId, Principal principal){
+        /* Case 1: expected ID or principal are null - reject the request */
+        if(expectedId == null || principal == null){
+            return false;
         } else {
-            List<SpotReviewEntity> reviewEntities = spotReviewDAO.findAllBySpotId(entity.getId());
-            List<SpotReviewModel> reviewModels = spotReviewMapper.entitiesToDto(reviewEntities);
+            Optional<UserEntity> userEntity = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
 
-            entity.setReviews(reviewModels);
+            /* Case 2: expected ID DOES NOT match principal are null - reject the request */
+            if(!expectedId.equals(userEntity.get().getId())){
+                return false;
+            /* Case 3: expected ID DOES match principal are null - accept the request */
+            } else {
+                return true;
+            }
         }
     }
 }

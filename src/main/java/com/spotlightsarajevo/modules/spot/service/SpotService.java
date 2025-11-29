@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface SpotService {
@@ -21,4 +22,11 @@ public interface SpotService {
 
     ResponseEntity<SpotModel> delete(Integer id);
 
+    ResponseEntity<Page<SpotReviewModel>> findReviewsForSpot(PageRequest pageRequest, Integer spotId, String sortOption);
+
+    ResponseEntity<SpotReviewModel> createSpotReview(SpotReviewCreateModel createRequest, Principal principal);
+
+    ResponseEntity<SpotReviewModel> updateSpotReview(SpotReviewUpdateModel updateRequest, Principal principal);
+
+    ResponseEntity<SpotReviewModel> deleteSpotReview(SpotReviewDeleteModel deleteRequest, Principal principal);
 }

@@ -1,24 +1,33 @@
 package com.spotlightsarajevo.modules.spot.service;
 
+import com.google.api.client.util.DateTime;
+import com.spotlightsarajevo.common.specifications.SpotReviewSpecification;
 import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.SpotDAO;
+import com.spotlightsarajevo.modules.spot.domain.SpotReviewDAO;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
 import com.spotlightsarajevo.modules.media.service.LookupImagesService;
+import com.spotlightsarajevo.modules.spot.domain.entity.SpotReviewEntity;
 import com.spotlightsarajevo.modules.spot.mapper.SpotMapper;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.common.specifications.SpotSpecifications;
+import com.spotlightsarajevo.modules.spot.mapper.SpotReviewMapper;
+import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.rmi.NoSuchObjectException;
+import java.security.Principal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -26,7 +35,9 @@ import java.util.*;
 @Service
 public class SpotServiceImpl implements SpotService {
     SpotDAO spotDAO;
+    SpotReviewDAO spotReviewDAO;
     SpotMapper spotMapper;
+    SpotReviewMapper spotReviewMapper;
     LookupImagesService lookupImagesService;
     CommonFunctions utils;
 
@@ -45,7 +56,7 @@ public class SpotServiceImpl implements SpotService {
 
             return ResponseEntity.status(200).body(responseList);
         } catch (Exception e) {
-            throw new SpotExceptions.SpotNotFoundException("ERROR");
+            throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND);
         }
     }
 
@@ -85,7 +96,7 @@ public class SpotServiceImpl implements SpotService {
     @Override
     public ResponseEntity<SpotOverviewModel> findSpotOverview(String spotSlug){
         if(Objects.equals(spotSlug, "")){
-            throw new SpotExceptions.SpotNotFoundException("SLUG_NOT_FOUND");
+            throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
         } else {
             Optional<SpotEntity> entity = spotDAO.findBySlug(spotSlug);
 
@@ -93,7 +104,6 @@ public class SpotServiceImpl implements SpotService {
                 utils.setSpotCategoriesAndRating(spotEntity);
                 utils.setSpotTags(spotEntity);
                 utils.setSpotWorkHours(spotEntity);
-                utils.setSpotReviews(spotEntity);
             });
 
             SpotOverviewModel spotOverviewModel = spotMapper.entityOverviewToDto(entity.get());
@@ -116,7 +126,7 @@ public class SpotServiceImpl implements SpotService {
 
             return ResponseEntity.status(200).body(spotMapper.entityToDto(addedEntity));
         } catch (Exception e){
-            throw new SpotExceptions.SpotCreationException("Could not create spot");
+            throw new SpotExceptions.SpotCreationException(ExceptionCodes.SpotExceptionCodes.SPOT_UPDATE_EXCEPTION);
         }
     }
 
@@ -137,9 +147,9 @@ public class SpotServiceImpl implements SpotService {
                 return ResponseEntity.status(200).body(spotMapper.entityToDto(existingSpot.get()));
             }
         } catch (NoSuchObjectException e) {
-            throw new SpotExceptions.SpotNotFoundException(spotUpdateModel.getId().toString());
+            throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND);
         } catch (Exception e){
-            throw new SpotExceptions.SpotConflictException("Could not update spot");
+            throw new SpotExceptions.SpotConflictException(ExceptionCodes.SpotExceptionCodes.SPOT_UPDATE_EXCEPTION);
         }
     }
 
@@ -156,7 +166,95 @@ public class SpotServiceImpl implements SpotService {
                 throw new RuntimeException();
             }
         } catch (Exception e){
-            throw new SpotExceptions.SpotUnauthorizedException("Could not delete spot");
+            throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Page<SpotReviewModel>> findReviewsForSpot(PageRequest pageRequest, Integer spotId, String sortOption) {
+        if(spotId == null){
+            throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
+        }
+
+        PageRequest endPageRequest = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+
+        Specification<SpotReviewEntity> spec = Specification
+                .allOf(SpotReviewSpecification.hasSpotId(spotId))
+                .and(SpotReviewSpecification.withDynamicSorting(sortOption));
+
+        Page<SpotReviewEntity> spotReviewEntityPage = spotReviewDAO.findAll(spec, endPageRequest);
+
+        Page<SpotReviewModel> responseList = new PageImpl<>(
+                spotReviewMapper.entitiesToDto(spotReviewEntityPage.getContent()),
+                endPageRequest,
+                spotReviewEntityPage.getTotalPages()
+        );
+
+        return ResponseEntity.status(200).body(responseList);
+    }
+
+    @Override
+    public ResponseEntity<SpotReviewModel> createSpotReview(SpotReviewCreateModel createRequest, Principal principal) {
+        if(!utils.isAuthorisedUser(createRequest.getUserId(), principal)){
+            throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+        };
+
+        if(createRequest.equals(null)){
+            throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.EMPTY_SPOT_REQUEST_BODY);
+        }
+
+        SpotReviewEntity newEntity = spotReviewMapper.dtoToEntity(createRequest);
+
+        newEntity.setCreated(LocalDate.now());
+
+        SpotReviewEntity createdEntity = spotReviewDAO.save(newEntity);
+
+        return ResponseEntity.status(200).body(spotReviewMapper.entityToDto(createdEntity));
+    }
+
+    @Override
+    public ResponseEntity<SpotReviewModel> updateSpotReview(SpotReviewUpdateModel updateRequest, Principal principal) {
+        if(!utils.isAuthorisedUser(updateRequest.getUserId(), principal)){
+            throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+        };
+
+        if(updateRequest.equals(null)){
+            throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.EMPTY_SPOT_REQUEST_BODY);
+        }
+
+        Optional<SpotReviewEntity> existingSpotReview = spotReviewDAO.findById(updateRequest.getId());
+
+        if(existingSpotReview.isEmpty()){
+            throw new SpotExceptions.SpotReviewException(ExceptionCodes.SpotExceptionCodes.SPOT_REVIEW_NOT_FOUND);
+        } else {
+            spotReviewMapper.updateEntityFromDto(updateRequest, existingSpotReview.get());
+
+            existingSpotReview.get().setModified(LocalDate.now());
+
+            spotReviewDAO.save(existingSpotReview.get());
+
+            return ResponseEntity.status(200).body(spotReviewMapper.entityToDto(existingSpotReview.get()));
+        }
+    }
+
+    @Override
+    public ResponseEntity<SpotReviewModel> deleteSpotReview(SpotReviewDeleteModel deleteRequest, Principal principal) {
+        if(!utils.isAuthorisedUser(deleteRequest.getUserId(), principal)){
+            throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+        };
+
+        if(deleteRequest.getSpotId() == null){
+            throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.EMPTY_SPOT_REQUEST_BODY);
+        }
+
+        Optional<SpotReviewEntity> existingSpotReview = spotReviewDAO.findById(deleteRequest.getId());
+
+        if(!existingSpotReview.isPresent()){
+            throw new SpotExceptions.SpotReviewException(ExceptionCodes.SpotExceptionCodes.SPOT_REVIEW_NOT_FOUND);
+        } else {
+            spotReviewDAO.delete(existingSpotReview.get());
+
+            return ResponseEntity.status(200).body(spotReviewMapper.entityToDto(existingSpotReview.get()));
         }
     }
 }
