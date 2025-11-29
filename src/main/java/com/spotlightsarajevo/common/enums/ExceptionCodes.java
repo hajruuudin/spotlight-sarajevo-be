@@ -7,7 +7,8 @@ public class ExceptionCodes {
         EMPTY_SPOT_REQUEST_BODY,
         SPOT_UNAUTHORIZED_ACCESS,
         SPOT_UPDATE_EXCEPTION,
-        SPOT_REVIEW_NOT_FOUND
+        SPOT_REVIEW_NOT_FOUND,
+        SPOT_REVIEW_CONFLICT
     }
 
     public enum EventExceptionCodes {
