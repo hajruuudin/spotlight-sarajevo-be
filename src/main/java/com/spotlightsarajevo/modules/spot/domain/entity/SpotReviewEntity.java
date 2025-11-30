@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @Entity
@@ -18,6 +21,9 @@ public class SpotReviewEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
+
+    @Column(name = "username", columnDefinition = "VARCHAR", length = 255)
+    private String username;
 
     @Column(name = "user_id", nullable = false)
     private Integer userId;
@@ -51,4 +57,10 @@ public class SpotReviewEntity implements Serializable {
 
     @Column(name = "spot_id")
     private Integer spotId;
+
+    @Column(name = "created", columnDefinition = "DATE")
+    private LocalDate created;
+
+    @Column(name = "modified", columnDefinition = "DATE")
+    private LocalDate modified;
 }

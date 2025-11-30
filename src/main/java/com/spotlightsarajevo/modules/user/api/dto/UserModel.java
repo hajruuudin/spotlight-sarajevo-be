@@ -29,15 +29,6 @@ public class UserModel implements Serializable {
     @Schema(description = "Flag indicating if the user is an admin")
     private Boolean isAdmin;
 
-    @Schema(description = "User preference category 01")
-    private Integer category01;
-
-    @Schema(description = "User preference category 02")
-    private Integer category02;
-
-    @Schema(description = "User preference category 03")
-    private Integer category03;
-
     @Schema(description = "Timestamp when the user was created")
     private LocalDateTime createdAt;
 

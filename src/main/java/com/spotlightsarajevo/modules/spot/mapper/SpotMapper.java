@@ -1,12 +1,11 @@
 package com.spotlightsarajevo.modules.spot.mapper;
 
-import com.spotlightsarajevo.modules.spot.api.dto.SpotShorthandModel;
+import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotCreateModel;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotModel;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotUpdateModel;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Mappings;
 
 import java.util.List;
 
@@ -17,4 +16,14 @@ public interface SpotMapper {
     List<SpotModel> entitiesToDtos(List<SpotEntity> spotEntityList);
     void updateEntityFromDto(SpotUpdateModel spotUpdateModel, @MappingTarget SpotEntity spotEntity);
     List<SpotShorthandModel> entitiesToShorthandDtos(List<SpotEntity> entities);
+    @Mappings({
+            @Mapping(source = "reviewStats.combinedRating", target = "combinedRating"),
+            @Mapping(source = "reviewStats.combinedQuality", target = "combinedLocaleQuality"),
+            @Mapping(source = "reviewStats.combinedAccessibility", target = "combinedAccessibility"),
+            @Mapping(source = "reviewStats.combinedStaffKindness", target = "combinedStaffKindness"),
+            @Mapping(source = "reviewStats.combinedAffordability", target = "combinedAffordability"),
+            @Mapping(source = "reviewStats.combinedAtmosphere", target = "combinedAtmosphere"),
+            @Mapping(source = "reviewStats.combinedCleanliness", target = "combinedCleanliness")
+    })
+    SpotOverviewModel entityOverviewToDto(SpotEntity entity);
 }

@@ -16,8 +16,8 @@ public class SpotExceptions {
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public static class SpotNotFoundException extends RuntimeException {
-        public SpotNotFoundException(String message){
-            super(message);
+        public SpotNotFoundException(ExceptionCodes.SpotExceptionCodes message){
+            super(message.toString());
         }
     }
 
@@ -31,8 +31,8 @@ public class SpotExceptions {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public static class SpotCreationException extends RuntimeException {
-        public SpotCreationException(String message) {
-            super(message);
+        public SpotCreationException(ExceptionCodes.SpotExceptionCodes message) {
+            super(message.toString());
         }
     }
 
@@ -46,8 +46,8 @@ public class SpotExceptions {
      */
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public static class SpotUnauthorizedException extends RuntimeException {
-        public SpotUnauthorizedException(String message) {
-            super(message);
+        public SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes message) {
+            super(message.toString());
         }
     }
 
@@ -61,8 +61,8 @@ public class SpotExceptions {
      */
     @ResponseStatus(HttpStatus.CONFLICT)
     public static class SpotConflictException extends RuntimeException {
-        public SpotConflictException(String message) {
-            super(message);
+        public SpotConflictException(ExceptionCodes.SpotExceptionCodes message) {
+            super(message.toString());
         }
     }
 
@@ -77,6 +77,21 @@ public class SpotExceptions {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public static class SpotSystemException extends RuntimeException {
         public SpotSystemException(ExceptionCodes.SpotExceptionCodes message) {
+            super(message.toString());
+        }
+    }
+
+    /**
+     * Thrown when an error occurs during any spot review operation which could contain invalid input formats.
+     *
+     * <p>This exception is typically thrown from {@link SpotServiceImpl}
+     * when providing parameters which do not conform to the required method specification (e.g. providing null params).</p>
+     *
+     * @see GlobalExceptionHandler
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public static class SpotReviewException extends RuntimeException {
+        public SpotReviewException(ExceptionCodes.SpotExceptionCodes message) {
             super(message.toString());
         }
     }

@@ -4,6 +4,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import com.spotlightsarajevo.common.enums.ExceptionCodes;
+import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.modules.collection.domain.CollectionDAO;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEntity;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEventEntity;
@@ -14,15 +16,22 @@ import com.spotlightsarajevo.modules.category.domain.entity.EventCategoryEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventTagsEntity;
 import com.spotlightsarajevo.modules.category.domain.SpotCategoryDAO;
+import com.spotlightsarajevo.modules.spot.api.dto.SpotReviewModel;
+import com.spotlightsarajevo.modules.spot.api.dto.SpotWorkHoursModel;
+import com.spotlightsarajevo.modules.spot.domain.SpotReviewDAO;
+import com.spotlightsarajevo.modules.spot.domain.SpotReviewStatsDAO;
 import com.spotlightsarajevo.modules.spot.domain.SpotTagsDAO;
 import com.spotlightsarajevo.modules.category.domain.entity.SpotCategoryEntity;
-import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
-import com.spotlightsarajevo.modules.spot.domain.entity.SpotTagsEntity;
+import com.spotlightsarajevo.modules.spot.domain.SpotWorkHoursDAO;
+import com.spotlightsarajevo.modules.spot.domain.entity.*;
+import com.spotlightsarajevo.modules.spot.mapper.SpotReviewMapper;
+import com.spotlightsarajevo.modules.spot.mapper.SpotWorkHoursMapper;
 import com.spotlightsarajevo.modules.tag.domain.TagDAO;
 import com.spotlightsarajevo.modules.tag.domain.entity.TagEntity;
 import com.spotlightsarajevo.modules.user.api.dto.GoogleUserModel;
 import com.spotlightsarajevo.modules.user.api.dto.PreferencesModel;
 import com.spotlightsarajevo.modules.user.api.dto.SystemUserModel;
+import com.spotlightsarajevo.modules.user.domain.UserDAO;
 import com.spotlightsarajevo.modules.user.domain.UserFavouriteEventsDAO;
 import com.spotlightsarajevo.modules.user.domain.UserFavouriteSpotsDAO;
 import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
@@ -41,6 +50,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -59,6 +69,12 @@ public class CommonFunctions {
     SpotTagsDAO spotTagsDAO;
     EventTagsDAO eventTagsDAO;
     TagMapper tagMapper;
+    SpotWorkHoursDAO spotWorkHoursDAO;
+    SpotWorkHoursMapper spotWorkHoursMapper;
+    SpotReviewDAO spotReviewDAO;
+    SpotReviewMapper spotReviewMapper;
+    SpotReviewStatsDAO spotReviewStatsDAO;
+    UserDAO userDAO;
 
     public String parseJwt(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
@@ -263,5 +279,29 @@ public class CommonFunctions {
         }
 
         entity.setEventTags(tagMapper.entitiesToDtos(tagEntities));
+    }
+
+    public void setSpotWorkHours(SpotEntity entity){
+        if (entity == null){
+            throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND);
+        } else {
+            List<SpotWorkHoursEntity> workHoursEntities = spotWorkHoursDAO.findAllBySpotId(entity.getId());
+            List<SpotWorkHoursModel> workHoursModels = spotWorkHoursMapper.entitiesToDtos(workHoursEntities);
+
+            entity.setWorkHours(workHoursModels);
+        }
+    }
+
+    /**
+     * Common method to check if the user that is accessing the API is the same user that made the request to
+     * the database from the frontend UI. Uses Springs principal object to validate the identity of the user.
+     *
+     * @param principal The principal of the request including authorisation data
+     *
+     * @return A boolean value representing if the request is authorised or not
+     */
+    public boolean isAuthorisedUser(Integer expectedUserId, Principal principal){
+        Optional<UserEntity> userEntity = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+        return expectedUserId.equals(userEntity.get().getId());
     }
 }
