@@ -14,6 +14,8 @@ import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.common.specifications.SpotSpecifications;
 import com.spotlightsarajevo.modules.spot.mapper.SpotReviewMapper;
+import com.spotlightsarajevo.modules.user.domain.UserDAO;
+import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +33,7 @@ import java.util.*;
 public class SpotServiceImpl implements SpotService {
 
     private final SpotDAO spotDAO;
+    private final UserDAO userDAO;
     private final SpotReviewDAO spotReviewDAO;
     private final SpotMapper spotMapper;
     private final SpotReviewMapper spotReviewMapper;
@@ -177,19 +180,43 @@ public class SpotServiceImpl implements SpotService {
         return ResponseEntity.ok(response);
     }
 
+    @Override
+    public ResponseEntity<SpotReviewModel> findUserReview(Integer spotId, Principal principal) {
+        if(spotId == null)
+            throw new SpotExceptions.SpotReviewException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        Optional<UserEntity> userEntity = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+
+        if(userEntity.isPresent()){
+            Optional<SpotReviewEntity> spotReviewEntity = spotReviewDAO.findBySpotIdAndUserId(spotId, userEntity.get().getId());
+
+            return spotReviewEntity
+                    .map(entity -> ResponseEntity.status(200).body(spotReviewMapper.entityToDto(entity)))
+                    .orElseGet(() -> ResponseEntity.status(200).body(null));
+        } else {
+            throw new SpotExceptions.SpotReviewException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+        }
+    }
+
     /* ---------------------------------------------
      *  CREATE REVIEW
      * --------------------------------------------- */
 
     @Override
     public ResponseEntity<SpotReviewModel> createSpotReview(SpotReviewCreateModel dto, Principal principal) {
-        validateUser(dto.getUserId(), principal);
+        Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
 
-        SpotReviewEntity entity = spotReviewMapper.dtoToEntity(dto);
-        entity.setCreated(LocalDate.now());
+        if(user.isPresent()){
+            SpotReviewEntity entity = spotReviewMapper.dtoToEntity(dto);
+            entity.setUserId(user.get().getId());
+            entity.setUsername(user.get().getUsername());
+            entity.setCreated(LocalDate.now());
 
-        SpotReviewEntity created = spotReviewDAO.save(entity);
-        return ResponseEntity.ok(spotReviewMapper.entityToDto(created));
+            SpotReviewEntity created = spotReviewDAO.save(entity);
+            return ResponseEntity.ok(spotReviewMapper.entityToDto(created));
+        } else {
+            throw new SpotExceptions.SpotReviewException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
+        }
     }
 
     /* ---------------------------------------------
@@ -217,19 +244,19 @@ public class SpotServiceImpl implements SpotService {
      * --------------------------------------------- */
 
     @Override
-    public ResponseEntity<SpotReviewModel> deleteSpotReview(SpotReviewDeleteModel dto, Principal principal) {
-        validateUser(dto.getUserId(), principal);
+    public ResponseEntity<SpotReviewModel> deleteSpotReview(Integer spotId, Integer reviewId, Principal principal) {
+//        validateUser(principal); FIX THIS
 
-        if (dto.getSpotId() == null)
+        if (spotId == null)
             throw new SpotExceptions.SpotSystemException(
                     ExceptionCodes.SpotExceptionCodes.EMPTY_SPOT_REQUEST_BODY);
 
-        SpotReviewEntity review = spotReviewDAO.findById(dto.getId())
+        SpotReviewEntity review = spotReviewDAO.findById(reviewId)
                 .orElseThrow(() ->
                         new SpotExceptions.SpotReviewException(
                                 ExceptionCodes.SpotExceptionCodes.SPOT_REVIEW_NOT_FOUND));
 
-        if (!review.getSpotId().equals(dto.getSpotId()))
+        if (!review.getSpotId().equals(spotId))
             throw new SpotExceptions.SpotReviewException(
                     ExceptionCodes.SpotExceptionCodes.SPOT_REVIEW_CONFLICT);
 

@@ -11,9 +11,8 @@ import java.util.Date;
 @Data
 @Schema(description = "Default, all property, table model for the Spot Review Entity")
 public class SpotReviewCreateModel implements Serializable {
-
-    @Schema(description = "Identifier of the user who submitted the review")
-    private Integer userId;
+    @Schema(description = "Identifier of the spot being reviewed")
+    private Integer spotId;
 
     @Schema(description = "Header or title of the review")
     private String header;
@@ -41,9 +40,6 @@ public class SpotReviewCreateModel implements Serializable {
 
     @Schema(description = "Rating of atmosphere given by the user")
     private BigDecimal userAtmosphere;
-
-    @Schema(description = "Identifier of the spot being reviewed")
-    private Integer spotId;
 
     @Schema(description = "Date the spot review was create")
     private LocalDate created;

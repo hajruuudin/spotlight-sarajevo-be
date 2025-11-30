@@ -22,6 +22,9 @@ public class SpotReviewEntity implements Serializable {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "username", columnDefinition = "VARCHAR", length = 255)
+    private String username;
+
     @Column(name = "user_id", nullable = false)
     private Integer userId;
 

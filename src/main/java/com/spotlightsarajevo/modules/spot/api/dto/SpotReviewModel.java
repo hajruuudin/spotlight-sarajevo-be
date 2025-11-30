@@ -18,7 +18,10 @@ public class SpotReviewModel implements Serializable {
     private Integer id;
 
     @Schema(description = "Identifier of the user who submitted the review")
-    private Integer userId;
+    private String userId;
+
+    @Schema(description = "Username of the user who submitted the review")
+    private String username;
 
     @Schema(description = "Header or title of the review")
     private String header;

@@ -294,34 +294,14 @@ public class CommonFunctions {
 
     /**
      * Common method to check if the user that is accessing the API is the same user that made the request to
-     * the database from the frontend UI. It sequentially checks the cases of access by comparing the ID of the
-     * request from the request body and the principal object from security.
-     * <ul>
-     *     <li>If there is no ID sent from the request body or there is no principal, the request is immediately rejected.</li>
-     *     <li>If there are IDs sent from both the request body and principal, but they do not match, it is assumed
-     *      someone else is utilising the API unauthorised and outside the frontend application, which is not allowed.</li>
-     *      <li>If both the IDs from the principal and the request body match, it means the request is authorised</li>
-     * <ul/>
+     * the database from the frontend UI. Uses Springs principal object to validate the identity of the user.
      *
-     * @param expectedId The ID which is set from the frontend session on the request
      * @param principal The principal of the request including authorisation data
      *
      * @return A boolean value representing if the request is authorised or not
      */
-    public boolean isAuthorisedUser(Integer expectedId, Principal principal){
-        /* Case 1: expected ID or principal are null - reject the request */
-        if(expectedId == null || principal == null){
-            return false;
-        } else {
-            Optional<UserEntity> userEntity = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
-
-            /* Case 2: expected ID DOES NOT match principal are null - reject the request */
-            if(!expectedId.equals(userEntity.get().getId())){
-                return false;
-            /* Case 3: expected ID DOES match principal are null - accept the request */
-            } else {
-                return true;
-            }
-        }
+    public boolean isAuthorisedUser(Integer expectedUserId, Principal principal){
+        Optional<UserEntity> userEntity = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+        return expectedUserId.equals(userEntity.get().getId());
     }
 }

@@ -56,6 +56,15 @@ public class SpotRESTController {
         return spotService.findReviewsForSpot(PageRequest.of(pageNumber, pageSize), spotId, sortOption);
     }
 
+    @GetMapping(value = "/find-user-review")
+    @Operation(description = "Get the users review of a specific spot")
+    public ResponseEntity<SpotReviewModel> findUserReview(
+            @RequestParam(required = true) Integer spotId,
+            Principal principal
+    ){
+        return spotService.findUserReview(spotId, principal);
+    }
+
     @PostMapping(value = "/add-review")
     @Operation(description = "Add a spot review to the database")
     public ResponseEntity<SpotReviewModel> addSpotReview(
@@ -75,9 +84,11 @@ public class SpotRESTController {
     @DeleteMapping(value = "/remove-review")
     @Operation(description = "Remove a spot review from the database")
     public ResponseEntity<SpotReviewModel> deleteSpotReview(
-            @RequestBody SpotReviewDeleteModel deleteRequest, Principal principal
+            @RequestParam(required = true) Integer spotId,
+            @RequestParam(required = true) Integer reviewId,
+            Principal principal
     ){
-        return spotService.deleteSpotReview(deleteRequest, principal);
+        return spotService.deleteSpotReview(spotId, reviewId, principal);
     }
 
     @PostMapping
