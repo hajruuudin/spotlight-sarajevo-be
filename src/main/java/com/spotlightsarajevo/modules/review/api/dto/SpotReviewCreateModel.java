@@ -1,4 +1,4 @@
-package com.spotlightsarajevo.modules.spot.api.dto;
+package com.spotlightsarajevo.modules.review.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -6,7 +6,6 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @Schema(description = "Default, all property, table model for the Spot Review Entity")

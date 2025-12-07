@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.spot.api.dto;
 
+import com.spotlightsarajevo.modules.review.api.dto.SpotReviewModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

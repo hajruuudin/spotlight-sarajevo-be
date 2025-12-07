@@ -1,9 +1,8 @@
 package com.spotlightsarajevo.config.security;
 
-import com.spotlightsarajevo.common.utils.CommonFunctions;
+import com.spotlightsarajevo.modules.user.utils.AuthUserUtilities;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
 
 @Component
 @AllArgsConstructor
@@ -25,12 +22,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-    private final CommonFunctions utils;
+    private final AuthUserUtilities authUserUtilities;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String jwt = utils.parseJwt(request);
+            String jwt = authUserUtilities.parseJwt(request);
             if (jwt != null && jwtUtil.validateToken(jwt)) {
                 String email = jwtUtil.extractUsername(jwt);
 

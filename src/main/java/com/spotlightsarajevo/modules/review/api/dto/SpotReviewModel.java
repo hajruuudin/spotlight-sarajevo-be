@@ -1,4 +1,4 @@
-package com.spotlightsarajevo.modules.spot.api.dto;
+package com.spotlightsarajevo.modules.review.api.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -9,13 +9,17 @@ import java.time.LocalDate;
 
 @Data
 @Schema(description = "Default, all property, table model for the Spot Review Entity")
-public class SpotReviewUpdateModel implements Serializable {
+public class SpotReviewModel implements Serializable {
+    private static final Long versionUUID = 1L;
 
-    @Schema(description = "Identifier of the review")
+    @Schema(description = "Unique identifier of the spot review")
     private Integer id;
 
     @Schema(description = "Identifier of the user who submitted the review")
     private Integer userId;
+
+    @Schema(description = "Username of the user who submitted the review")
+    private String username;
 
     @Schema(description = "Header or title of the review")
     private String header;
@@ -53,4 +57,3 @@ public class SpotReviewUpdateModel implements Serializable {
     @Schema(description = "Date the spot review was last edited")
     private LocalDate modified;
 }
-

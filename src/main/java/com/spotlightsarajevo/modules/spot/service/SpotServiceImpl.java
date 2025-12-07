@@ -1,21 +1,18 @@
 package com.spotlightsarajevo.modules.spot.service;
 
-import com.spotlightsarajevo.common.specifications.SpotReviewSpecification;
 import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.SpotDAO;
-import com.spotlightsarajevo.modules.spot.domain.SpotReviewDAO;
+import com.spotlightsarajevo.modules.review.domain.SpotReviewDAO;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
 import com.spotlightsarajevo.modules.media.service.LookupImagesService;
-import com.spotlightsarajevo.modules.spot.domain.entity.SpotReviewEntity;
 import com.spotlightsarajevo.modules.spot.mapper.SpotMapper;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.SpotExceptions;
-import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.common.specifications.SpotSpecifications;
-import com.spotlightsarajevo.modules.spot.mapper.SpotReviewMapper;
+import com.spotlightsarajevo.modules.review.mapper.SpotReviewMapper;
+import com.spotlightsarajevo.modules.spot.utils.SpotUtilities;
 import com.spotlightsarajevo.modules.user.domain.UserDAO;
-import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,8 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import java.security.Principal;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -38,11 +34,9 @@ public class SpotServiceImpl implements SpotService {
     private final SpotMapper spotMapper;
     private final SpotReviewMapper spotReviewMapper;
     private final LookupImagesService lookupImagesService;
-    private final CommonFunctions utils;
+    private final SpotUtilities utils;
 
-    /* ---------------------------------------------
-     *  SPOT LISTING
-     * --------------------------------------------- */
+
 
     @Override
     public ResponseEntity<Page<SpotModel>> findAll(PageRequest pageRequest) {
@@ -85,9 +79,6 @@ public class SpotServiceImpl implements SpotService {
         return ResponseEntity.ok(response);
     }
 
-    /* ---------------------------------------------
-     *  SPOT OVERVIEW
-     * --------------------------------------------- */
 
     @Override
     public ResponseEntity<SpotOverviewModel> findSpotOverview(String slug) {
@@ -153,126 +144,6 @@ public class SpotServiceImpl implements SpotService {
 
         spotDAO.delete(entity);
         return ResponseEntity.ok(spotMapper.entityToDto(entity));
-    }
-
-    /* ---------------------------------------------
-     *  SPOT REVIEWS
-     * --------------------------------------------- */
-
-    @Override
-    public ResponseEntity<Page<SpotReviewModel>> findReviewsForSpot(PageRequest pageRequest, Integer spotId, String sortOption) {
-        if (spotId == null)
-            throw new SpotExceptions.SpotSystemException(
-                    ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
-
-        Specification<SpotReviewEntity> spec = Specification
-                .allOf(SpotReviewSpecification.hasSpotId(spotId))
-                .and(SpotReviewSpecification.withDynamicSorting(sortOption));
-
-        Page<SpotReviewEntity> page = spotReviewDAO.findAll(spec, pageRequest);
-
-        Page<SpotReviewModel> response = new PageImpl<>(
-                spotReviewMapper.entitiesToDto(page.getContent()),
-                pageRequest,
-                page.getTotalElements()
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<SpotReviewModel> findUserReview(Integer spotId, Principal principal) {
-        if(spotId == null)
-            throw new SpotExceptions.SpotReviewException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
-
-        Optional<UserEntity> userEntity = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
-
-        if(userEntity.isPresent()){
-            Optional<SpotReviewEntity> spotReviewEntity = spotReviewDAO.findBySpotIdAndUserId(spotId, userEntity.get().getId());
-
-            return spotReviewEntity
-                    .map(entity -> ResponseEntity.status(200).body(spotReviewMapper.entityToDto(entity)))
-                    .orElseGet(() -> ResponseEntity.status(200).body(null));
-        } else {
-            throw new SpotExceptions.SpotReviewException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
-        }
-    }
-
-    /* ---------------------------------------------
-     *  CREATE REVIEW
-     * --------------------------------------------- */
-
-    @Override
-    public ResponseEntity<SpotReviewModel> createSpotReview(SpotReviewCreateModel dto, Principal principal) {
-        Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
-
-        if(user.isPresent()){
-            SpotReviewEntity entity = spotReviewMapper.dtoToEntity(dto);
-            entity.setUserId(user.get().getId());
-            entity.setUsername(user.get().getUsername());
-            entity.setCreated(LocalDate.now());
-
-            SpotReviewEntity created = spotReviewDAO.save(entity);
-            return ResponseEntity.ok(spotReviewMapper.entityToDto(created));
-        } else {
-            throw new SpotExceptions.SpotReviewException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
-        }
-    }
-
-    /* ---------------------------------------------
-     *  UPDATE REVIEW
-     * --------------------------------------------- */
-
-    @Override
-    public ResponseEntity<SpotReviewModel> updateSpotReview(SpotReviewUpdateModel dto, Principal principal) {
-        validateUser(dto.getUserId(), principal);
-
-        SpotReviewEntity entity = spotReviewDAO.findById(dto.getId())
-                .orElseThrow(() ->
-                        new SpotExceptions.SpotReviewException(
-                                ExceptionCodes.SpotExceptionCodes.SPOT_REVIEW_NOT_FOUND));
-
-        spotReviewMapper.updateEntityFromDto(dto, entity);
-        entity.setModified(LocalDate.now());
-
-        spotReviewDAO.save(entity);
-        return ResponseEntity.ok(spotReviewMapper.entityToDto(entity));
-    }
-
-    /* ---------------------------------------------
-     *  DELETE REVIEW
-     * --------------------------------------------- */
-
-    @Override
-    public ResponseEntity<SpotReviewModel> deleteSpotReview(Integer spotId, Integer reviewId, Principal principal) {
-//        validateUser(principal); FIX THIS
-
-        if (spotId == null)
-            throw new SpotExceptions.SpotSystemException(
-                    ExceptionCodes.SpotExceptionCodes.EMPTY_SPOT_REQUEST_BODY);
-
-        SpotReviewEntity review = spotReviewDAO.findById(reviewId)
-                .orElseThrow(() ->
-                        new SpotExceptions.SpotReviewException(
-                                ExceptionCodes.SpotExceptionCodes.SPOT_REVIEW_NOT_FOUND));
-
-        if (!review.getSpotId().equals(spotId))
-            throw new SpotExceptions.SpotReviewException(
-                    ExceptionCodes.SpotExceptionCodes.SPOT_REVIEW_CONFLICT);
-
-        spotReviewDAO.delete(review);
-        return ResponseEntity.ok(spotReviewMapper.entityToDto(review));
-    }
-
-    /* ---------------------------------------------
-     *  PRIVATE HELPERS
-     * --------------------------------------------- */
-
-    private void validateUser(Integer userId, Principal principal) {
-        if (!utils.isAuthorisedUser(userId, principal)) {
-            throw new SpotExceptions.SpotUnauthorizedException(
-                    ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
-        }
     }
 }
 

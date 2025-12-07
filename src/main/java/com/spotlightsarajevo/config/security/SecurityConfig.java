@@ -1,9 +1,9 @@
 package com.spotlightsarajevo.config.security;
 
-import com.spotlightsarajevo.modules.user.security.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -36,15 +36,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/**",
-                                "/swagger-ui/**",
-                                "/spotlight-sarajevo-api",
-                                "/v3/api-docs/**",
-                                "/category/allSpot",
-                                "/category/allEvent"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(HttpMethod.POST, "/review/spot/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/review/spot/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/review/spot/**").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
