@@ -1,4 +1,4 @@
-package com.spotlightsarajevo.modules.user.security;
+package com.spotlightsarajevo.config.security;
 
 import com.spotlightsarajevo.modules.user.domain.UserDAO;
 import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;

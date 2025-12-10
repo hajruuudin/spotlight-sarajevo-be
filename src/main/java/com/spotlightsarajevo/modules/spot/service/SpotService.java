@@ -21,14 +21,4 @@ public interface SpotService {
     ResponseEntity<SpotModel> update(SpotUpdateModel spotUpdateModel);
 
     ResponseEntity<SpotModel> delete(Integer id);
-
-    ResponseEntity<Page<SpotReviewModel>> findReviewsForSpot(PageRequest pageRequest, Integer spotId, String sortOption);
-
-    ResponseEntity<SpotReviewModel> findUserReview(Integer spotId, Principal principal);
-
-    ResponseEntity<SpotReviewModel> createSpotReview(SpotReviewCreateModel createRequest, Principal principal);
-
-    ResponseEntity<SpotReviewModel> updateSpotReview(SpotReviewUpdateModel updateRequest, Principal principal);
-
-    ResponseEntity<SpotReviewModel> deleteSpotReview(Integer spotId, Integer reviewId, Principal principal);
 }

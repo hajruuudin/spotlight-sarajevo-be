@@ -30,7 +30,6 @@ public class EventRESTController {
             @RequestParam(required = false) String searchTerm,
             @RequestParam(defaultValue = "ALPHABETICAL", required = false) String sortOption,
             @RequestParam(required = false) List<Integer> categoryIds) {
-        System.out.println(sortOption + " A POR LA 15" + categoryIds);
         return eventService.findEventsPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption, categoryIds);
     }
 }

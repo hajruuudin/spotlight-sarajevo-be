@@ -6,12 +6,12 @@ import com.spotlightsarajevo.modules.event.api.dto.EventModel;
 import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
 import com.spotlightsarajevo.modules.event.api.dto.EventUpdateModel;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
+import com.spotlightsarajevo.modules.event.utils.EventUtilities;
 import com.spotlightsarajevo.modules.media.service.LookupImagesService;
 import com.spotlightsarajevo.modules.event.mapper.EventMapper;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.EventExceptions;
-import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.common.specifications.EventSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 public class EventServiceImpl implements EventService {
     EventDAO eventDAO;
-    CommonFunctions utils;
+    EventUtilities utils;
     EventMapper eventMapper;
     LookupImagesService lookupImagesService;
 

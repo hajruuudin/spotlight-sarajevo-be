@@ -3,7 +3,7 @@ package com.spotlightsarajevo.common.specifications;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.SortingOptions;
 import com.spotlightsarajevo.common.exceptions.SpotExceptions;
-import com.spotlightsarajevo.modules.spot.domain.entity.SpotReviewEntity;
+import com.spotlightsarajevo.modules.review.domain.entity.SpotReviewEntity;
 import org.springframework.data.jpa.domain.Specification;
 
 public class SpotReviewSpecification {

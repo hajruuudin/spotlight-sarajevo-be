@@ -1,6 +1,5 @@
 package com.spotlightsarajevo.modules.user.service;
 
-import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.modules.user.api.dto.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

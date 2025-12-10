@@ -1,6 +1,6 @@
 package com.spotlightsarajevo.modules.spot.domain.entity;
 
-import com.spotlightsarajevo.modules.spot.api.dto.SpotReviewModel;
+import com.spotlightsarajevo.modules.review.api.dto.SpotReviewModel;
 import com.spotlightsarajevo.modules.spot.api.dto.SpotWorkHoursModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import jakarta.persistence.*;
