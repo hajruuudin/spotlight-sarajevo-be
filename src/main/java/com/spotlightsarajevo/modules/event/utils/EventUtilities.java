@@ -1,13 +1,16 @@
 package com.spotlightsarajevo.modules.event.utils;
 
+import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.modules.category.domain.EventCategoryDAO;
 import com.spotlightsarajevo.modules.category.domain.entity.EventCategoryEntity;
+import com.spotlightsarajevo.modules.event.api.dto.EventOrganiserModel;
 import com.spotlightsarajevo.modules.event.domain.EventOrganiserDAO;
 import com.spotlightsarajevo.modules.event.domain.EventTagsDAO;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventTagsEntity;
 import com.spotlightsarajevo.modules.event.mapper.EventOrganiserMapper;
+import com.spotlightsarajevo.modules.media.service.LookupImagesService;
 import com.spotlightsarajevo.modules.tag.domain.TagDAO;
 import com.spotlightsarajevo.modules.tag.domain.entity.TagEntity;
 import com.spotlightsarajevo.modules.tag.mappers.TagMapper;
@@ -27,6 +30,7 @@ public class EventUtilities {
     TagDAO tagDAO;
     TagMapper tagMapper;
     EventOrganiserMapper eventOrganiserMapper;
+    LookupImagesService lookupImagesService;
 
     public void setEventCategories(EventEntity entity){
         Optional<EventCategoryEntity> category = eventCategoryDAO.findById(entity.getCategoryId());
@@ -56,6 +60,18 @@ public class EventUtilities {
 
     public void setEventOrganiser(EventEntity entity){
         Optional<EventOrganiserEntity> organiserEntity = eventOrganiserDAO.findById(entity.getOrganiserId());
-        organiserEntity.ifPresent(eventOrganiserEntity -> entity.setOrganiser(eventOrganiserMapper.entityToDto(eventOrganiserEntity)));
+
+        if(organiserEntity.isPresent()){
+            Optional<EventCategoryEntity> category = eventCategoryDAO.findById(organiserEntity.get().getOrganiserCategoryId());
+            EventOrganiserModel organiserModel = eventOrganiserMapper.entityToDto(organiserEntity.get());
+
+            if (category.isPresent()) {
+                organiserModel.setOrganiserCategoryNameBs(category.get().getEventCategoryNameBs());
+                organiserModel.setOrganiserCategoryNameEn(category.get().getEventCategoryNameEn());
+            }
+
+            lookupImagesService.lookupThumbnailImage(organiserModel, ObjectType.ORGANISER, organiserModel.getId());
+            organiserEntity.ifPresent(eventOrganiserEntity -> entity.setOrganiser(organiserModel));
+        }
     }
 }

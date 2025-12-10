@@ -62,8 +62,8 @@ public class EventEntity implements Serializable {
     @Column(name = "reservation")
     private Boolean reservation;
 
-    @Column(name = "cancel_refund", columnDefinition = "VARCHAR", length = 255)
-    private String cancelRefund;
+    @Column(name = "cancel_refund")
+    private Boolean cancelRefund;
 
     @Column(name = "event_language", columnDefinition = "VARCHAR", length = 255)
     private String eventLanguage;

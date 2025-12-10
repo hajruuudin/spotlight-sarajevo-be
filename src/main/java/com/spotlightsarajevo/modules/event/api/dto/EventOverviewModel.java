@@ -70,7 +70,7 @@ public class EventOverviewModel implements Serializable {
     private String entryPrice;
 
     @Schema(description = "Cancellation and refund policy")
-    private String cancelRefund;
+    private Boolean cancelRefund;
 
     @Schema(description = "Language of the event")
     private String eventLanguage;
