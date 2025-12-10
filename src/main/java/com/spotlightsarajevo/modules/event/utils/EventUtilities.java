@@ -2,9 +2,12 @@ package com.spotlightsarajevo.modules.event.utils;
 
 import com.spotlightsarajevo.modules.category.domain.EventCategoryDAO;
 import com.spotlightsarajevo.modules.category.domain.entity.EventCategoryEntity;
+import com.spotlightsarajevo.modules.event.domain.EventOrganiserDAO;
 import com.spotlightsarajevo.modules.event.domain.EventTagsDAO;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
+import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventTagsEntity;
+import com.spotlightsarajevo.modules.event.mapper.EventOrganiserMapper;
 import com.spotlightsarajevo.modules.tag.domain.TagDAO;
 import com.spotlightsarajevo.modules.tag.domain.entity.TagEntity;
 import com.spotlightsarajevo.modules.tag.mappers.TagMapper;
@@ -20,8 +23,10 @@ import java.util.Optional;
 public class EventUtilities {
     EventCategoryDAO eventCategoryDAO;
     EventTagsDAO eventTagsDAO;
+    EventOrganiserDAO eventOrganiserDAO;
     TagDAO tagDAO;
     TagMapper tagMapper;
+    EventOrganiserMapper eventOrganiserMapper;
 
     public void setEventCategories(EventEntity entity){
         Optional<EventCategoryEntity> category = eventCategoryDAO.findById(entity.getCategoryId());
@@ -47,5 +52,10 @@ public class EventUtilities {
         }
 
         entity.setEventTags(tagMapper.entitiesToDtos(tagEntities));
+    }
+
+    public void setEventOrganiser(EventEntity entity){
+        Optional<EventOrganiserEntity> organiserEntity = eventOrganiserDAO.findById(entity.getOrganiserId());
+        organiserEntity.ifPresent(eventOrganiserEntity -> entity.setOrganiser(eventOrganiserMapper.entityToDto(eventOrganiserEntity)));
     }
 }

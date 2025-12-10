@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.event.domain.entity;
 
+import com.spotlightsarajevo.modules.event.api.dto.EventOrganiserModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -71,10 +72,13 @@ public class EventEntity implements Serializable {
     private BigDecimal eventLat;
 
     @Column(name = "event_long", columnDefinition = "NUMERIC", nullable = false)
-    private BigDecimal eventLong;
+    private BigDecimal eventLon;
 
     @Column(name = "location", columnDefinition = "VARCHAR", nullable = false)
     private String location;
+
+    @Column(name = "location_link_slug", columnDefinition = "VARCHAR")
+    private String locationLinkSlug;
 
     @Column(name = "organiser_id", nullable = false)
     private Integer organiserId;
@@ -86,11 +90,11 @@ public class EventEntity implements Serializable {
     private String categoryNameEn;
 
     @Transient
-    private BigDecimal combinedRating;
-
-    @Transient
     private String thumbnailImage;
 
     @Transient
     private List<TagModel> eventTags;
+
+    @Transient
+    private EventOrganiserModel organiser;
 }

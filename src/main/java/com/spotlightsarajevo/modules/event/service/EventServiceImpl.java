@@ -1,10 +1,7 @@
 package com.spotlightsarajevo.modules.event.service;
 
+import com.spotlightsarajevo.modules.event.api.dto.*;
 import com.spotlightsarajevo.modules.event.domain.EventDAO;
-import com.spotlightsarajevo.modules.event.api.dto.EventCreateModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventUpdateModel;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.event.utils.EventUtilities;
 import com.spotlightsarajevo.modules.media.service.LookupImagesService;
@@ -23,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -78,5 +76,29 @@ public class EventServiceImpl implements EventService {
     @Override
     public ResponseEntity<EventModel> delete(Integer id) {
         return null;
+    }
+
+    @Override
+    public ResponseEntity<EventOverviewModel> findEventOverview(String eventSlug) {
+        if(eventSlug == null || eventSlug.isBlank()){
+            throw new EventExceptions.EventNotFoundException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND.toString());
+        }
+
+        Optional<EventEntity> eventEntity = eventDAO.findBySlug(eventSlug);
+
+        if(eventEntity.isEmpty()){
+            throw new EventExceptions.EventNotFoundException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND.toString());
+        } else {
+            utils.setEventCategories(eventEntity.get());
+            utils.setEventTags(eventEntity.get());
+            utils.setEventOrganiser(eventEntity.get());
+
+            EventOverviewModel eventOverviewModel = eventMapper.entityToOverviewDto(eventEntity.get());
+
+            lookupImagesService.lookupThumbnailImage(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
+            lookupImagesService.lookupAllImages(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
+
+            return ResponseEntity.status(200).body(eventOverviewModel);
+        }
     }
 }
