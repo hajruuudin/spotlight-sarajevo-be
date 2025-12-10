@@ -81,13 +81,13 @@ public class EventServiceImpl implements EventService {
     @Override
     public ResponseEntity<EventOverviewModel> findEventOverview(String eventSlug) {
         if(eventSlug == null || eventSlug.isBlank()){
-            throw new EventExceptions.EventNotFoundException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND.toString());
+            throw new EventExceptions.EventNotFoundException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND);
         }
 
         Optional<EventEntity> eventEntity = eventDAO.findBySlug(eventSlug);
 
         if(eventEntity.isEmpty()){
-            throw new EventExceptions.EventNotFoundException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND.toString());
+            throw new EventExceptions.EventNotFoundException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND);
         } else {
             utils.setEventCategories(eventEntity.get());
             utils.setEventTags(eventEntity.get());

@@ -16,8 +16,8 @@ public class EventExceptions {
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public static class EventNotFoundException extends RuntimeException {
-        public EventNotFoundException(String message){
-            super(message);
+        public EventNotFoundException(ExceptionCodes.EventExceptionCodes message){
+            super(message.toString());
         }
     }
 
@@ -31,8 +31,8 @@ public class EventExceptions {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public static class EventCreationException extends RuntimeException {
-        public EventCreationException(String message) {
-            super(message);
+        public EventCreationException(ExceptionCodes.EventExceptionCodes message) {
+            super(message.toString());
         }
     }
 
@@ -46,8 +46,8 @@ public class EventExceptions {
      */
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public static class EventUnauthorizedException extends RuntimeException {
-        public EventUnauthorizedException(String message) {
-            super(message);
+        public EventUnauthorizedException(ExceptionCodes.EventExceptionCodes message) {
+            super(message.toString());
         }
     }
 
@@ -61,8 +61,8 @@ public class EventExceptions {
      */
     @ResponseStatus(HttpStatus.CONFLICT)
     public static class EventConflictException extends RuntimeException {
-        public EventConflictException(String message) {
-            super(message);
+        public EventConflictException(ExceptionCodes.EventExceptionCodes message) {
+            super(message.toString());
         }
     }
 

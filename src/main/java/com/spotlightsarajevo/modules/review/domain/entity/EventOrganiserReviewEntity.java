@@ -1,4 +1,4 @@
-package com.spotlightsarajevo.modules.event.domain.entity;
+package com.spotlightsarajevo.modules.review.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

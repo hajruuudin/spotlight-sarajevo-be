@@ -1,14 +1,17 @@
 package com.spotlightsarajevo.modules.review.service;
 
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
+import com.spotlightsarajevo.common.exceptions.EventExceptions;
 import com.spotlightsarajevo.common.exceptions.SpotExceptions;
+import com.spotlightsarajevo.common.specifications.EventOrganiserSpecification;
 import com.spotlightsarajevo.common.specifications.SpotReviewSpecification;
+import com.spotlightsarajevo.modules.review.domain.EventOrganiserReviewDAO;
+import com.spotlightsarajevo.modules.review.api.dto.*;
 import com.spotlightsarajevo.modules.review.domain.SpotReviewDAO;
+import com.spotlightsarajevo.modules.review.domain.entity.EventOrganiserReviewEntity;
+import com.spotlightsarajevo.modules.review.mapper.EventOrganiserReviewMapper;
 import com.spotlightsarajevo.modules.review.mapper.SpotReviewMapper;
 import com.spotlightsarajevo.modules.review.utils.ReviewUtilities;
-import com.spotlightsarajevo.modules.review.api.dto.SpotReviewCreateModel;
-import com.spotlightsarajevo.modules.review.api.dto.SpotReviewModel;
-import com.spotlightsarajevo.modules.review.api.dto.SpotReviewUpdateModel;
 import com.spotlightsarajevo.modules.review.domain.entity.SpotReviewEntity;
 import com.spotlightsarajevo.modules.user.domain.UserDAO;
 import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
@@ -29,12 +32,16 @@ import java.util.Optional;
 public class ReviewServiceImpl implements ReviewService {
     SpotReviewDAO spotReviewDAO;
     SpotReviewMapper spotReviewMapper;
+    EventOrganiserReviewDAO eventOrganiserReviewDAO;
+    EventOrganiserReviewMapper eventOrganiserReviewMapper;
     UserDAO userDAO;
     ReviewUtilities utils;
 
-    /* ============================================================== */
-    /* =================== DATA RETRIEVAL METHODS =================== */
-    /* ============================================================== */
+    /* ============================================================= */
+    /* ==================== SPOT REVIEWS CRUD ====================== */
+    /* ============================================================= */
+
+    /* =================== DATA RETRIEVAL METHODS ================== */
 
     @Override
     public ResponseEntity<Page<SpotReviewModel>> findReviewsForSpot(PageRequest pageRequest, Integer spotId, String sortOption) {
@@ -75,9 +82,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    /* ============================================================== */
-    /* ============== CREATE - UPDATE - DELETE METHODS ============== */
-    /* ============================================================== */
+    /* =================== CREATE, UPDATE, DELETE METHODS  ================== */
 
     @Override
     public ResponseEntity<SpotReviewModel> createSpotReview(SpotReviewCreateModel dto, Principal principal) {
@@ -102,7 +107,7 @@ public class ReviewServiceImpl implements ReviewService {
 //        if (!utils.isAuthorisedUser(dto.getUserId(), principal)) {
 //            throw new SpotExceptions.SpotUnauthorizedException(
 //                    ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
-//        }
+//        } THINK ABOUT THIS LATER ON WHEN REFACTORING CODE
 
         SpotReviewEntity entity = spotReviewDAO.findById(dto.getId())
                 .orElseThrow(() ->
@@ -133,6 +138,103 @@ public class ReviewServiceImpl implements ReviewService {
 
         spotReviewDAO.delete(review);
         return ResponseEntity.ok(spotReviewMapper.entityToDto(review));
+    }
+
+    /* ============================================================= */
+    /* ============== EVENT ORGANISER REVIEWS CRUD ================= */
+    /* ============================================================= */
+
+    /* =================== DATA RETRIEVAL METHODS ================== */
+
+    @Override
+    public ResponseEntity<Page<EventOrganiserReviewModel>> findReviewsForOrganiser(PageRequest pageRequest, Integer organiserId, String sortOption) {
+        if (organiserId == null)
+            throw new SpotExceptions.SpotSystemException(
+                    ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        Specification<EventOrganiserReviewEntity> spec = Specification
+                .allOf(EventOrganiserSpecification.hasOrganiserId(organiserId))
+                .and(EventOrganiserSpecification.withDynamicSorting(sortOption));
+
+        Page<EventOrganiserReviewEntity> page = eventOrganiserReviewDAO.findAll(spec, pageRequest);
+
+        Page<EventOrganiserReviewModel> response = new PageImpl<>(
+                eventOrganiserReviewMapper.entitiesToDto(page.getContent()),
+                pageRequest,
+                page.getTotalElements()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<EventOrganiserReviewModel> findUserOrganiserReview(Integer organiserId, Principal principal) {
+        if (organiserId == null)
+            throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        Optional<UserEntity> userEntity = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+
+        if (userEntity.isPresent()) {
+            Optional<EventOrganiserReviewEntity> reviewEntity = eventOrganiserReviewDAO.findByOrganiserIdAndUserId(organiserId, userEntity.get().getId());
+
+            return reviewEntity
+                    .map(entity -> ResponseEntity.status(200).body(eventOrganiserReviewMapper.entityToDto(entity)))
+                    .orElseGet(() -> ResponseEntity.status(200).body(null));
+        } else {
+            throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.EVENT_ORGANISER_REVIEW_NOT_FOUND);
+        }
+    }
+
+    /* =================== CREATE, UPDATE, DELETE METHODS  ================== */
+
+    @Override
+    public ResponseEntity<EventOrganiserReviewModel> createOrganiserReview(EventOrganiserReviewCreateModel dto, Principal principal) {
+        Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+
+        if (user.isPresent()) {
+            EventOrganiserReviewEntity entity = eventOrganiserReviewMapper.dtoToEntity(dto);
+
+            entity.setUserId(user.get().getId());
+            entity.setUsername(user.get().getUsername());
+            entity.setCreated(LocalDate.now());
+
+            EventOrganiserReviewEntity created = eventOrganiserReviewDAO.save(entity);
+            return ResponseEntity.ok(eventOrganiserReviewMapper.entityToDto(created));
+        } else {
+            throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+        }
+    }
+
+    @Override
+    public ResponseEntity<EventOrganiserReviewModel> updateOrganiserReview(EventOrganiserReviewUpdateModel dto, Principal principal) {
+        // Validation logic (commented out as per your original code)
+        // if (!utils.isAuthorisedUser(dto.getUserId(), principal)) { ... }
+
+        EventOrganiserReviewEntity entity = eventOrganiserReviewDAO.findById(dto.getId())
+                .orElseThrow(() ->
+                        new EventExceptions.EventNotFoundException(ExceptionCodes.EventExceptionCodes.EVENT_ORGANISER_REVIEW_NOT_FOUND)); // Assuming you add a specific code for Organisers
+
+        eventOrganiserReviewMapper.updateEntityFromDto(dto, entity);
+        entity.setModified(LocalDate.now());
+
+        eventOrganiserReviewDAO.save(entity);
+        return ResponseEntity.ok(eventOrganiserReviewMapper.entityToDto(entity));
+    }
+
+    @Override
+    public ResponseEntity<EventOrganiserReviewModel> deleteOrganiserReview(Integer organiserId, Integer reviewId, Principal principal) {
+        if (organiserId == null)
+            throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        EventOrganiserReviewEntity review = eventOrganiserReviewDAO.findById(reviewId)
+                .orElseThrow(() ->
+                        new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT));
+
+        if (!review.getOrganiserId().equals(organiserId))
+            throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        eventOrganiserReviewDAO.delete(review);
+        return ResponseEntity.ok(eventOrganiserReviewMapper.entityToDto(review));
     }
 
 }
