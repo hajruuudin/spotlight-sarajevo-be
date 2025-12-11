@@ -198,6 +198,7 @@ public class ReviewServiceImpl implements ReviewService {
             entity.setUsername(user.get().getUsername());
             entity.setCreated(LocalDate.now());
 
+            System.out.println("Entity to be save id:" + entity);
             EventOrganiserReviewEntity created = eventOrganiserReviewDAO.save(entity);
             return ResponseEntity.ok(eventOrganiserReviewMapper.entityToDto(created));
         } else {

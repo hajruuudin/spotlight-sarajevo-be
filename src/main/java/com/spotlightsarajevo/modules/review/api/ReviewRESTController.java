@@ -98,6 +98,7 @@ public class ReviewRESTController {
     public ResponseEntity<EventOrganiserReviewModel> addOrganiserReview(
             @RequestBody EventOrganiserReviewCreateModel request, Principal principal
     ){
+        System.out.println(request);
         return reviewService.createOrganiserReview(request, principal);
     }
 
