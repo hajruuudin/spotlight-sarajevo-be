@@ -1,4 +1,4 @@
-package com.spotlightsarajevo.modules.event.domain.entity;
+package com.spotlightsarajevo.modules.review.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,13 +7,14 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "ss_event_review")
-public class EventReviewEntity implements Serializable {
+@Table(name = "ss_event_organiser_reviews")
+public class EventOrganiserReviewEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -32,14 +33,20 @@ public class EventReviewEntity implements Serializable {
     private String body;
 
     @Column(name = "user_event_quality", columnDefinition = "NUMERIC")
-    private BigDecimal userEventQuality;
+    private BigDecimal userOrganiserQuality;
 
     @Column(name = "user_event_enjoyability", columnDefinition = "NUMERIC")
-    private BigDecimal userEventEnjoyability;
+    private BigDecimal userOrganiserEnjoyability;
 
     @Column(name = "user_event_atmosphere", columnDefinition = "NUMERIC")
-    private BigDecimal userEventAtmosphere;
+    private BigDecimal userOrganiserAtmosphere;
 
-    @Column(name = "event_id")
-    private Integer eventId;
+    @Column(name = "organiser_id")
+    private Integer organiserId;
+
+    @Column(name = "created")
+    private LocalDate created;
+
+    @Column(name = "modified")
+    private LocalDate modified;
 }

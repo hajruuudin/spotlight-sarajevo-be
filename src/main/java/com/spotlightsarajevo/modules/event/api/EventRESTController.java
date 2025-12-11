@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.event.api;
 
+import com.spotlightsarajevo.modules.event.api.dto.EventOverviewModel;
 import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
 import com.spotlightsarajevo.modules.event.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,5 +32,13 @@ public class EventRESTController {
             @RequestParam(defaultValue = "ALPHABETICAL", required = false) String sortOption,
             @RequestParam(required = false) List<Integer> categoryIds) {
         return eventService.findEventsPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption, categoryIds);
+    }
+
+    @GetMapping(value = "/find-event-overview")
+    @Operation(description = "Get an overview model for an event, including category names, tags and organiser model")
+    public ResponseEntity<EventOverviewModel> findEventOverview(
+            @RequestParam(required = true) String eventSlug
+    ){
+        return eventService.findEventOverview(eventSlug);
     }
 }

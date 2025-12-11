@@ -1,9 +1,6 @@
 package com.spotlightsarajevo.modules.event.service;
 
-import com.spotlightsarajevo.modules.event.api.dto.EventCreateModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventUpdateModel;
+import com.spotlightsarajevo.modules.event.api.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -15,4 +12,6 @@ public interface EventService {
     ResponseEntity<EventModel> create(EventCreateModel eventCreateModel);
     ResponseEntity<EventModel> update(EventUpdateModel eventUpdateModel);
     ResponseEntity<EventModel> delete(Integer id);
+
+    ResponseEntity<EventOverviewModel> findEventOverview(String eventSlug);
 }

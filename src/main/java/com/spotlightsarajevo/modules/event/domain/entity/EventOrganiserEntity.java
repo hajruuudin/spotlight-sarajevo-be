@@ -26,7 +26,7 @@ public class EventOrganiserEntity implements Serializable {
     private LocalDateTime organiserCreationDate;
 
     @Column(name = "organiser_category_id", columnDefinition = "VARCHAR", length = 255, nullable = false)
-    private String organiserCategoryId;
+    private Integer organiserCategoryId;
 
     @Column(name = "organiser_phone", columnDefinition = "VARCHAR", length = 20)
     private String organiserPhone;

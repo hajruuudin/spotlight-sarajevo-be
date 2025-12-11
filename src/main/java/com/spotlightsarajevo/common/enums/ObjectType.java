@@ -1,5 +1,5 @@
 package com.spotlightsarajevo.common.enums;
 
 public enum ObjectType {
-    SPOT, EVENT, USER, GUIDE
+    SPOT, EVENT, USER, GUIDE, ORGANISER
 }

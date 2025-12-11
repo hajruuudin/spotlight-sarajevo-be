@@ -1,9 +1,7 @@
 package com.spotlightsarajevo.modules.review.api;
 
+import com.spotlightsarajevo.modules.review.api.dto.*;
 import com.spotlightsarajevo.modules.review.service.ReviewService;
-import com.spotlightsarajevo.modules.review.api.dto.SpotReviewCreateModel;
-import com.spotlightsarajevo.modules.review.api.dto.SpotReviewModel;
-import com.spotlightsarajevo.modules.review.api.dto.SpotReviewUpdateModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -20,6 +18,10 @@ import java.security.Principal;
 @RequestMapping(value = "/review")
 public class ReviewRESTController {
     private final ReviewService reviewService;
+
+    /* ============================================================= */
+    /* ==================== SPOT REVIEWS CRUD ====================== */
+    /* ============================================================= */
 
     @GetMapping(value = "/spot/find-spot-reviews")
     @Operation(description = "Get a page of spot reviews for a spot")
@@ -65,5 +67,56 @@ public class ReviewRESTController {
             Principal principal
     ){
         return reviewService.deleteSpotReview(spotId, reviewId, principal);
+    }
+
+    /* ======================================================================== */
+    /* ==================== EVENT ORGANISER REVIEWS CRUD ====================== */
+    /* ======================================================================== */
+
+    @GetMapping(value = "/organiser/find-organiser-reviews")
+    @Operation(description = "Find all organiser reviews with pagination included")
+    public ResponseEntity<Page<EventOrganiserReviewModel>> findOrganiserReviews(
+            @RequestParam(required = true, defaultValue = "0") Integer pageNumber,
+            @RequestParam(required = true, defaultValue = "10") Integer pageSize,
+            @RequestParam(required = true) Integer organiserId,
+            @RequestParam(required = false, defaultValue = "ALPHABETICAL") String sortOption
+    ) {
+        return reviewService.findReviewsForOrganiser(PageRequest.of(pageNumber, pageSize), organiserId, sortOption);
+    }
+
+    @GetMapping(value = "/organiser/find-user-review")
+    @Operation(description = "Find a users review for the organiser")
+    public ResponseEntity<EventOrganiserReviewModel> findUserOrganiserReview(
+            @RequestParam(required = true) Integer organiserId,
+            Principal principal
+    ){
+        return reviewService.findUserOrganiserReview(organiserId, principal);
+    }
+
+    @PostMapping(value = "/organiser/add-review")
+    @Operation(description = "Add a review to an event organiser")
+    public ResponseEntity<EventOrganiserReviewModel> addOrganiserReview(
+            @RequestBody EventOrganiserReviewCreateModel request, Principal principal
+    ){
+        System.out.println(request);
+        return reviewService.createOrganiserReview(request, principal);
+    }
+
+    @PutMapping(value = "/organiser/update-review")
+    @Operation(description = "Update an existing organiser review in the database")
+    public ResponseEntity<EventOrganiserReviewModel> updateOrganiserReview(
+            @RequestBody EventOrganiserReviewUpdateModel request, Principal principal
+    ){
+        return reviewService.updateOrganiserReview(request, principal);
+    }
+
+    @DeleteMapping(value = "/organiser/remove-review")
+    @Operation(description = "Remove an existing organiser review in the database")
+    public ResponseEntity<EventOrganiserReviewModel> deleteOrganiserReview(
+            @RequestParam(required = true) Integer organiserId,
+            @RequestParam(required = true) Integer reviewId,
+            Principal principal
+    ){
+        return reviewService.deleteOrganiserReview(organiserId, reviewId, principal);
     }
 }

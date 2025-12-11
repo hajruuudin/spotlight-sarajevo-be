@@ -20,8 +20,11 @@ public class EventOrganiserModel implements Serializable {
     @Schema(description = "Date when the organiser entity was created")
     private LocalDateTime organiserCreationDate;
 
-    @Schema(description = "Category identifier of the organiser")
-    private String organiserCategoryId;
+    @Schema(description = "Category name of the organiser in English")
+    private String organiserCategoryNameEn;
+
+    @Schema(description = "Category name of the organiser in Bosnian")
+    private String organiserCategoryNameBs;
 
     @Schema(description = "Phone number of the organiser")
     private String organiserPhone;
@@ -31,4 +34,7 @@ public class EventOrganiserModel implements Serializable {
 
     @Schema(description = "Website URL of the organiser")
     private String organiserWebsite;
+
+    @Schema(description = "Thumbnail image of the organiser (logo or a default image)")
+    private String thumbnailImage;
 }

@@ -32,8 +32,8 @@ public class LookupImagesServiceImpl implements LookupImagesService {
             }
         } else {
             try {
-                Method setImageURLMethod = objectModel.getClass().getMethod("setImageUrl", String.class);
-                setImageURLMethod.invoke(objectModel, "/https://i.ibb.co/W472hxLk/FALLBACK.png");
+                Method setImageURLMethod = objectModel.getClass().getMethod("setThumbnailImage", String.class);
+                setImageURLMethod.invoke(objectModel, "https://i.ibb.co/W472hxLk/FALLBACK.png");
             } catch (NoSuchMethodException e) {
 
             } catch (Exception e) {
