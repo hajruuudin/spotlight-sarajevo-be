@@ -70,4 +70,9 @@ public class AuthExceptions {
             super(message);
         }
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public static class AuthenticationUserNotFoundException extends RuntimeException {
+        public AuthenticationUserNotFoundException(String message){ super(message);}
+    }
 }

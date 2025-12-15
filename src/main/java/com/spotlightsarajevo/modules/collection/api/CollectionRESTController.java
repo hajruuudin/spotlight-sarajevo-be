@@ -23,17 +23,7 @@ public class CollectionRESTController {
     public ResponseEntity<List<CollectionModel>> findUserCollections(
             Principal principal
     ){
-        return null;
-    }
-
-    @GetMapping("/{requestType}/{collectionId}")
-    @Operation(description = "Get either an event collection or a spot collection depending on the required type")
-    public ResponseEntity<CollectionModel> findCollectionByTypeAndId(
-            @PathVariable String requestType,
-            @PathVariable Integer collectionId,
-            Principal principal
-    ){
-        return null;
+        return collectionService.findUserCollections(principal);
     }
 
     @PostMapping
@@ -42,7 +32,7 @@ public class CollectionRESTController {
             @RequestBody CollectionCreateModel request,
             Principal principal
     ){
-        return null;
+        return collectionService.addCollection(request, principal);
     }
 
     @PutMapping
@@ -51,7 +41,7 @@ public class CollectionRESTController {
             @RequestBody CollectionUpdateModel request,
             Principal principal
             ){
-        return null;
+        return collectionService.updateCollection(request, principal);
     }
 
     @DeleteMapping(value = "/delete/{collectionId}")
@@ -60,16 +50,16 @@ public class CollectionRESTController {
             @PathVariable Integer collectionId,
             Principal principal
     ){
-        return null;
+        return collectionService.deleteCollection(collectionId, principal);
     }
 
-    @GetMapping(value = "/{:collectionId}/items")
+    @GetMapping(value = "/{collectionId}/items")
     @Operation(description = "Find items for a specific collection")
     public ResponseEntity<CollectionItemsModel> findCollectionItems(
             @PathVariable Integer collectionId,
             Principal principal
     ){
-        return null;
+        return collectionService.findCollectionItems(collectionId, principal);
     }
 
     @PostMapping(value = "/add-item")
@@ -78,7 +68,7 @@ public class CollectionRESTController {
             @RequestBody CollectionAddItemModel request,
             Principal principal
     ){
-        return null;
+        return collectionService.addItemToCollection(request, principal);
     }
 
     @DeleteMapping(value = "/remove-item")
@@ -89,7 +79,7 @@ public class CollectionRESTController {
             @RequestParam String collectionType,
             Principal principal
     ){
-        return null;
+        return collectionService.removeItemFromCollection(collectionId, itemId, collectionType, principal);
     }
 
 }

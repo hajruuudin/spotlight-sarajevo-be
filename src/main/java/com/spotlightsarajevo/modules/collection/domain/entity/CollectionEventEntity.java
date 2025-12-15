@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.collection.domain.entity;
 
+import com.spotlightsarajevo.common.utils.CollectionItem;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "ss_collection_event")
-public class CollectionEventEntity implements Serializable {
+public class CollectionEventEntity implements Serializable, CollectionItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
