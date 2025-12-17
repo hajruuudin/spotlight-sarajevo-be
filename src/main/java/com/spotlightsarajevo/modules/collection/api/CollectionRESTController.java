@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.collection.api;
 
+import com.spotlightsarajevo.common.utils.CollectionItemsObject;
 import com.spotlightsarajevo.modules.collection.api.dto.*;
 import com.spotlightsarajevo.modules.collection.service.CollectionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Tag(name = "collection", description = "Collection API Routes")
@@ -32,6 +34,7 @@ public class CollectionRESTController {
             @RequestBody CollectionCreateModel request,
             Principal principal
     ){
+        System.out.println(request);
         return collectionService.addCollection(request, principal);
     }
 
@@ -82,4 +85,43 @@ public class CollectionRESTController {
         return collectionService.removeItemFromCollection(collectionId, itemId, collectionType, principal);
     }
 
+    @GetMapping(value = "/find-spot-in-collections")
+    @Operation(description = "Find the collection ids in which a spot is located in")
+    public ResponseEntity<SpotInCollectionModel> findSpotInCollections(
+            @RequestParam Integer spotId,
+            Principal principal
+    ){
+        return collectionService.findSpotInCollections(spotId, principal);
+    }
+
+    @GetMapping(value = "/find-event-in-collections")
+    @Operation(description = "Find the collection ids in which an event is located in")
+    public ResponseEntity<EventInCollectionModel> findEventInCollections(
+            @RequestParam Integer eventId,
+            Principal principal
+    ){
+        return collectionService.findEventInCollections(eventId, principal);
+    }
+
+    @PostMapping(value = "/add-items-bulk")
+    @Operation(description = "Add one object to multiple collections at once")
+    public ResponseEntity<Map<String, Object>> addItemToCollectionsBulk(
+        @RequestBody AddItemToCollectionsModel request,
+        Principal principal
+    ){
+        System.out.println(request);
+        return collectionService.addItemToCollectionsBulk(request, principal);
+    };
+
+    @DeleteMapping(value = "/remove-items-bulk")
+    @Operation(description = "Remove one object from multiple collections at once")
+    public ResponseEntity<Map<String, Object>> removeItemFromCollectionsBulk(
+            @RequestParam List<Integer> collectionIds,
+            @RequestParam Integer objectId,
+            @RequestParam String objectType,
+            Principal principal
+    ){
+        System.out.println(collectionIds + " and " + objectId + " and " + objectType);
+        return collectionService.removeItemsFromCollectionsBulk(collectionIds, objectType, objectId, principal);
+    }
 }

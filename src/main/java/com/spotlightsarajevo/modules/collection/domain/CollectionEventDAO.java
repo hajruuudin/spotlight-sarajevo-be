@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface CollectionEventDAO extends JpaRepository<CollectionEventEntity, Integer> {
     List<CollectionItem> findAllByCollectionId(Integer collectionId);
     Optional<CollectionEventEntity> findByCollectionIdAndEventId(Integer collectionId, Integer eventId);
+    List<CollectionEventEntity> findAllByEventIdAndCollection_UserId(Integer eventId, Integer userId);
 }

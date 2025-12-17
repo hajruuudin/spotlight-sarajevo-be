@@ -1,10 +1,12 @@
 package com.spotlightsarajevo.modules.collection.service;
 
+import com.spotlightsarajevo.common.utils.CollectionItemsObject;
 import com.spotlightsarajevo.modules.collection.api.dto.*;
 import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 public interface CollectionService {
     /**
@@ -65,4 +67,12 @@ public interface CollectionService {
      * @return A ResponseEntity containing the updated CollectionItemsModel list.
      */
     ResponseEntity<CollectionItemsModel> removeItemFromCollection(Integer collectionId, Integer itemId, String collectionType, Principal principal);
+
+    ResponseEntity<SpotInCollectionModel> findSpotInCollections(Integer spotId, Principal principal);
+
+    ResponseEntity<EventInCollectionModel> findEventInCollections(Integer eventId, Principal principal);
+
+    ResponseEntity<Map<String, Object>> addItemToCollectionsBulk(AddItemToCollectionsModel request, Principal principal);
+
+    ResponseEntity<Map<String, Object>> removeItemsFromCollectionsBulk(List<Integer> ids, String objectType, Integer objectId, Principal principal);
 }

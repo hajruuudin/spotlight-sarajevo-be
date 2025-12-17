@@ -4,6 +4,7 @@ import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.CollectionExceptions;
 import com.spotlightsarajevo.common.utils.CollectionItem;
+import com.spotlightsarajevo.common.utils.CollectionItemsObject;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.modules.collection.api.dto.*;
 import com.spotlightsarajevo.modules.collection.domain.CollectionDAO;
@@ -16,6 +17,7 @@ import com.spotlightsarajevo.modules.collection.mapper.CollectionMapper;
 import com.spotlightsarajevo.modules.collection.utils.CollectionUtils;
 import com.spotlightsarajevo.modules.user.domain.UserDAO;
 import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,7 +56,7 @@ public class CollectionServiceImpl implements CollectionService {
     public ResponseEntity<CollectionModel> addCollection(CollectionCreateModel request, Principal principal) {
         if(principal == null) throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_FIND_UNAUTHORISED);
         if(request == null) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
-        if(!request.getCollectionType().equals(ObjectType.SPOT.toString()) || !request.getCollectionType().equals(ObjectType.EVENT.toString()))
+        if(!request.getCollectionType().equals(ObjectType.SPOT.toString()) && !request.getCollectionType().equals(ObjectType.EVENT.toString()))
             throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
 
         UserEntity user = commonFunctions.getUserFromPrincipal(principal);
@@ -232,5 +235,113 @@ public class CollectionServiceImpl implements CollectionService {
         } else {
             throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_INVALID_TYPE);
         }
+    }
+
+    @Override
+    public ResponseEntity<SpotInCollectionModel> findSpotInCollections(Integer spotId, Principal principal) {
+        if(principal == null) throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_FIND_UNAUTHORISED);
+        if(spotId == null) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+
+        List<CollectionSpotEntity> mappings = collectionSpotDAO.findAllBySpotIdAndCollection_UserId(spotId, user.getId());
+
+        SpotInCollectionModel model = new SpotInCollectionModel();
+
+        model.setIds(mappings.stream()
+                .map(CollectionSpotEntity::getCollectionId)
+                .toList());
+
+        return ResponseEntity.status(200).body(model);
+    }
+
+    @Override
+    public ResponseEntity<EventInCollectionModel> findEventInCollections(Integer eventId, Principal principal) {
+        if(principal == null) throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_FIND_UNAUTHORISED);
+        if(eventId == null) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+
+        List<CollectionEventEntity> mappings = collectionEventDAO.findAllByEventIdAndCollection_UserId(eventId, user.getId());
+
+        EventInCollectionModel model = new EventInCollectionModel();
+
+        model.setIds(mappings.stream()
+                .map(CollectionEventEntity::getCollectionId)
+                .toList());
+
+        return ResponseEntity.status(200).body(model);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Map<String, Object>> addItemToCollectionsBulk(AddItemToCollectionsModel request, Principal principal) {
+        if (principal == null) throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_FIND_UNAUTHORISED);
+        if (request == null || request.getIds() == null) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        String type = request.getCollectionType();
+        Integer objId = request.getObjectId();
+
+        for (Integer colId : request.getIds()) {
+            Optional<CollectionEntity> collection = collectionDAO.findById(colId);
+
+            if(collection.isPresent()){
+                collectionUtils.checkAuthentication(collection.get().getUserId(), user.getId());
+
+                if (ObjectType.SPOT.toString().equals(type)) {
+                    if (collectionSpotDAO.findByCollectionIdAndSpotId(colId, objId).isEmpty()) {
+                        CollectionSpotEntity spotEntity = new CollectionSpotEntity();
+                        spotEntity.setCollectionId(colId);
+                        spotEntity.setSpotId(objId);
+                        collectionSpotDAO.save(spotEntity);
+                    }
+                } else if (ObjectType.EVENT.toString().equals(type)) {
+                    if (collectionEventDAO.findByCollectionIdAndEventId(colId, objId).isEmpty()) {
+                        CollectionEventEntity eventEntity = new CollectionEventEntity();
+                        eventEntity.setCollectionId(colId);
+                        eventEntity.setEventId(objId);
+                        collectionEventDAO.save(eventEntity);
+                    }
+                }else {
+                    throw new CollectionExceptions.CollectionNotFoundException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_NOT_FOUND);
+                }
+            }
+        }
+
+        return ResponseEntity.status(200).body(Map.of(
+                "Item added", request.getIds()
+        ));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Map<String, Object>> removeItemsFromCollectionsBulk(List<Integer> ids, String objectType, Integer objectId, Principal principal) {
+        if (principal == null) throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_FIND_UNAUTHORISED);
+        if (ids == null || objectId == null) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+
+        for (Integer colId : ids) {
+            Optional<CollectionEntity> collection = collectionDAO.findById(colId);
+
+            if(collection.isPresent()){
+                collectionUtils.checkAuthentication(collection.get().getUserId(), user.getId());
+
+                if (ObjectType.SPOT.toString().equals(objectType)) {
+                    collectionSpotDAO.findByCollectionIdAndSpotId(colId, objectId)
+                            .ifPresent(collectionSpotDAO::delete);
+                } else if (ObjectType.EVENT.toString().equals(objectType)) {
+                    collectionEventDAO.findByCollectionIdAndEventId(colId, objectId)
+                            .ifPresent(collectionEventDAO::delete);
+                }
+            } else {
+                throw new CollectionExceptions.CollectionNotFoundException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_NOT_FOUND);
+            }
+        }
+
+        return ResponseEntity.status(200).body(Map.of(
+                "Item removed", ids
+        ));
     }
 }

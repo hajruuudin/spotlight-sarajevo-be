@@ -24,4 +24,8 @@ public class CollectionEventEntity implements Serializable, CollectionItem {
 
     @Column(name = "event_id", nullable = false)
     private Integer eventId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "collection_id", insertable = false, updatable = false)
+    private CollectionEntity collection;
 }

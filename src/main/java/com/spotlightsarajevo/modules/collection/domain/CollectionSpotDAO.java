@@ -1,6 +1,7 @@
 package com.spotlightsarajevo.modules.collection.domain;
 
 import com.spotlightsarajevo.common.utils.CollectionItem;
+import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEventEntity;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionSpotEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,4 +14,5 @@ import java.util.Optional;
 public interface CollectionSpotDAO extends JpaRepository<CollectionSpotEntity, Integer> {
     List<CollectionItem> findAllByCollectionId(Integer collectionId);
     Optional<CollectionSpotEntity> findByCollectionIdAndSpotId(Integer collectionId, Integer spotId);
+    List<CollectionSpotEntity> findAllBySpotIdAndCollection_UserId(Integer spotId, Integer userId);
 }
