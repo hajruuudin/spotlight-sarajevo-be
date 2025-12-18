@@ -15,7 +15,6 @@ import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEventEnt
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionSpotEntity;
 import com.spotlightsarajevo.modules.collection.mapper.CollectionMapper;
 import com.spotlightsarajevo.modules.collection.utils.CollectionUtils;
-import com.spotlightsarajevo.modules.user.domain.UserDAO;
 import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,12 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -118,21 +113,33 @@ public class CollectionServiceImpl implements CollectionService {
 
         if(collectionEntity.isPresent()){
             if(Objects.equals(collectionEntity.get().getCollectionType(), ObjectType.SPOT.toString())){
-                List<CollectionItem> collectionSpotEntities = collectionSpotDAO.findAllByCollectionId(collectionId);
+                List<CollectionItem> collectionSpotLinks = collectionSpotDAO.findAllByCollectionId(collectionId);
+                List<CollectionItem> collectionSpotShorthands = new ArrayList<>();
+
+                for(CollectionItem entity : collectionSpotLinks){
+                    CollectionItem item = collectionUtils.resolveCollectionItem((CollectionSpotEntity) entity);
+                    collectionSpotShorthands.add(item);
+                }
 
                 CollectionItemsModel collectionItemsModel = new CollectionItemsModel();
                 collectionItemsModel.setCollectionId(collectionId);
                 collectionItemsModel.setCollectionType(collectionEntity.get().getCollectionType());
-                collectionItemsModel.setCollectionItems(collectionSpotEntities);
+                collectionItemsModel.setCollectionItems(collectionSpotShorthands);
 
                 return ResponseEntity.status(200).body(collectionItemsModel);
             } else if (Objects.equals(collectionEntity.get().getCollectionType(), ObjectType.EVENT.toString())){
-                List<CollectionItem> collectionEventEntities = collectionEventDAO.findAllByCollectionId(collectionId);
+                List<CollectionItem> collectionEventLinks = collectionEventDAO.findAllByCollectionId(collectionId);
+                List<CollectionItem> collectionEventShorthands = new ArrayList<>();
+
+                for(CollectionItem entity : collectionEventLinks){
+                    CollectionItem item = collectionUtils.resolveCollectionItem((CollectionEventEntity) entity);
+                    collectionEventShorthands.add(item);
+                }
 
                 CollectionItemsModel collectionItemsModel = new CollectionItemsModel();
                 collectionItemsModel.setCollectionId(collectionId);
                 collectionItemsModel.setCollectionType(collectionEntity.get().getCollectionType());
-                collectionItemsModel.setCollectionItems(collectionEventEntities);
+                collectionItemsModel.setCollectionItems(collectionEventShorthands);
 
                 return ResponseEntity.status(200).body(collectionItemsModel);
             } else {

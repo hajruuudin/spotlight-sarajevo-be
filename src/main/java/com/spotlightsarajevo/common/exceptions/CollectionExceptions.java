@@ -32,4 +32,11 @@ public class CollectionExceptions {
             super(message.toString());
         }
     }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public static class CollectionSystemException extends RuntimeException{
+        public CollectionSystemException(ExceptionCodes.CollectionExceptionCodes message){
+            super(message.toString());
+        }
+    }
 }
