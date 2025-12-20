@@ -26,4 +26,5 @@ public interface SpotMapper {
             @Mapping(source = "reviewStats.combinedCleanliness", target = "combinedCleanliness")
     })
     SpotOverviewModel entityOverviewToDto(SpotEntity entity);
+    SpotShorthandModel entityToShorthandDto(SpotEntity entity);
 }

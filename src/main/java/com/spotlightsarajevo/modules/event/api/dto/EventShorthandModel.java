@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.event.api.dto;
 
+import com.spotlightsarajevo.common.utils.CollectionItem;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Data
 @Schema(description = "Properties for an event shorthand model")
-public class EventShorthandModel implements Serializable {
+public class EventShorthandModel implements Serializable, CollectionItem {
     private static final long versionUUId = 1L;
 
     @Schema(description = "Unique identifier of the event")

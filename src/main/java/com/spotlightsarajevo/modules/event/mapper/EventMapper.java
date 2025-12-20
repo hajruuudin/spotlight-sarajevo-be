@@ -11,4 +11,5 @@ import java.util.List;
 public interface EventMapper {
     List<EventShorthandModel> entitiesToShorthandDtos(List<EventEntity> entities);
     EventOverviewModel entityToOverviewDto(EventEntity eventEntity);
+    EventShorthandModel entityToShorthandDto(EventEntity eventEntity);
 }

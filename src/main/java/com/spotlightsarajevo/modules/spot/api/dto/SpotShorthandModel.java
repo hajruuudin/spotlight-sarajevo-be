@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.spot.api.dto;
 
+import com.spotlightsarajevo.common.utils.CollectionItem;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Data
 @Schema(description = "Properties for a spot shorthand model")
-public class SpotShorthandModel implements Serializable {
+public class SpotShorthandModel implements Serializable, CollectionItem {
     private static final long versionUUId = 1L;
 
     @Schema(description = "Unique identifier of the Spot")
