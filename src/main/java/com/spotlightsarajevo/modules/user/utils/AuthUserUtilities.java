@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 @Component
+@AllArgsConstructor
 public class AuthUserUtilities {
     private static final GsonFactory jsonFactory = new GsonFactory();
     private static final NetHttpTransport transport = new NetHttpTransport();

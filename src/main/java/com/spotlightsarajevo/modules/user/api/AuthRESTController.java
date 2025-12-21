@@ -38,15 +38,15 @@ public class AuthRESTController {
 
     @Operation(description = "Register a user with their respective Credentials along with the survey data")
     @PostMapping(value = "/register")
-    public ResponseEntity<UserModel> register(@RequestBody PreferencesModel request, HttpSession session){
+    public ResponseEntity<LoggedUserModel> register(@RequestBody PreferencesModel request, HttpSession session, HttpServletResponse response){
         if(session.getAttribute(CommonConstants.GOOGLE_USER_INFO_SESSION_KEY) != null){
             GoogleUserModel googleData = (GoogleUserModel) session.getAttribute(CommonConstants.GOOGLE_USER_INFO_SESSION_KEY);
 
-            return authService.registerByGoogle(googleData, request);
+            return authService.registerByGoogle(googleData, request, response);
         } else if (session.getAttribute(CommonConstants.SYSTEM_USER_INFO_SESSION_KEY) != null){
             SystemUserModel systemData = (SystemUserModel) session.getAttribute(CommonConstants.SYSTEM_USER_INFO_SESSION_KEY);
 
-            return authService.registerBySystem(systemData, request);
+            return authService.registerBySystem(systemData, request, response);
         } else {
             System.out.println(session.getAttribute(CommonConstants.SYSTEM_USER_INFO_SESSION_KEY));
             System.out.println(session.getAttribute(CommonConstants.GOOGLE_USER_INFO_SESSION_KEY));
@@ -56,14 +56,14 @@ public class AuthRESTController {
 
     @Operation(description = "Login a user using Google Credentials")
     @PostMapping(value = "/login/google")
-    public ResponseEntity<Map<String, Object>> loginGoogle(
+    public ResponseEntity<LoggedUserModel> loginGoogle(
             @RequestBody Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException {
         return authService.loginGoogle(payload, servletResponse);
     }
 
     @Operation(description = "Login a user with System Credentials")
     @PostMapping(value = "/login/system")
-    public ResponseEntity<Map<String, Object>> loginSystem(
+    public ResponseEntity<LoggedUserModel> loginSystem(
             @RequestBody SystemLoginModel request, HttpServletResponse servletResponse){
         return authService.loginSystem(request, servletResponse);
     }
