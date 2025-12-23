@@ -65,6 +65,22 @@ public class CollectionRESTController {
         return collectionService.findCollectionItems(collectionId, principal);
     }
 
+    @GetMapping(value = "/all-spots")
+    @Operation(description = "Find all spots that were added to some collection")
+    public ResponseEntity<CollectionItemsModel> findAllSpotsCollection(
+            Principal principal
+    ){
+        return collectionService.findAllSpotsCollection(principal);
+    }
+
+    @GetMapping(value = "/all-events")
+    @Operation(description = "FInd all events that were added to some collection")
+    public ResponseEntity<CollectionItemsModel> findAllEventsCollection(
+            Principal principal
+    ){
+        return collectionService.findAllEventsCollection(principal);
+    }
+
     @PostMapping(value = "/add-item")
     @Operation(description = "Add an item to a specified collection")
     public ResponseEntity<CollectionItemsModel> addItemToCollection(

@@ -15,5 +15,6 @@ import java.util.Optional;
 public interface CollectionSpotDAO extends JpaRepository<CollectionSpotEntity, Integer> {
     List<CollectionItem> findAllByCollectionId(Integer collectionId);
     Optional<CollectionSpotEntity> findByCollectionIdAndSpotId(Integer collectionId, Integer spotId);
-    List<CollectionSpotEntity> findAllBySpotIdAndCollection_UserId(Integer spotId, Integer userId);
+    List<CollectionSpotEntity> findAllBySpotIdAndUserId(Integer spotId, Integer userId);
+    List<CollectionSpotEntity> findAllByUserId(Integer userId);
 }

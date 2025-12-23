@@ -50,6 +50,10 @@ public interface CollectionService {
      */
     ResponseEntity<CollectionItemsModel> findCollectionItems(Integer collectionId, Principal principal);
 
+    ResponseEntity<CollectionItemsModel> findAllSpotsCollection(Principal principal);
+
+    ResponseEntity<CollectionItemsModel> findAllEventsCollection(Principal principal);
+
     /**
      * Add a new item (e.g., a spot or event ID) to an existing user collection.
      * @param request The data model containing the collection ID, item ID, and item type to be added.

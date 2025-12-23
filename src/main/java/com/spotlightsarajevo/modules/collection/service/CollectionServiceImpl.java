@@ -2,6 +2,7 @@ package com.spotlightsarajevo.modules.collection.service;
 
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
+import com.spotlightsarajevo.common.enums.ProtectedKeywords;
 import com.spotlightsarajevo.common.exceptions.CollectionExceptions;
 import com.spotlightsarajevo.common.utils.CollectionItem;
 import com.spotlightsarajevo.common.utils.CollectionItemsObject;
@@ -51,15 +52,17 @@ public class CollectionServiceImpl implements CollectionService {
     public ResponseEntity<CollectionModel> addCollection(CollectionCreateModel request, Principal principal) {
         if(principal == null) throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_FIND_UNAUTHORISED);
         if(request == null) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
-        if(!request.getCollectionType().equals(ObjectType.SPOT.toString()) && !request.getCollectionType().equals(ObjectType.EVENT.toString()))
-            throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
+        if(!request.getCollectionType().equals(ObjectType.SPOT.toString()) && !request.getCollectionType().equals(ObjectType.EVENT.toString())) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
+        if(request.getCollectionName().equals(ProtectedKeywords.ALL_SPOTS.toString()) || request.getCollectionName().equals(ProtectedKeywords.ALL_EVENTS.toString())) throw new CollectionExceptions.CollectionNamingException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_NAME_CONFLICT);
 
         UserEntity user = commonFunctions.getUserFromPrincipal(principal);
 
         CollectionEntity entity = collectionMapper.dtoToEntity(request);
+
         entity.setCreated(LocalDateTime.now());
         entity.setCreatedBy(user.getUsername());
         entity.setUserId(user.getId());
+        entity.setIsSystem(false);
 
         CollectionEntity savedEntity = collectionDAO.save(entity);
 
@@ -70,11 +73,15 @@ public class CollectionServiceImpl implements CollectionService {
     public ResponseEntity<CollectionModel> updateCollection(CollectionUpdateModel request, Principal principal) {
         if(principal == null) throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_FIND_UNAUTHORISED);
         if(request == null) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
+        if(request.getCollectionName().equals(ProtectedKeywords.ALL_SPOTS.toString()) || request.getCollectionName().equals(ProtectedKeywords.ALL_EVENTS.toString())) throw new CollectionExceptions.CollectionNamingException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_NAME_CONFLICT);
 
         UserEntity user = commonFunctions.getUserFromPrincipal(principal);
 
         Optional<CollectionEntity> entity = collectionDAO.findById(request.getId());
         if (entity.isPresent()){
+            if(entity.get().getIsSystem()){
+                throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_SYSTEM_EXCEPTION);
+            }
             collectionMapper.updateEntityFromDto(request, entity.get());
             collectionDAO.save(entity.get());
 
@@ -90,10 +97,13 @@ public class CollectionServiceImpl implements CollectionService {
         if(collectionId == null) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
 
         UserEntity user = commonFunctions.getUserFromPrincipal(principal);
-        collectionUtils.checkAuthentication(collectionId, user.getId());
 
         Optional<CollectionEntity> entity = collectionDAO.findById(collectionId);
         if(entity.isPresent()){
+            if(entity.get().getIsSystem()){
+                throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_SYSTEM_EXCEPTION);
+            }
+            collectionUtils.checkAuthentication(entity.get().getUserId(), user.getId());
             collectionDAO.delete(entity.get());
 
             return ResponseEntity.status(200).body(collectionMapper.entityToDto(entity.get()));
@@ -121,9 +131,7 @@ public class CollectionServiceImpl implements CollectionService {
                     collectionSpotShorthands.add(item);
                 }
 
-                CollectionItemsModel collectionItemsModel = new CollectionItemsModel();
-                collectionItemsModel.setCollectionId(collectionId);
-                collectionItemsModel.setCollectionType(collectionEntity.get().getCollectionType());
+                CollectionItemsModel collectionItemsModel = collectionMapper.entityToCollectionItems(collectionEntity.get());
                 collectionItemsModel.setCollectionItems(collectionSpotShorthands);
 
                 return ResponseEntity.status(200).body(collectionItemsModel);
@@ -136,9 +144,9 @@ public class CollectionServiceImpl implements CollectionService {
                     collectionEventShorthands.add(item);
                 }
 
-                CollectionItemsModel collectionItemsModel = new CollectionItemsModel();
-                collectionItemsModel.setCollectionId(collectionId);
-                collectionItemsModel.setCollectionType(collectionEntity.get().getCollectionType());
+                CollectionItemsModel collectionItemsModel = collectionMapper.entityToCollectionItems(collectionEntity.get());
+                collectionItemsModel.setCollectionItems(collectionEventShorthands);
+
                 collectionItemsModel.setCollectionItems(collectionEventShorthands);
 
                 return ResponseEntity.status(200).body(collectionItemsModel);
@@ -149,6 +157,59 @@ public class CollectionServiceImpl implements CollectionService {
             throw new CollectionExceptions.CollectionNotFoundException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_NOT_FOUND);
         }
     }
+
+    @Override
+    public ResponseEntity<CollectionItemsModel> findAllSpotsCollection(Principal principal) {
+        if (principal == null)
+            throw new CollectionExceptions.CollectionUnauthorisedException(
+                    ExceptionCodes.CollectionExceptionCodes.COLLECTION_FIND_UNAUTHORISED
+            );
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+
+        List<CollectionSpotEntity> userSpots = collectionSpotDAO.findAllByUserId(user.getId());
+
+        List<CollectionItem> collectionItems = new ArrayList<>();
+        for (CollectionSpotEntity entity : userSpots) {
+            CollectionItem item = collectionUtils.resolveCollectionItem(entity);
+            collectionItems.add(item);
+        }
+
+        CollectionItemsModel collectionItemsModel = new CollectionItemsModel();
+        collectionItemsModel.setCollectionId(null);
+        collectionItemsModel.setCollectionType(ObjectType.SPOT.toString());
+        collectionItemsModel.setCollectionItems(collectionItems);
+        collectionItemsModel.setIsSystem(true);
+
+        return ResponseEntity.status(200).body(collectionItemsModel);
+    }
+
+    @Override
+    public ResponseEntity<CollectionItemsModel> findAllEventsCollection(Principal principal) {
+        if (principal == null)
+            throw new CollectionExceptions.CollectionUnauthorisedException(
+                    ExceptionCodes.CollectionExceptionCodes.COLLECTION_FIND_UNAUTHORISED
+            );
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+
+        List<CollectionEventEntity> userEvents = collectionEventDAO.findAllByUserId(user.getId());
+
+        List<CollectionItem> collectionItems = new ArrayList<>();
+        for (CollectionEventEntity entity : userEvents) {
+            CollectionItem item = collectionUtils.resolveCollectionItem(entity);
+            collectionItems.add(item);
+        }
+
+        CollectionItemsModel collectionItemsModel = new CollectionItemsModel();
+        collectionItemsModel.setCollectionId(null);
+        collectionItemsModel.setCollectionType(ObjectType.EVENT.toString());
+        collectionItemsModel.setCollectionItems(collectionItems);
+        collectionItemsModel.setIsSystem(true);
+
+        return ResponseEntity.status(200).body(collectionItemsModel);
+    }
+
 
     @Override
     public ResponseEntity<CollectionItemsModel> addItemToCollection(CollectionAddItemModel request, Principal principal) {
@@ -169,23 +230,23 @@ public class CollectionServiceImpl implements CollectionService {
 
         if (Objects.equals(collectionType, ObjectType.SPOT.toString())){
             CollectionSpotEntity spotEntity = collectionMapper.itemSpotDtoToEntity(request);
+            spotEntity.setUserId(user.getId());
             collectionSpotDAO.save(spotEntity);
 
             List<CollectionItem> collectionSpotEntities = collectionSpotDAO.findAllByCollectionId(request.getCollectionId());
-            CollectionItemsModel collectionItemsModel = new CollectionItemsModel();
-            collectionItemsModel.setCollectionId(request.getCollectionId());
-            collectionItemsModel.setCollectionType(collectionType);
+
+            CollectionItemsModel collectionItemsModel = collectionMapper.entityToCollectionItems(collectionEntity);
             collectionItemsModel.setCollectionItems(collectionSpotEntities);
 
             return ResponseEntity.status(200).body(collectionItemsModel);
         } else if (Objects.equals(collectionType, ObjectType.EVENT.toString())){
             CollectionEventEntity eventEntity = collectionMapper.itemEvenDtoToEntity(request);
+            eventEntity.setUserId(user.getId());
             collectionEventDAO.save(eventEntity);
 
             List<CollectionItem> collectionEventEntities = collectionEventDAO.findAllByCollectionId(request.getCollectionId());
-            CollectionItemsModel collectionItemsModel = new CollectionItemsModel();
-            collectionItemsModel.setCollectionId(request.getCollectionId());
-            collectionItemsModel.setCollectionType(collectionType);
+
+            CollectionItemsModel collectionItemsModel = collectionMapper.entityToCollectionItems(collectionEntity);
             collectionItemsModel.setCollectionItems(collectionEventEntities);
 
             return ResponseEntity.status(200).body(collectionItemsModel);
@@ -251,7 +312,7 @@ public class CollectionServiceImpl implements CollectionService {
 
         UserEntity user = commonFunctions.getUserFromPrincipal(principal);
 
-        List<CollectionSpotEntity> mappings = collectionSpotDAO.findAllBySpotIdAndCollection_UserId(spotId, user.getId());
+        List<CollectionSpotEntity> mappings = collectionSpotDAO.findAllBySpotIdAndUserId(spotId, user.getId());
 
         SpotInCollectionModel model = new SpotInCollectionModel();
 
@@ -269,7 +330,7 @@ public class CollectionServiceImpl implements CollectionService {
 
         UserEntity user = commonFunctions.getUserFromPrincipal(principal);
 
-        List<CollectionEventEntity> mappings = collectionEventDAO.findAllByEventIdAndCollection_UserId(eventId, user.getId());
+        List<CollectionEventEntity> mappings = collectionEventDAO.findAllByEventIdAndUserId(eventId, user.getId());
 
         EventInCollectionModel model = new EventInCollectionModel();
 
@@ -301,6 +362,7 @@ public class CollectionServiceImpl implements CollectionService {
                         CollectionSpotEntity spotEntity = new CollectionSpotEntity();
                         spotEntity.setCollectionId(colId);
                         spotEntity.setSpotId(objId);
+                        spotEntity.setUserId(user.getId());
                         collectionSpotDAO.save(spotEntity);
                     }
                 } else if (ObjectType.EVENT.toString().equals(type)) {
@@ -308,6 +370,7 @@ public class CollectionServiceImpl implements CollectionService {
                         CollectionEventEntity eventEntity = new CollectionEventEntity();
                         eventEntity.setCollectionId(colId);
                         eventEntity.setEventId(objId);
+                        eventEntity.setUserId(user.getId());
                         collectionEventDAO.save(eventEntity);
                     }
                 }else {

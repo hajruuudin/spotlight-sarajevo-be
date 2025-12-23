@@ -153,36 +153,6 @@ public class AuthUserUtilities {
     }
 
     /**
-     * Method to create two default user collections, one for {@link CollectionSpotEntity} and
-     * one for {@link CollectionEventEntity}. Used in {@link AuthServiceImpl} during Google and System registration
-     *
-     * @param userEntity The user who the collections are linked to
-     * @apiNote The name of the collections are by default "All Spots" and "All Events" and <b> cannot be changed</b>
-     * within the application UI.
-     */
-    public void setUserDefaultCollections(UserEntity userEntity){
-        if(userEntity == null){
-            throw new AuthExceptions.UserRegisterException("User Entity cannot be null");
-        }
-
-        CollectionEntity collectionSpotEntity = new CollectionEntity();
-        collectionSpotEntity.setCollectionName("All Spots");
-        collectionSpotEntity.setCollectionType(String.valueOf(ObjectType.SPOT));
-        collectionSpotEntity.setUserId(userEntity.getId());
-        collectionSpotEntity.setCreated(LocalDateTime.now());
-        collectionSpotEntity.setCreatedBy("SYSTEM");
-        collectionDAO.save(collectionSpotEntity);
-
-        CollectionEntity collectionEventEntity = new CollectionEntity();
-        collectionEventEntity.setCollectionName("All Events");
-        collectionEventEntity.setCollectionType(String.valueOf(ObjectType.EVENT));
-        collectionEventEntity.setUserId(userEntity.getId());
-        collectionEventEntity.setCreated(LocalDateTime.now());
-        collectionEventEntity.setCreatedBy("SYSTEM");
-        collectionDAO.save(collectionEventEntity);
-    }
-
-    /**
      * Method to create a new JWT cookie upon logging in. Used in {@link AuthServiceImpl} during
      * logging in as Google or System user.
      *

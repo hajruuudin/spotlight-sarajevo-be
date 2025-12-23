@@ -127,9 +127,6 @@ public class AuthServiceImpl implements AuthService {
             // Using the ID of the new entity, save the users preferences
             authUserUtilities.setUserFavouriteObjects(savedUserEntity, preferencesModel);
 
-            // Create a default collection for the user, one for spots, one for events
-            authUserUtilities.setUserDefaultCollections(savedUserEntity);
-
             // Immediately log the user in
             UserDetails userDetails = userDetailsService.loadUserByUsername(googleData.getEmail());
             String jwt = jwtUtil.generateToken(userDetails);
@@ -157,9 +154,6 @@ public class AuthServiceImpl implements AuthService {
 
             // Using the ID of the new entity, save the users preferences
             authUserUtilities.setUserFavouriteObjects(savedUserEntity, preferencesModel);
-
-            // Create a default collection for the user, one for spots, one for events
-            authUserUtilities.setUserDefaultCollections(savedUserEntity);
 
             // Immediately log the user in to the system
             UserDetails userDetails = userDetailsService.loadUserByUsername(systemData.getEmail());
