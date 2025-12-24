@@ -36,8 +36,6 @@ public class SpotServiceImpl implements SpotService {
     private final LookupImagesService lookupImagesService;
     private final SpotUtilities utils;
 
-
-
     @Override
     public ResponseEntity<Page<SpotModel>> findAll(PageRequest pageRequest) {
         Page<SpotEntity> page = spotDAO.findAll(pageRequest);

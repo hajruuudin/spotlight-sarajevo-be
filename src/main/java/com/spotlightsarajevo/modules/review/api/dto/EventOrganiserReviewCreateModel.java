@@ -22,6 +22,9 @@ public class EventOrganiserReviewCreateModel implements Serializable {
     @Schema(description = "The main content or body of the record")
     private String body;
 
+    @Schema(description = "The organiser rating the user provided")
+    private BigDecimal userOverallRating;
+
     @Schema(description = "Quality rating given by the user for the organiser")
     private BigDecimal userOrganiserQuality;
 

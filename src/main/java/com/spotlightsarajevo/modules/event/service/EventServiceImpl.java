@@ -91,7 +91,7 @@ public class EventServiceImpl implements EventService {
         } else {
             utils.setEventCategories(eventEntity.get());
             utils.setEventTags(eventEntity.get());
-            utils.setEventOrganiser(eventEntity.get());
+            utils.setEventOrganiserAndStats(eventEntity.get());
 
             EventOverviewModel eventOverviewModel = eventMapper.entityToOverviewDto(eventEntity.get());
 

@@ -208,7 +208,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ResponseEntity<EventOrganiserReviewModel> updateOrganiserReview(EventOrganiserReviewUpdateModel dto, Principal principal) {
-        // Validation logic (commented out as per your original code)
+        // Validation logic
         // if (!utils.isAuthorisedUser(dto.getUserId(), principal)) { ... }
 
         EventOrganiserReviewEntity entity = eventOrganiserReviewDAO.findById(dto.getId())
