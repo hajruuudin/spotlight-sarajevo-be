@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.collection.service;
 
+import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.utils.CollectionItemsObject;
 import com.spotlightsarajevo.modules.collection.api.dto.*;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +71,7 @@ public interface CollectionService {
      * @param principal Spring Security principal object sent over the request. Used for authentication & authorisation.
      * @return A ResponseEntity containing the updated CollectionItemsModel list.
      */
-    ResponseEntity<CollectionItemsModel> removeItemFromCollection(Integer collectionId, Integer itemId, String collectionType, Principal principal);
+    ResponseEntity<CollectionItemsModel> removeItemFromCollection(Integer collectionId, Integer itemId, String collectionType, Boolean isSystem, Principal principal);
 
     ResponseEntity<SpotInCollectionModel> findSpotInCollections(Integer spotId, Principal principal);
 
@@ -78,5 +79,7 @@ public interface CollectionService {
 
     ResponseEntity<Map<String, Object>> addItemToCollectionsBulk(AddItemToCollectionsModel request, Principal principal);
 
-    ResponseEntity<Map<String, Object>> removeItemsFromCollectionsBulk(List<Integer> ids, String objectType, Integer objectId, Principal principal);
+    ResponseEntity<Map<String, Object>> removeItemsFromCollectionsBulk(List<Integer> ids, String objectType, Integer objectId, Boolean isSystem, Principal principal);
+
+    boolean isItemSavedInSystemCollection(Integer objectId, String objectType, Principal principal);
 }

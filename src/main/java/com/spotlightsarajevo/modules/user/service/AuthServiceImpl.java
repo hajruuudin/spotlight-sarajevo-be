@@ -13,6 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -113,6 +114,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<LoggedUserModel> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferencesModel, HttpServletResponse response) {
         try {
             // Generate a new, blank, user entity
@@ -126,6 +128,9 @@ public class AuthServiceImpl implements AuthService {
 
             // Using the ID of the new entity, save the users preferences
             authUserUtilities.setUserFavouriteObjects(savedUserEntity, preferencesModel);
+
+            // Creating two system collections for Spots and for Events
+            authUserUtilities.setUserDefaultCollections(savedUserEntity);
 
             // Immediately log the user in
             UserDetails userDetails = userDetailsService.loadUserByUsername(googleData.getEmail());
@@ -154,6 +159,9 @@ public class AuthServiceImpl implements AuthService {
 
             // Using the ID of the new entity, save the users preferences
             authUserUtilities.setUserFavouriteObjects(savedUserEntity, preferencesModel);
+
+            // Creating two system collections for Spots and for Events
+            authUserUtilities.setUserDefaultCollections(savedUserEntity);
 
             // Immediately log the user in to the system
             UserDetails userDetails = userDetailsService.loadUserByUsername(systemData.getEmail());

@@ -4,8 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum ProtectedKeywords {
-    ALL_SPOTS("All Spots"),
-    ALL_EVENTS("All Events");
+    ALL_SPOTS("ALL-SPOTS"),
+    ALL_EVENTS("ALL-EVENTS"),
+    SYSTEM("SYSTEM");
 
     private final String value;
 

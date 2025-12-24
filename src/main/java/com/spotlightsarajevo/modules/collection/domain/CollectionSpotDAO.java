@@ -17,4 +17,5 @@ public interface CollectionSpotDAO extends JpaRepository<CollectionSpotEntity, I
     Optional<CollectionSpotEntity> findByCollectionIdAndSpotId(Integer collectionId, Integer spotId);
     List<CollectionSpotEntity> findAllBySpotIdAndUserId(Integer spotId, Integer userId);
     List<CollectionSpotEntity> findAllByUserId(Integer userId);
+    boolean existsByCollectionIdAndSpotId(Integer collectionId, Integer spotId);
 }

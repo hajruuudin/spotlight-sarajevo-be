@@ -15,4 +15,5 @@ public interface CollectionEventDAO extends JpaRepository<CollectionEventEntity,
     Optional<CollectionEventEntity> findByCollectionIdAndEventId(Integer collectionId, Integer eventId);
     List<CollectionEventEntity> findAllByEventIdAndUserId(Integer eventId, Integer userId);
     List<CollectionEventEntity> findAllByUserId(Integer userId);
+    boolean existsByCollectionIdAndEventId(Integer collectionId, Integer eventId);
 }

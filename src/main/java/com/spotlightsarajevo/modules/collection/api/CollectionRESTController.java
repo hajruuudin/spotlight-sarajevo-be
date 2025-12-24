@@ -96,9 +96,10 @@ public class CollectionRESTController {
             @RequestParam Integer collectionId,
             @RequestParam Integer itemId,
             @RequestParam String collectionType,
+            @RequestParam Boolean isSystem,
             Principal principal
     ){
-        return collectionService.removeItemFromCollection(collectionId, itemId, collectionType, principal);
+        return collectionService.removeItemFromCollection(collectionId, itemId, collectionType, isSystem, principal);
     }
 
     @GetMapping(value = "/find-spot-in-collections")
@@ -125,7 +126,6 @@ public class CollectionRESTController {
         @RequestBody AddItemToCollectionsModel request,
         Principal principal
     ){
-        System.out.println(request);
         return collectionService.addItemToCollectionsBulk(request, principal);
     };
 
@@ -135,9 +135,19 @@ public class CollectionRESTController {
             @RequestParam List<Integer> collectionIds,
             @RequestParam Integer objectId,
             @RequestParam String objectType,
+            @RequestParam Boolean isSystem,
             Principal principal
     ){
-        System.out.println(collectionIds + " and " + objectId + " and " + objectType);
-        return collectionService.removeItemsFromCollectionsBulk(collectionIds, objectType, objectId, principal);
+        return collectionService.removeItemsFromCollectionsBulk(collectionIds, objectType, objectId, isSystem, principal);
+    }
+
+    @GetMapping(value = "/exists")
+    @Operation(description = "Check if an object is saved to a users system collections")
+    public boolean existsInSystemCollections(
+            @RequestParam Integer objectId,
+            @RequestParam String objectType,
+            Principal principal
+    ){
+        return collectionService.isItemSavedInSystemCollection(objectId, objectType, principal);
     }
 }

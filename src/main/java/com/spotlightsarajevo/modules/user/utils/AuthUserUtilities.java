@@ -5,6 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.spotlightsarajevo.common.enums.ObjectType;
+import com.spotlightsarajevo.common.enums.ProtectedKeywords;
 import com.spotlightsarajevo.common.exceptions.AuthExceptions;
 import com.spotlightsarajevo.common.utils.CommonConstants;
 import com.spotlightsarajevo.modules.collection.domain.CollectionDAO;
@@ -150,6 +151,38 @@ public class AuthUserUtilities {
             userFavouriteEventsEntity.setEventId(eventId);
             userFavouriteEventsDAO.save(userFavouriteEventsEntity);
         }
+    }
+
+    /**
+     * Method to create two default user collections, one for {@link CollectionSpotEntity} and
+     * one for {@link CollectionEventEntity}. Used in {@link AuthServiceImpl} during Google and System registration
+     *
+     * @param userEntity The user who the collections are linked to
+     * @apiNote The name of the collections are by default "All Spots" and "All Events" and <b> cannot be changed</b>
+     * within the application UI.
+     */
+    public void setUserDefaultCollections(UserEntity userEntity){
+        if(userEntity == null){
+            throw new AuthExceptions.UserRegisterException("User Entity cannot be null");
+        }
+
+        CollectionEntity collectionSpotEntity = new CollectionEntity();
+        collectionSpotEntity.setCollectionName(ProtectedKeywords.ALL_SPOTS.getValue());
+        collectionSpotEntity.setCollectionType(String.valueOf(ObjectType.SPOT));
+        collectionSpotEntity.setIsSystem(true);
+        collectionSpotEntity.setUserId(userEntity.getId());
+        collectionSpotEntity.setCreated(LocalDateTime.now());
+        collectionSpotEntity.setCreatedBy(ProtectedKeywords.SYSTEM.getValue());
+        collectionDAO.save(collectionSpotEntity);
+
+        CollectionEntity collectionEventEntity = new CollectionEntity();
+        collectionEventEntity.setCollectionName(ProtectedKeywords.ALL_EVENTS.getValue());
+        collectionEventEntity.setCollectionType(String.valueOf(ObjectType.EVENT));
+        collectionEventEntity.setIsSystem(true);
+        collectionEventEntity.setUserId(userEntity.getId());
+        collectionEventEntity.setCreated(LocalDateTime.now());
+        collectionEventEntity.setCreatedBy(ProtectedKeywords.SYSTEM.getValue());
+        collectionDAO.save(collectionEventEntity);
     }
 
     /**
