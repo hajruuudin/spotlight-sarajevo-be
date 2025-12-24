@@ -19,9 +19,6 @@ public class EventOrganiserReviewUpdateModel implements Serializable {
     @Schema(description = "Identifier of the organiser associated with the record")
     private Integer organiserId;
 
-    @Schema(description = "Username of the user who created the record")
-    private String username;
-
     @Schema(description = "A short header or title for the record")
     private String header;
 

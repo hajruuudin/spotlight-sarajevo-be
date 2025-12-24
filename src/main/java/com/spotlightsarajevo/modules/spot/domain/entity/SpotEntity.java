@@ -57,27 +57,6 @@ public class SpotEntity implements Serializable {
     @Column(name = "category_id")
     private Integer categoryId;
 
-    @Column(name = "initial_overall_rating", columnDefinition = "NUMERIC")
-    private BigDecimal initialOverallRating;
-
-    @Column(name = "initial_cleanliness", columnDefinition = "NUMERIC")
-    private BigDecimal initialCleanliness;
-
-    @Column(name = "initial_affordability", columnDefinition = "NUMERIC")
-    private BigDecimal initialAffordability;
-
-    @Column(name = "initial_accessibility", columnDefinition = "NUMERIC")
-    private BigDecimal initialAccessibility;
-
-    @Column(name = "initial_staff_kindness", columnDefinition = "NUMERIC")
-    private BigDecimal initialStaffKindness;
-
-    @Column(name = "initial_locale_quality", columnDefinition = "NUMERIC")
-    private BigDecimal initialLocaleQuality;
-
-    @Column(name = "initial_atmosphere", columnDefinition = "NUMERIC")
-    private BigDecimal initialAtmosphere;
-
     @Column(name = "created")
     private LocalDateTime created;
 

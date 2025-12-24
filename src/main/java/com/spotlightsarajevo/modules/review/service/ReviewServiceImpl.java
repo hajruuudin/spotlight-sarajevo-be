@@ -218,6 +218,7 @@ public class ReviewServiceImpl implements ReviewService {
         eventOrganiserReviewMapper.updateEntityFromDto(dto, entity);
         entity.setModified(LocalDate.now());
 
+
         eventOrganiserReviewDAO.save(entity);
         return ResponseEntity.ok(eventOrganiserReviewMapper.entityToDto(entity));
     }
