@@ -27,4 +27,7 @@ public class TouristGuideSectionModel implements Serializable {
 
     @Schema(description = "Body/content of the section in English")
     private String sectionBodyEn;
+
+    @Schema(description = "Image of the section, labeled as thumbnail image")
+    private String thumbnailImage;
 }

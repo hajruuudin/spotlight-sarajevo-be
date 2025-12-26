@@ -29,4 +29,9 @@ public class ExceptionCodes {
         COLLECTION_SYSTEM_EXCEPTION,
         COLLECTION_NAME_CONFLICT
     }
+
+    public enum TouristGuideExceptionCodes {
+        TOURIST_GUIDE_BAD_REQUEST,
+        TOURIST_GUIDE_NOT_FOUND
+    }
 }

@@ -1,11 +1,15 @@
 package com.spotlightsarajevo.modules.guide.domain.entity;
 
+import com.spotlightsarajevo.common.enums.GuideType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
+import java.util.Map;
 
 @Data
 @Entity
@@ -18,12 +22,29 @@ public class TouristGuideEntity implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "guide_title", columnDefinition = "VARCHAR", length = 30, nullable = false)
-    private String guideTitle;
+    @Column(name = "slug", columnDefinition = "VARCHAR", nullable = false)
+    private String slug;
 
-    @Column(name = "guide_small_description_bs", columnDefinition = "VARCHAR", length = 50, nullable = false)
+    @Column(name = "guide_title_bs", columnDefinition = "VARCHAR", length = 100, nullable = false)
+    private String guideTitleBs;
+
+    @Column(name = "guide_title_en", columnDefinition = "VARCHAR", length = 100, nullable = false)
+    private String guideTitleEn;
+
+    @Column(name = "guide_small_description_bs", columnDefinition = "VARCHAR", length = 250, nullable = false)
     private String guideSmallDescriptionBs;
 
-    @Column(name = "guide_small_description_en", columnDefinition = "VARCHAR", length = 50, nullable = false)
+    @Column(name = "guide_small_description_en", columnDefinition = "VARCHAR", length = 250, nullable = false)
     private String guideSmallDescriptionEn;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "guide_type", columnDefinition = "VARCHAR", length = 20, nullable = false)
+    private GuideType guideType;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "contact_info")
+    private Map<String, String> contactInfo;
+
+    @Column(name = "category_id", columnDefinition = "NUMERIC", nullable = false)
+    private Integer categoryId;
 }
