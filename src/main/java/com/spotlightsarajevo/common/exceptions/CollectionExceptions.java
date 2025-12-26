@@ -39,4 +39,11 @@ public class CollectionExceptions {
             super(message.toString());
         }
     }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public static class CollectionNamingException extends  RuntimeException{
+        public CollectionNamingException(ExceptionCodes.CollectionExceptionCodes message) {
+            super(message.toString());
+        }
+    }
 }

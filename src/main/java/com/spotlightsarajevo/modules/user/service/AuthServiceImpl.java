@@ -13,6 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -113,7 +114,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<UserModel> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferencesModel) {
+    @Transactional
+    public ResponseEntity<LoggedUserModel> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferencesModel, HttpServletResponse response) {
         try {
             // Generate a new, blank, user entity
             UserEntity userEntity = new UserEntity();
@@ -127,11 +129,16 @@ public class AuthServiceImpl implements AuthService {
             // Using the ID of the new entity, save the users preferences
             authUserUtilities.setUserFavouriteObjects(savedUserEntity, preferencesModel);
 
-            // Create a default collection for the user, one for spots, one for events
+            // Creating two system collections for Spots and for Events
             authUserUtilities.setUserDefaultCollections(savedUserEntity);
 
+            // Immediately log the user in
+            UserDetails userDetails = userDetailsService.loadUserByUsername(googleData.getEmail());
+            String jwt = jwtUtil.generateToken(userDetails);
+            AuthUserUtilities.setJwtCookie(response, jwt);
+
             // Return the saved element
-            return ResponseEntity.status(200).body(userMapper.entityToDto(savedUserEntity));
+            return ResponseEntity.status(200).body(userMapper.entityToLoggedDto(savedUserEntity));
         } catch (Exception e) {
             e.printStackTrace();
             throw new AuthExceptions.GoogleRegisterException("Unexpected error during Google-register process");
@@ -139,7 +146,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<UserModel> registerBySystem(SystemUserModel systemData, PreferencesModel preferencesModel) {
+    public ResponseEntity<LoggedUserModel> registerBySystem(SystemUserModel systemData, PreferencesModel preferencesModel, HttpServletResponse response) {
         try {
             // Generate a new, blank, user entity
             UserEntity userEntity = new UserEntity();
@@ -153,11 +160,16 @@ public class AuthServiceImpl implements AuthService {
             // Using the ID of the new entity, save the users preferences
             authUserUtilities.setUserFavouriteObjects(savedUserEntity, preferencesModel);
 
-            // Create a default collection for the user, one for spots, one for events
+            // Creating two system collections for Spots and for Events
             authUserUtilities.setUserDefaultCollections(savedUserEntity);
 
+            // Immediately log the user in to the system
+            UserDetails userDetails = userDetailsService.loadUserByUsername(systemData.getEmail());
+            String jwt = jwtUtil.generateToken(userDetails);
+            AuthUserUtilities.setJwtCookie(response, jwt);
+
             // Return the saved element
-            return ResponseEntity.status(200).body(userMapper.entityToDto(savedUserEntity));
+            return ResponseEntity.status(200).body(userMapper.entityToLoggedDto(savedUserEntity));
         } catch (Exception e) {
             e.printStackTrace();
             throw new AuthExceptions.SystemRegisterException("Unexpected error during System-register process");
@@ -165,7 +177,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> loginGoogle(Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException {
+    public ResponseEntity<LoggedUserModel> loginGoogle(Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException {
         String idTokenString = payload.get("idToken");
 
         if (idTokenString == null) {
@@ -184,23 +196,13 @@ public class AuthServiceImpl implements AuthService {
                     throw new AuthExceptions.GoogleLoginException("This email is registered with system credentials. Please log in with that instead.");
                 }
 
-                Optional<UserEntity> userEntity = userDAO.findByGoogleId(googleId);
+                Optional<UserEntity> entity = userDAO.findByGoogleId(googleId);
 
-                if (userEntity.isPresent()) {
+                if (entity.isPresent()) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                     String jwt = jwtUtil.generateToken(userDetails);
                     AuthUserUtilities.setJwtCookie(servletResponse, jwt);
-                    return ResponseEntity.ok(Map.of(
-                            "user", new LoggedUserModel(
-                                    userEntity.get().getId(),
-                                    userEntity.get().getFirstName(),
-                                    userEntity.get().getLastName(),
-                                    userEntity.get().getGoogleEmail(),
-                                    userEntity.get().getUsername(),
-                                    userEntity.get().getIsAdmin(),
-                                    userEntity.get().getIsPremium()
-                            )
-                    ));
+                    return ResponseEntity.status(200).body(userMapper.entityToLoggedDto(entity.get()));
                 } else {
                     throw new AuthExceptions.GoogleLoginException("No account is registered to this email. Please register.");
                 }
@@ -211,7 +213,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> loginSystem(SystemLoginModel request, HttpServletResponse servletResponse) {
+    public ResponseEntity<LoggedUserModel> loginSystem(SystemLoginModel request, HttpServletResponse servletResponse) {
         if(request == null){
             throw new AuthExceptions.SystemRegisterException("Credentials cannot be null");
         }
@@ -225,18 +227,8 @@ public class AuthServiceImpl implements AuthService {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
                 String jwt = jwtUtil.generateToken(userDetails);
                 AuthUserUtilities.setJwtCookie(servletResponse, jwt);
-                System.out.println(entity);
-                return ResponseEntity.ok(Map.of(
-                        "user", new LoggedUserModel(
-                                entity.get().getId(),
-                                entity.get().getFirstName(),
-                                entity.get().getLastName(),
-                                entity.get().getSysEmail(),
-                                entity.get().getUsername(),
-                                entity.get().getIsAdmin(),
-                                entity.get().getIsPremium()
-                        )
-                ));
+
+                return ResponseEntity.status(200).body(userMapper.entityToLoggedDto(entity.get()));
             } else {
                 throw new AuthExceptions.SystemRegisterException("Invalid credentials");
             }

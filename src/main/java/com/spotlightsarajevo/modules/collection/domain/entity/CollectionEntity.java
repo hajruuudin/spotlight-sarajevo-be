@@ -36,4 +36,7 @@ public class CollectionEntity implements Serializable {
 
     @Column(name = "user_id", nullable = false)
     private Integer userId;
+
+    @Column(name = "is_system", nullable = false, columnDefinition = "BOOLEAN")
+    private Boolean isSystem;
 }

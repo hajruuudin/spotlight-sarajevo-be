@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface CollectionDAO extends JpaRepository<CollectionEntity, Integer> {
     List<CollectionEntity> findByUserId(Integer userId);
-//    Optional<CollectionEntity> findByCollectionTypeAndId(String collectionType, Integer id);
+    Optional<CollectionEntity> findByUserIdAndCollectionTypeAndIsSystemTrue(Integer userId, String collectionType);
 }

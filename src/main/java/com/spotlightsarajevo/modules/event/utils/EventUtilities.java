@@ -5,9 +5,11 @@ import com.spotlightsarajevo.modules.category.domain.EventCategoryDAO;
 import com.spotlightsarajevo.modules.category.domain.entity.EventCategoryEntity;
 import com.spotlightsarajevo.modules.event.api.dto.EventOrganiserModel;
 import com.spotlightsarajevo.modules.event.domain.EventOrganiserDAO;
+import com.spotlightsarajevo.modules.event.domain.EventOrganiserReviewStatsDAO;
 import com.spotlightsarajevo.modules.event.domain.EventTagsDAO;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserEntity;
+import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserReviewStatsEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventTagsEntity;
 import com.spotlightsarajevo.modules.event.mapper.EventOrganiserMapper;
 import com.spotlightsarajevo.modules.media.service.LookupImagesService;
@@ -27,6 +29,7 @@ public class EventUtilities {
     EventCategoryDAO eventCategoryDAO;
     EventTagsDAO eventTagsDAO;
     EventOrganiserDAO eventOrganiserDAO;
+    EventOrganiserReviewStatsDAO eventOrganiserReviewStatsDAO;
     TagDAO tagDAO;
     TagMapper tagMapper;
     EventOrganiserMapper eventOrganiserMapper;
@@ -58,7 +61,7 @@ public class EventUtilities {
         entity.setEventTags(tagMapper.entitiesToDtos(tagEntities));
     }
 
-    public void setEventOrganiser(EventEntity entity){
+    public void setEventOrganiserAndStats(EventEntity entity){
         Optional<EventOrganiserEntity> organiserEntity = eventOrganiserDAO.findById(entity.getOrganiserId());
 
         if(organiserEntity.isPresent()){
@@ -69,6 +72,9 @@ public class EventUtilities {
                 organiserModel.setOrganiserCategoryNameBs(category.get().getEventCategoryNameBs());
                 organiserModel.setOrganiserCategoryNameEn(category.get().getEventCategoryNameEn());
             }
+
+            Optional<EventOrganiserReviewStatsEntity> organiserReviewStatsEntity = eventOrganiserReviewStatsDAO.findByOrganiserId(organiserEntity.get().getId());
+            organiserReviewStatsEntity.ifPresent(eventOrganiserReviewStatsEntity -> eventOrganiserMapper.updateOrganiserFromStats(eventOrganiserReviewStatsEntity, organiserModel));
 
             lookupImagesService.lookupThumbnailImage(organiserModel, ObjectType.ORGANISER, organiserModel.getId());
             organiserEntity.ifPresent(eventOrganiserEntity -> entity.setOrganiser(organiserModel));

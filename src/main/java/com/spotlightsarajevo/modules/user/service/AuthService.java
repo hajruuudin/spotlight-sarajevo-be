@@ -63,10 +63,9 @@ public interface AuthService {
      *
      * @throws GoogleRegisterException in case anything is missing, data does not get added or unexpected errors occur within the method.
      *
-     * @see CommonFunctions
      * @see com.google.api.client.googleapis.auth.oauth2.GoogleIdToken
      */
-    ResponseEntity<UserModel> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferencesModel);
+    ResponseEntity<LoggedUserModel> registerByGoogle(GoogleUserModel googleData, PreferencesModel preferencesModel, HttpServletResponse response);
 
     /**
      * Service method to register the user to the database via System authentication. Upon completion, the users account
@@ -80,9 +79,8 @@ public interface AuthService {
      *
      * @throws SystemLoginException in case anything is missing, data does not get added or unexpected errors occur within the method.
      *
-     * @see CommonFunctions
      */
-    ResponseEntity<UserModel> registerBySystem(SystemUserModel systemData, PreferencesModel preferencesModel);
+    ResponseEntity<LoggedUserModel> registerBySystem(SystemUserModel systemData, PreferencesModel preferencesModel, HttpServletResponse response);
 
     /**
      * Logs a user in using Google Authentication. It takes the ID token sent from the frontend and firstly verifies
@@ -95,7 +93,7 @@ public interface AuthService {
      *
      * @throws GoogleLoginException if anything goes wrong during method execution.
      */
-    ResponseEntity<Map<String, Object>> loginGoogle(Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException;
+    ResponseEntity<LoggedUserModel> loginGoogle(Map<String, String> payload, HttpServletResponse servletResponse) throws GeneralSecurityException, IOException;
 
     /**
      * Logs a user in using System Authentication. It takes the {@link SystemLoginModel} sent from the frontend and firstly verifies
@@ -108,7 +106,7 @@ public interface AuthService {
      *
      * @throws SystemLoginException if anything goes wrong during method execution.
      */
-    ResponseEntity<Map<String, Object>> loginSystem(SystemLoginModel request, HttpServletResponse servletResponse);
+    ResponseEntity<LoggedUserModel> loginSystem(SystemLoginModel request, HttpServletResponse servletResponse);
 
     /**
      * Logs a user out of the application. It essentially removes any cookies from the servlet response and

@@ -32,14 +32,17 @@ public class EventOrganiserReviewEntity implements Serializable {
     @Column(name = "body", columnDefinition = "TEXT")
     private String body;
 
-    @Column(name = "user_event_quality", columnDefinition = "NUMERIC")
+    @Column(name = "user_organiser_quality", columnDefinition = "NUMERIC")
     private BigDecimal userOrganiserQuality;
 
-    @Column(name = "user_event_enjoyability", columnDefinition = "NUMERIC")
+    @Column(name = "user_organiser_enjoyability", columnDefinition = "NUMERIC")
     private BigDecimal userOrganiserEnjoyability;
 
-    @Column(name = "user_event_atmosphere", columnDefinition = "NUMERIC")
+    @Column(name = "user_organiser_atmosphere", columnDefinition = "NUMERIC")
     private BigDecimal userOrganiserAtmosphere;
+
+    @Column(name = "user_overall_rating", columnDefinition = "NUMERIC")
+    private BigDecimal userOverallRating;
 
     @Column(name = "organiser_id")
     private Integer organiserId;

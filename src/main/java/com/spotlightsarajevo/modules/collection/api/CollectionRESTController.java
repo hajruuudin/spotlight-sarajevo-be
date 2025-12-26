@@ -65,6 +65,22 @@ public class CollectionRESTController {
         return collectionService.findCollectionItems(collectionId, principal);
     }
 
+    @GetMapping(value = "/all-spots")
+    @Operation(description = "Find all spots that were added to some collection")
+    public ResponseEntity<CollectionItemsModel> findAllSpotsCollection(
+            Principal principal
+    ){
+        return collectionService.findAllSpotsCollection(principal);
+    }
+
+    @GetMapping(value = "/all-events")
+    @Operation(description = "FInd all events that were added to some collection")
+    public ResponseEntity<CollectionItemsModel> findAllEventsCollection(
+            Principal principal
+    ){
+        return collectionService.findAllEventsCollection(principal);
+    }
+
     @PostMapping(value = "/add-item")
     @Operation(description = "Add an item to a specified collection")
     public ResponseEntity<CollectionItemsModel> addItemToCollection(
@@ -80,9 +96,10 @@ public class CollectionRESTController {
             @RequestParam Integer collectionId,
             @RequestParam Integer itemId,
             @RequestParam String collectionType,
+            @RequestParam Boolean isSystem,
             Principal principal
     ){
-        return collectionService.removeItemFromCollection(collectionId, itemId, collectionType, principal);
+        return collectionService.removeItemFromCollection(collectionId, itemId, collectionType, isSystem, principal);
     }
 
     @GetMapping(value = "/find-spot-in-collections")
@@ -109,7 +126,6 @@ public class CollectionRESTController {
         @RequestBody AddItemToCollectionsModel request,
         Principal principal
     ){
-        System.out.println(request);
         return collectionService.addItemToCollectionsBulk(request, principal);
     };
 
@@ -119,9 +135,19 @@ public class CollectionRESTController {
             @RequestParam List<Integer> collectionIds,
             @RequestParam Integer objectId,
             @RequestParam String objectType,
+            @RequestParam Boolean isSystem,
             Principal principal
     ){
-        System.out.println(collectionIds + " and " + objectId + " and " + objectType);
-        return collectionService.removeItemsFromCollectionsBulk(collectionIds, objectType, objectId, principal);
+        return collectionService.removeItemsFromCollectionsBulk(collectionIds, objectType, objectId, isSystem, principal);
+    }
+
+    @GetMapping(value = "/exists")
+    @Operation(description = "Check if an object is saved to a users system collections")
+    public boolean existsInSystemCollections(
+            @RequestParam Integer objectId,
+            @RequestParam String objectType,
+            Principal principal
+    ){
+        return collectionService.isItemSavedInSystemCollection(objectId, objectType, principal);
     }
 }

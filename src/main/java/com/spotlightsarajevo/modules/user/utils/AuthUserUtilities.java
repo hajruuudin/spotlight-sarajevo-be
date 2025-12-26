@@ -5,6 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.spotlightsarajevo.common.enums.ObjectType;
+import com.spotlightsarajevo.common.enums.ProtectedKeywords;
 import com.spotlightsarajevo.common.exceptions.AuthExceptions;
 import com.spotlightsarajevo.common.utils.CommonConstants;
 import com.spotlightsarajevo.modules.collection.domain.CollectionDAO;
@@ -37,6 +38,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 @Component
+@AllArgsConstructor
 public class AuthUserUtilities {
     private static final GsonFactory jsonFactory = new GsonFactory();
     private static final NetHttpTransport transport = new NetHttpTransport();
@@ -165,19 +167,21 @@ public class AuthUserUtilities {
         }
 
         CollectionEntity collectionSpotEntity = new CollectionEntity();
-        collectionSpotEntity.setCollectionName("All Spots");
+        collectionSpotEntity.setCollectionName(ProtectedKeywords.ALL_SPOTS.getValue());
         collectionSpotEntity.setCollectionType(String.valueOf(ObjectType.SPOT));
+        collectionSpotEntity.setIsSystem(true);
         collectionSpotEntity.setUserId(userEntity.getId());
         collectionSpotEntity.setCreated(LocalDateTime.now());
-        collectionSpotEntity.setCreatedBy("SYSTEM");
+        collectionSpotEntity.setCreatedBy(ProtectedKeywords.SYSTEM.getValue());
         collectionDAO.save(collectionSpotEntity);
 
         CollectionEntity collectionEventEntity = new CollectionEntity();
-        collectionEventEntity.setCollectionName("All Events");
+        collectionEventEntity.setCollectionName(ProtectedKeywords.ALL_EVENTS.getValue());
         collectionEventEntity.setCollectionType(String.valueOf(ObjectType.EVENT));
+        collectionEventEntity.setIsSystem(true);
         collectionEventEntity.setUserId(userEntity.getId());
         collectionEventEntity.setCreated(LocalDateTime.now());
-        collectionEventEntity.setCreatedBy("SYSTEM");
+        collectionEventEntity.setCreatedBy(ProtectedKeywords.SYSTEM.getValue());
         collectionDAO.save(collectionEventEntity);
     }
 

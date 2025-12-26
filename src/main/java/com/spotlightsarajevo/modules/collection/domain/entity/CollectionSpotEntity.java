@@ -25,11 +25,14 @@ public class CollectionSpotEntity implements Serializable, CollectionItem {
     @Column(name = "spot_id", nullable = false)
     private Integer spotId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "collection_id", insertable = false, updatable = false)
-    CollectionEntity collection;
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
 
-    public Integer getUserId() {
-        return this.collection != null ? this.collection.getUserId() : null;
-    }
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "collection_id", insertable = false, updatable = false)
+//    CollectionEntity collection;
+//
+//    public Integer getUserId() {
+//        return this.collection != null ? this.collection.getUserId() : null;
+//    }
 }

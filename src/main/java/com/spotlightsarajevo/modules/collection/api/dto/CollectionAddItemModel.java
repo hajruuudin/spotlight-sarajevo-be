@@ -16,4 +16,7 @@ public class CollectionAddItemModel implements Serializable {
 
     @Schema(description = "Id of the collection to add the event to")
     private Integer collectionId;
+
+    @Schema(description = "Determines if the collection to be added is a system collection or user collection")
+    private Boolean isSystem;
 }

@@ -14,6 +14,9 @@ public class CollectionModel implements Serializable {
     @Schema(description = "Unique identifier of the collection")
     private Integer id;
 
+    @Schema(description = "Determines if the collection is a system created one, or a custom created one")
+    private Boolean isSystem;
+
     @Schema(description = "Name of the collection")
     private String collectionName;
 

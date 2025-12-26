@@ -10,4 +10,5 @@ public class AddItemToCollectionsModel implements Serializable {
     private List<Integer> ids;
     private String collectionType;
     private Integer objectId;
+    private Boolean isSystem;
 }

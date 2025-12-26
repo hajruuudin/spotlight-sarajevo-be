@@ -6,6 +6,8 @@ import com.spotlightsarajevo.common.exceptions.CollectionExceptions;
 import com.spotlightsarajevo.common.exceptions.EventExceptions;
 import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.common.utils.CollectionItem;
+import com.spotlightsarajevo.modules.collection.domain.CollectionDAO;
+import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEntity;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEventEntity;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionSpotEntity;
 import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
@@ -47,5 +49,12 @@ public class CollectionUtils {
         }
 
         throw new CollectionExceptions.CollectionSystemException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_SYSTEM_EXCEPTION);
+    }
+
+    public Integer getSystemCollectionId(Integer userId, String type, CollectionDAO collectionDAO) {
+        return collectionDAO.findByUserIdAndCollectionTypeAndIsSystemTrue(userId, type)
+                .map(CollectionEntity::getId)
+                .orElseThrow(() -> new CollectionExceptions.CollectionNotFoundException(
+                        ExceptionCodes.CollectionExceptionCodes.COLLECTION_NOT_FOUND));
     }
 }

@@ -208,7 +208,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ResponseEntity<EventOrganiserReviewModel> updateOrganiserReview(EventOrganiserReviewUpdateModel dto, Principal principal) {
-        // Validation logic (commented out as per your original code)
+        // Validation logic
         // if (!utils.isAuthorisedUser(dto.getUserId(), principal)) { ... }
 
         EventOrganiserReviewEntity entity = eventOrganiserReviewDAO.findById(dto.getId())
@@ -217,6 +217,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         eventOrganiserReviewMapper.updateEntityFromDto(dto, entity);
         entity.setModified(LocalDate.now());
+
 
         eventOrganiserReviewDAO.save(entity);
         return ResponseEntity.ok(eventOrganiserReviewMapper.entityToDto(entity));

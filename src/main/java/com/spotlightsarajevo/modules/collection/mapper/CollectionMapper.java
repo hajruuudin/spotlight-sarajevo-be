@@ -1,9 +1,6 @@
 package com.spotlightsarajevo.modules.collection.mapper;
 
-import com.spotlightsarajevo.modules.collection.api.dto.CollectionAddItemModel;
-import com.spotlightsarajevo.modules.collection.api.dto.CollectionCreateModel;
-import com.spotlightsarajevo.modules.collection.api.dto.CollectionModel;
-import com.spotlightsarajevo.modules.collection.api.dto.CollectionUpdateModel;
+import com.spotlightsarajevo.modules.collection.api.dto.*;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEntity;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEventEntity;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionSpotEntity;
@@ -27,4 +24,7 @@ public interface CollectionMapper {
     @Mapping(source = "objectId", target = "eventId")
     @Mapping(source = "collectionId", target = "collectionId")
     CollectionEventEntity itemEvenDtoToEntity(CollectionAddItemModel dto);
+
+    @Mapping(source = "id", target = "collectionId")
+    CollectionItemsModel entityToCollectionItems(CollectionEntity entity);
 }

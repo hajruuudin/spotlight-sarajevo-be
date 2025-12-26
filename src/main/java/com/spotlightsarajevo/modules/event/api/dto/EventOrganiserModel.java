@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -37,4 +38,17 @@ public class EventOrganiserModel implements Serializable {
 
     @Schema(description = "Thumbnail image of the organiser (logo or a default image)")
     private String thumbnailImage;
+
+    @Schema(description = "Overall aggregate rating of the organiser form the Users")
+    private BigDecimal overallRating;
+
+    @Schema(description = "Overall aggregate atmosphere rating of the organiser form the Users")
+    private BigDecimal overallAtmosphere;
+
+    @Schema(description = "Overall aggregate enjoyability rating of the organiser form the Users")
+    private BigDecimal overallEnjoyability;
+
+    @Schema(description = "Overall aggregate quality rating of the organiser form the Users")
+    private BigDecimal overallQuality;
+
 }
