@@ -33,6 +33,6 @@ public class MediaStoreModel implements Serializable {
     private LocalDateTime created;
 
     @Schema(description = "Date and time when the media item was created by user")
-    private LocalDateTime createdBy;
+    private String createdBy;
 }
 

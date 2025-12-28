@@ -89,6 +89,7 @@ public class GlobalExceptionHandler {
     /* General Exception handler for anything not specified */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGenericException(Exception ex) {
+        ex.printStackTrace();
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", ex.getMessage(), ex.toString());
     }
 

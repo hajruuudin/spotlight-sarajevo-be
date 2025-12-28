@@ -35,4 +35,7 @@ public class TouristGuideSectionEntity implements Serializable {
 
     @Column(name = "order_idx", columnDefinition = "INTEGER DEFAULT 0")
     private Integer orderIdx;
+
+    @Transient
+    private String thumbnailImage;
 }

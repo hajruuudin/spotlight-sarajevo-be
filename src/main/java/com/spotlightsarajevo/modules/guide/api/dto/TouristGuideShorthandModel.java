@@ -17,26 +17,23 @@ public class TouristGuideShorthandModel implements Serializable {
     private String slug;
 
     @Schema(description = "Main title of the guide in Bosnian", example = "Historija Sarajeva")
-    private String titleBs;
+    private String guideTitleBs;
 
     @Schema(description = "Main title of the guide in English", example = "History of Sarajevo")
-    private String titleEn;
+    private String guideTitleEn;
 
     @Schema(description = "Short summary/teaser of the guide in Bosnian", example = "Kratak pregled ključnih historijskih događaja...")
-    private String smallDescriptionBs;
+    private String guideSmallDescriptionBs;
 
     @Schema(description = "Short summary/teaser of the guide in English", example = "A brief overview of key historical events...")
-    private String smallDescriptionEn;
+    private String guideSmallDescriptionEn;
 
     @Schema(description = "URL of the thumbnail image representing the guide", example = "https://api.spotlightsarajevo.ba/media/guide_1_thumb.jpg")
-    private String thumbnailUrl;
+    private String thumbnailImage;
 
     @Schema(description = "The name of the assigned category in Bosnian", example = "Kultura")
     private String categoryNameBs;
 
     @Schema(description = "The name of the assigned category in English", example = "Culture")
     private String categoryNameEn;
-
-    @Schema(description = "Image of the guide, labeled as thumbnail image")
-    private String thumbnailImage;
 }

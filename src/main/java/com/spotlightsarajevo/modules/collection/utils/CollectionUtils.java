@@ -1,31 +1,18 @@
 package com.spotlightsarajevo.modules.collection.utils;
 
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
-import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.CollectionExceptions;
-import com.spotlightsarajevo.common.exceptions.EventExceptions;
-import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.common.utils.CollectionItem;
 import com.spotlightsarajevo.modules.collection.domain.CollectionDAO;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEntity;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEventEntity;
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionSpotEntity;
-import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
-import com.spotlightsarajevo.modules.event.domain.EventDAO;
-import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.event.facades.EventCollectionFacade;
-import com.spotlightsarajevo.modules.event.mapper.EventMapper;
-import com.spotlightsarajevo.modules.media.service.LookupImagesService;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotShorthandModel;
-import com.spotlightsarajevo.modules.spot.domain.SpotDAO;
-import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
 import com.spotlightsarajevo.modules.spot.facades.SpotCollectionFacade;
-import com.spotlightsarajevo.modules.spot.mapper.SpotMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Component
 @AllArgsConstructor

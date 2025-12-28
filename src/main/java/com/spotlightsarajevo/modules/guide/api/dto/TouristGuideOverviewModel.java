@@ -19,19 +19,22 @@ public class TouristGuideOverviewModel implements Serializable {
     private String slug;
 
     @Schema(description = "Full title of the guide in Bosnian", example = "Vodič kroz sarajevske zanate")
-    private String titleBs;
+    private String guideTitleBs;
 
     @Schema(description = "Full title of the guide in English", example = "Guide to Sarajevo Crafts")
-    private String titleEn;
+    private String guideTitleEn;
+
+    @Schema(description = "Small introductory text in Bosnian")
+    private String guideSmallDescriptionBs;
+
+    @Schema(description = "Small introductory text in English")
+    private String guideSmallDescriptionEn;
 
     @Schema(description = "Comprehensive introductory text in Bosnian (supports HTML content)")
-    private String fullDescriptionBs;
+    private String guideFullDescriptionBs;
 
     @Schema(description = "Comprehensive introductory text in English (supports HTML content)")
-    private String fullDescriptionEn;
-
-    @Schema(description = "URL of the main representative image for the guide")
-    private String thumbnailUrl;
+    private String guideFullDescriptionEn;
 
     @Schema(description = "Name of the category in Bosnian", example = "Tradicija")
     private String categoryNameBs;

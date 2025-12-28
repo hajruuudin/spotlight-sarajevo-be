@@ -1,8 +1,6 @@
 package com.spotlightsarajevo.modules.guide.mapper;
 
-import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideOverviewModel;
-import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideSectionModel;
-import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideShorthandModel;
+import com.spotlightsarajevo.modules.guide.api.dto.*;
 import com.spotlightsarajevo.modules.guide.domain.entity.TouristGuideEntity;
 import com.spotlightsarajevo.modules.guide.domain.entity.TouristGuideSectionEntity;
 import org.mapstruct.Mapper;
@@ -16,6 +14,8 @@ public interface TouristGuideMapper {
     TouristGuideShorthandModel entityToShorthandDto(TouristGuideEntity entity);
     List<TouristGuideShorthandModel> entitiesToShorthandDtos(List<TouristGuideEntity> entities);
     TouristGuideOverviewModel entityToOverviewDto(TouristGuideEntity entity);
+    TouristGuideEntity dtoToEntity(TouristGuideCreateModel dto);
 
     TouristGuideSectionModel sectionEntityToDto(TouristGuideSectionEntity entity);
+    TouristGuideSectionEntity dtoToSectionEntity(TouristGuideSectionCreateModel dto);
 }

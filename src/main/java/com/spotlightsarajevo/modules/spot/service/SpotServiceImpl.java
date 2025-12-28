@@ -1,10 +1,10 @@
 package com.spotlightsarajevo.modules.spot.service;
 
+import com.spotlightsarajevo.modules.media.service.MediaService;
 import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.SpotDAO;
 import com.spotlightsarajevo.modules.review.domain.SpotReviewDAO;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
-import com.spotlightsarajevo.modules.media.service.LookupImagesService;
 import com.spotlightsarajevo.modules.spot.mapper.SpotMapper;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
@@ -33,7 +33,7 @@ public class SpotServiceImpl implements SpotService {
     private final SpotReviewDAO spotReviewDAO;
     private final SpotMapper spotMapper;
     private final SpotReviewMapper spotReviewMapper;
-    private final LookupImagesService lookupImagesService;
+    private final MediaService mediaService;
     private final SpotUtilities utils;
 
     @Override
@@ -65,7 +65,7 @@ public class SpotServiceImpl implements SpotService {
         for (SpotEntity spot : page.getContent()) {
             utils.setSpotCategoriesAndRating(spot);
             utils.setSpotTags(spot);
-            lookupImagesService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
+            mediaService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
         }
 
         Page<SpotShorthandModel> response = new PageImpl<>(
@@ -97,8 +97,8 @@ public class SpotServiceImpl implements SpotService {
 
         SpotOverviewModel model = spotMapper.entityOverviewToDto(spot);
 
-        lookupImagesService.lookupThumbnailImage(model, ObjectType.SPOT, spot.getId());
-        lookupImagesService.lookupAllImages(model, ObjectType.SPOT, spot.getId());
+        mediaService.lookupThumbnailImage(model, ObjectType.SPOT, spot.getId());
+        mediaService.lookupAllImages(model, ObjectType.SPOT, spot.getId());
 
         return ResponseEntity.ok(model);
     }

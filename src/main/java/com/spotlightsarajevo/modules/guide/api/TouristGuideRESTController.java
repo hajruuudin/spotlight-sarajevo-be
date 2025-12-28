@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.guide.api;
 
+import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideCreateModel;
 import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideOverviewModel;
 import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideShorthandModel;
 import com.spotlightsarajevo.modules.guide.service.TouristGuideService;
@@ -9,7 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -26,11 +27,28 @@ public class TouristGuideRESTController {
         return guideService.findAllGuides();
     }
 
+    @GetMapping(value = "/category/{categoryId}")
+    @Operation(description = "Get all tourist guides for a specific category id")
+    ResponseEntity<List<TouristGuideShorthandModel>> findByCategory(
+            @PathVariable Integer categoryId
+    ){
+        return guideService.findByCategory(categoryId);
+    }
+
     @GetMapping(value = "/{slug}")
     @Operation(description = "Get a tourist guide by its ID")
     public ResponseEntity<TouristGuideOverviewModel> findGuideOverview(
             @PathVariable String slug)
     {
         return guideService.findGuideOverview(slug);
+    }
+
+    @PostMapping(value = "/create")
+    @Operation(description = "Create a new tourist guide inside the database")
+    public ResponseEntity<TouristGuideOverviewModel> create(
+            @RequestBody TouristGuideCreateModel request,
+            Principal principal
+    ){
+        return guideService.create(request, principal);
     }
 }

@@ -12,7 +12,7 @@ import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserReviewStatsEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventTagsEntity;
 import com.spotlightsarajevo.modules.event.mapper.EventOrganiserMapper;
-import com.spotlightsarajevo.modules.media.service.LookupImagesService;
+import com.spotlightsarajevo.modules.media.service.MediaService;
 import com.spotlightsarajevo.modules.tag.domain.TagDAO;
 import com.spotlightsarajevo.modules.tag.domain.entity.TagEntity;
 import com.spotlightsarajevo.modules.tag.mappers.TagMapper;
@@ -33,7 +33,7 @@ public class EventUtilities {
     TagDAO tagDAO;
     TagMapper tagMapper;
     EventOrganiserMapper eventOrganiserMapper;
-    LookupImagesService lookupImagesService;
+    MediaService mediaService;
 
     public void setEventCategories(EventEntity entity){
         Optional<EventCategoryEntity> category = eventCategoryDAO.findById(entity.getCategoryId());
@@ -76,7 +76,7 @@ public class EventUtilities {
             Optional<EventOrganiserReviewStatsEntity> organiserReviewStatsEntity = eventOrganiserReviewStatsDAO.findByOrganiserId(organiserEntity.get().getId());
             organiserReviewStatsEntity.ifPresent(eventOrganiserReviewStatsEntity -> eventOrganiserMapper.updateOrganiserFromStats(eventOrganiserReviewStatsEntity, organiserModel));
 
-            lookupImagesService.lookupThumbnailImage(organiserModel, ObjectType.ORGANISER, organiserModel.getId());
+            mediaService.lookupThumbnailImage(organiserModel, ObjectType.ORGANISER, organiserModel.getId());
             organiserEntity.ifPresent(eventOrganiserEntity -> entity.setOrganiser(organiserModel));
         }
     }

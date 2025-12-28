@@ -37,6 +37,12 @@ public class TouristGuideEntity implements Serializable {
     @Column(name = "guide_small_description_en", columnDefinition = "VARCHAR", length = 250, nullable = false)
     private String guideSmallDescriptionEn;
 
+    @Column(name = "guide_full_description_bs", columnDefinition = "TEXT", nullable = false)
+    private String guideFullDescriptionBs;
+
+    @Column(name = "guide_full_description_en", columnDefinition = "TEXT", nullable = false)
+    private String guideFullDescriptionEn;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "guide_type", columnDefinition = "VARCHAR", length = 20, nullable = false)
     private GuideType guideType;
@@ -47,4 +53,13 @@ public class TouristGuideEntity implements Serializable {
 
     @Column(name = "category_id", columnDefinition = "NUMERIC", nullable = false)
     private Integer categoryId;
+
+    @Transient
+    private String categoryNameBs;
+
+    @Transient
+    private String categoryNameEn;
+
+    @Transient
+    private String thumbnailImage;
 }

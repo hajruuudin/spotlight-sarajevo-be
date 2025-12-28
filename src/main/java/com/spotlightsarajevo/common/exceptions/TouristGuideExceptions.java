@@ -18,4 +18,18 @@ public class TouristGuideExceptions {
             super(message.toString());
         }
     }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public static class TouristGuideAuth extends RuntimeException{
+        public TouristGuideAuth(ExceptionCodes.TouristGuideExceptionCodes message){
+            super(message.toString());
+        }
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public static class TouristGuideConflict extends RuntimeException{
+        public TouristGuideConflict(ExceptionCodes.TouristGuideExceptionCodes message){
+            super(message.toString());
+        }
+    }
 }
