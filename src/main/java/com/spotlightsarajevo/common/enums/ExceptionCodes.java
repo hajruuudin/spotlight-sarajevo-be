@@ -29,4 +29,16 @@ public class ExceptionCodes {
         COLLECTION_SYSTEM_EXCEPTION,
         COLLECTION_NAME_CONFLICT
     }
+
+    public enum TouristGuideExceptionCodes {
+        TOURIST_GUIDE_BAD_REQUEST,
+        TOURIST_GUIDE_NOT_FOUND,
+        TOURIST_GUIDE_C_BR,
+        TOURIST_GUIDE_C_AU,
+        TOURIST_GUIDE_C_SLUG,
+    }
+
+    public enum MediaExceptionCodes {
+        MEDIA_C_BR
+    }
 }

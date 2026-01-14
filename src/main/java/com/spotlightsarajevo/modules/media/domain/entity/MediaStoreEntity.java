@@ -40,5 +40,5 @@ public class MediaStoreEntity implements Serializable {
     private LocalDateTime created;
 
     @Column(name = "created_by")
-    private LocalDateTime createdBy;
+    private String createdBy;
 }

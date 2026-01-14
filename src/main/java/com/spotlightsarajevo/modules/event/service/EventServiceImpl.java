@@ -4,12 +4,12 @@ import com.spotlightsarajevo.modules.event.api.dto.*;
 import com.spotlightsarajevo.modules.event.domain.EventDAO;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.event.utils.EventUtilities;
-import com.spotlightsarajevo.modules.media.service.LookupImagesService;
 import com.spotlightsarajevo.modules.event.mapper.EventMapper;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.EventExceptions;
 import com.spotlightsarajevo.common.specifications.EventSpecification;
+import com.spotlightsarajevo.modules.media.service.MediaService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -28,7 +28,7 @@ public class EventServiceImpl implements EventService {
     EventDAO eventDAO;
     EventUtilities utils;
     EventMapper eventMapper;
-    LookupImagesService lookupImagesService;
+    MediaService mediaService;
 
     @Override
     public ResponseEntity<Page<EventShorthandModel>> findEventsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds) {
@@ -52,7 +52,7 @@ public class EventServiceImpl implements EventService {
         for(EventEntity eventEntity : eventEntities.getContent()){
             utils.setEventCategories(eventEntity);
             utils.setEventTags(eventEntity);
-            lookupImagesService.lookupThumbnailImage(eventEntity, ObjectType.EVENT, eventEntity.getId());
+            mediaService.lookupThumbnailImage(eventEntity, ObjectType.EVENT, eventEntity.getId());
         }
 
         Page<EventShorthandModel> responseList = new PageImpl<>(
@@ -95,8 +95,8 @@ public class EventServiceImpl implements EventService {
 
             EventOverviewModel eventOverviewModel = eventMapper.entityToOverviewDto(eventEntity.get());
 
-            lookupImagesService.lookupThumbnailImage(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
-            lookupImagesService.lookupAllImages(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
+            mediaService.lookupThumbnailImage(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
+            mediaService.lookupAllImages(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
 
             return ResponseEntity.status(200).body(eventOverviewModel);
         }

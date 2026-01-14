@@ -6,6 +6,7 @@ import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -22,5 +23,18 @@ public class CommonFunctions {
         } else {
             throw new AuthExceptions.AuthenticationUserNotFoundException("Principal User Not Found");
         }
+    }
+
+    public String generateSlug(String title) {
+        if (title == null || title.isEmpty()) {
+            return "";
+        }
+
+        return title
+                .toLowerCase()
+                .trim()
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("\\s+", "-")
+                .replaceAll("-+", "-");
     }
 }
