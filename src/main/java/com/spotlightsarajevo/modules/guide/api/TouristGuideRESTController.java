@@ -36,7 +36,7 @@ public class TouristGuideRESTController {
     }
 
     @GetMapping(value = "/{slug}")
-    @Operation(description = "Get a tourist guide by its ID")
+    @Operation(description = "Get a tourist guide by its Slug")
     public ResponseEntity<TouristGuideOverviewModel> findGuideOverview(
             @PathVariable String slug)
     {
