@@ -41,4 +41,9 @@ public class ExceptionCodes {
     public enum MediaExceptionCodes {
         MEDIA_C_BR
     }
+
+    public enum TransportExceptionCodes {
+        TRANSPORT_METHOD_NOT_FOUND,
+        TRANSPORT_INVALID_REQUEST
+    }
 }
