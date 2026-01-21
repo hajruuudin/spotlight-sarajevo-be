@@ -16,6 +16,9 @@ public class TransportMethodLineModel implements Serializable {
     @Schema(description = "ID of the operator running this line")
     private Integer operatorId;
 
+    @Schema(description = "Name of the operator running this line")
+    private String transportOperatorName;
+
     @Schema(description = "Starting point/station of the line")
     private String lineStart;
 
@@ -27,7 +30,4 @@ public class TransportMethodLineModel implements Serializable {
 
     @Schema(description = "GeoJSON representation of the line geometry")
     private String geometryGeoJson;
-
-    @Schema(description = "ID of the transport method type (bus, tram, trolleybus, etc.)")
-    private Integer transportTypeId;
 }

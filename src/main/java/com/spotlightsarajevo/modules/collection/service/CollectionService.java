@@ -1,10 +1,7 @@
 package com.spotlightsarajevo.modules.collection.service;
 
-import com.spotlightsarajevo.common.enums.ObjectType;
-import com.spotlightsarajevo.common.utils.CollectionItemsObject;
 import com.spotlightsarajevo.modules.collection.api.dto.*;
 import org.springframework.http.ResponseEntity;
-
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -73,13 +70,46 @@ public interface CollectionService {
      */
     ResponseEntity<CollectionItemsModel> removeItemFromCollection(Integer collectionId, Integer itemId, String collectionType, Boolean isSystem, Principal principal);
 
+    /**
+     * Check if a specific spot is present in any of the user's collections.
+     * @param spotId The unique identifier of the item to check.
+     * @param principal Spring Security principal object sent over the request. Used for authentication & authorisation.
+     * @return A ResponseEntity containing a CollectionItemsObject indicating presence in collections.
+     */
     ResponseEntity<SpotInCollectionModel> findSpotInCollections(Integer spotId, Principal principal);
 
+    /**
+     * Check if a specific event is present in any of the user's collections.
+     * @param eventId The unique identifier of the event to check.
+     * @param principal Spring Security principal object sent over the request. Used for authentication & authorisation.
+     * @return A ResponseEntity containing a CollectionItemsObject indicating presence in collections.
+     */
     ResponseEntity<EventInCollectionModel> findEventInCollections(Integer eventId, Principal principal);
 
+    /**
+     * Add multiple items to multiple collections in bulk.
+     * @param request The data model containing the list of item IDs, object type, and collection IDs.
+     * @param principal Spring Security principal object sent over the request. Used for authentication & authorisation.
+     * @return A ResponseEntity containing a map with the results of the bulk addition.
+     */
     ResponseEntity<Map<String, Object>> addItemToCollectionsBulk(AddItemToCollectionsModel request, Principal principal);
 
+    /**
+     * Remove multiple items from multiple collections in bulk.
+     * @param ids The list of item IDs to be removed.
+     * @param objectType The type of the items (e.g., "spot" or "event").
+     * @param objectId The unique identifier of the item type.
+     * @param principal Spring Security principal object sent over the request. Used for authentication & authorisation.
+     * @return A ResponseEntity containing a map with the results of the bulk removal.
+     */
     ResponseEntity<Map<String, Object>> removeItemsFromCollectionsBulk(List<Integer> ids, String objectType, Integer objectId, Boolean isSystem, Principal principal);
 
+    /**
+     * Check if a specific item is saved in the system collection for the authenticated user.
+     * @param objectId The unique identifier of the item to check.
+     * @param objectType The type of the item (e.g., "spot" or "event").
+     * @param principal Spring Security principal object sent over the request. Used for authentication & authorisation.
+     * @return true if the item is saved in the system collection, false otherwise.
+     */
     boolean isItemSavedInSystemCollection(Integer objectId, String objectType, Principal principal);
 }

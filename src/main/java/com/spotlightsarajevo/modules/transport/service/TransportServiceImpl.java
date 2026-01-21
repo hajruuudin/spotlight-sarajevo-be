@@ -5,10 +5,13 @@ import com.spotlightsarajevo.common.exceptions.TransportExceptions;
 import com.spotlightsarajevo.modules.transport.api.dto.TransportMethodLineModel;
 import com.spotlightsarajevo.modules.transport.api.dto.TransportMethodModel;
 import com.spotlightsarajevo.modules.transport.api.dto.TransportMethodShorthandModel;
+import com.spotlightsarajevo.modules.transport.api.dto.TransportTaxiOperatorModel;
 import com.spotlightsarajevo.modules.transport.domain.TransportMethodDAO;
 import com.spotlightsarajevo.modules.transport.domain.TransportMethodLineDAO;
+import com.spotlightsarajevo.modules.transport.domain.TransportTaxiOperatorDAO;
 import com.spotlightsarajevo.modules.transport.domain.entity.TransportMethodEntity;
 import com.spotlightsarajevo.modules.transport.domain.entity.TransportMethodLineEntity;
+import com.spotlightsarajevo.modules.transport.domain.entity.TransportTaxiOperatorEntity;
 import com.spotlightsarajevo.modules.transport.mapper.TransportMapper;
 import com.spotlightsarajevo.modules.transport.utils.TransportUtilities;
 import lombok.AllArgsConstructor;
@@ -24,6 +27,7 @@ import java.util.Optional;
 public class TransportServiceImpl implements TransportService {
     TransportMethodDAO transportMethodDAO;
     TransportMethodLineDAO transportMethodLineDAO;
+    TransportTaxiOperatorDAO taxiOperatorDAO;
     TransportMapper transportMapper;
     TransportUtilities transportUtilities;
 
@@ -72,6 +76,14 @@ public class TransportServiceImpl implements TransportService {
             model.setGeometryGeoJson(transportUtilities.convertGeometryToGeoJson(entity.getGeometry()));
             models.add(model);
         }
+
+        return ResponseEntity.status(200).body(models);
+    }
+
+    @Override
+    public ResponseEntity<List<TransportTaxiOperatorModel>> findTaxiOperators() {
+        List<TransportTaxiOperatorEntity> entities = taxiOperatorDAO.findAll();
+        List<TransportTaxiOperatorModel> models = transportMapper.taxiEntitiesToDtos(entities);
 
         return ResponseEntity.status(200).body(models);
     }

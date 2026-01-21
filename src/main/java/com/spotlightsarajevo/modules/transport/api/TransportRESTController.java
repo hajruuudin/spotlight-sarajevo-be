@@ -3,6 +3,7 @@ package com.spotlightsarajevo.modules.transport.api;
 import com.spotlightsarajevo.modules.transport.api.dto.TransportMethodLineModel;
 import com.spotlightsarajevo.modules.transport.api.dto.TransportMethodModel;
 import com.spotlightsarajevo.modules.transport.api.dto.TransportMethodShorthandModel;
+import com.spotlightsarajevo.modules.transport.api.dto.TransportTaxiOperatorModel;
 import com.spotlightsarajevo.modules.transport.service.TransportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,5 +42,11 @@ public class TransportRESTController {
             @RequestParam Integer transportTypeId
     ) {
         return transportService.findLinesByOperatorAndTransportType(operatorId, transportTypeId);
+    }
+
+    @GetMapping(value = "/taxis")
+    @Operation(description = "Get all the current Taxi operators inside the database")
+    public ResponseEntity<List<TransportTaxiOperatorModel>> findTaxiOperators(){
+        return transportService.findTaxiOperators();
     }
 }

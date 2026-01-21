@@ -4,12 +4,13 @@ import com.spotlightsarajevo.modules.guide.api.dto.*;
 import com.spotlightsarajevo.modules.guide.domain.entity.TouristGuideEntity;
 import com.spotlightsarajevo.modules.guide.domain.entity.TouristGuideSectionEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 import org.w3c.dom.Entity;
 import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface TouristGuideMapper {
     TouristGuideShorthandModel entityToShorthandDto(TouristGuideEntity entity);
     List<TouristGuideShorthandModel> entitiesToShorthandDtos(List<TouristGuideEntity> entities);

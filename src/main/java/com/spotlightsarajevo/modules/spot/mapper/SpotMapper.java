@@ -2,14 +2,11 @@ package com.spotlightsarajevo.modules.spot.mapper;
 
 import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.Mappings;
+import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SpotMapper {
     SpotEntity dtoToEntity(SpotCreateModel spotCreateModel);
     SpotModel entityToDto(SpotEntity spotEntity);

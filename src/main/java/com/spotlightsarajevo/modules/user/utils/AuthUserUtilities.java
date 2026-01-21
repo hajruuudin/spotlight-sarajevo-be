@@ -26,9 +26,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
@@ -37,6 +35,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
+/**
+ * Utility class for user authentication and registration processes.
+ * Contains methods for parsing JWT tokens, verifying Google ID tokens,
+ * setting user entity data during registration, and managing user favourite categories and collections.
+ *
+ * Used in {@link AuthServiceImpl}
+ */
 @Component
 @AllArgsConstructor
 public class AuthUserUtilities {
@@ -199,8 +204,6 @@ public class AuthUserUtilities {
         jwtCookie.setPath("/");
         response.addCookie(jwtCookie);
     }
-
-
 
     /**
      * Common method to check if the user that is accessing the API is the same user that made the request to
