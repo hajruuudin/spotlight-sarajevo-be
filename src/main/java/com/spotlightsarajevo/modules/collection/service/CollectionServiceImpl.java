@@ -5,7 +5,6 @@ import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.enums.ProtectedKeywords;
 import com.spotlightsarajevo.common.exceptions.CollectionExceptions;
 import com.spotlightsarajevo.common.utils.CollectionItem;
-import com.spotlightsarajevo.common.utils.CollectionItemsObject;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.modules.collection.api.dto.*;
 import com.spotlightsarajevo.modules.collection.domain.CollectionDAO;
@@ -16,7 +15,7 @@ import com.spotlightsarajevo.modules.collection.domain.entity.CollectionEventEnt
 import com.spotlightsarajevo.modules.collection.domain.entity.CollectionSpotEntity;
 import com.spotlightsarajevo.modules.collection.mapper.CollectionMapper;
 import com.spotlightsarajevo.modules.collection.utils.CollectionUtils;
-import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
+import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -12,7 +12,7 @@ import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.common.specifications.SpotSpecifications;
 import com.spotlightsarajevo.modules.review.mapper.SpotReviewMapper;
 import com.spotlightsarajevo.modules.spot.utils.SpotUtilities;
-import com.spotlightsarajevo.modules.user.domain.UserDAO;
+import com.spotlightsarajevo.modules.auth.domain.UserDAO;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

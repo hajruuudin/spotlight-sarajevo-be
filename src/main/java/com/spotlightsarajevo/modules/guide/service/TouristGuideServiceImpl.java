@@ -13,17 +13,15 @@ import com.spotlightsarajevo.modules.guide.mapper.TouristGuideMapper;
 import com.spotlightsarajevo.modules.guide.utils.TouristGuideUtilities;
 import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
 import com.spotlightsarajevo.modules.media.service.MediaService;
-import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
+import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

@@ -1,6 +1,6 @@
 package com.spotlightsarajevo.config.security;
 
-import com.spotlightsarajevo.modules.user.utils.AuthUserUtilities;
+import com.spotlightsarajevo.modules.auth.utils.AuthUserUtilities;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

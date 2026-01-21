@@ -1,12 +1,11 @@
 package com.spotlightsarajevo.common.utils;
 
 import com.spotlightsarajevo.common.exceptions.AuthExceptions;
-import com.spotlightsarajevo.modules.user.domain.UserDAO;
-import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
+import com.spotlightsarajevo.modules.auth.domain.UserDAO;
+import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
 import java.security.Principal;
 import java.util.Optional;
 

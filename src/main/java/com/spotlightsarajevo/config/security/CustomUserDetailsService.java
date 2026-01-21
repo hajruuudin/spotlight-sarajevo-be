@@ -1,7 +1,7 @@
 package com.spotlightsarajevo.config.security;
 
-import com.spotlightsarajevo.modules.user.domain.UserDAO;
-import com.spotlightsarajevo.modules.user.domain.entity.UserEntity;
+import com.spotlightsarajevo.modules.auth.domain.UserDAO;
+import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

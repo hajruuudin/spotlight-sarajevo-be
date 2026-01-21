@@ -9,5 +9,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventCategoryMapper {
+    EventCategoryModel entityToDto(EventCategoryEntity entity);
     List<EventCategoryModel> entitiesToDtos(List<EventCategoryEntity> entity);
 }
