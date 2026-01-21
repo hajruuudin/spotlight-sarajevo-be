@@ -4,10 +4,11 @@ import com.spotlightsarajevo.modules.event.api.dto.EventOverviewModel;
 import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventMapper {
     List<EventShorthandModel> entitiesToShorthandDtos(List<EventEntity> entities);
     EventOverviewModel entityToOverviewDto(EventEntity eventEntity);

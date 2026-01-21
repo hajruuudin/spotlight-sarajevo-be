@@ -9,9 +9,40 @@ import org.springframework.http.ResponseEntity;
 import java.security.Principal;
 import java.util.List;
 
+/**
+ * TouristGuideService interface defines methods for managing tourist guides.
+ * It includes methods to find all guides, find guides by category,
+ */
 public interface TouristGuideService {
+    /**
+     * Retrieves a list of all tourist guides in shorthand format.
+     *
+     * @return ResponseEntity containing a list of TouristGuideShorthandModel
+     */
     ResponseEntity<List<TouristGuideShorthandModel>> findAllGuides();
+
+    /**
+     * Retrieves a list of tourist guides by category ID in shorthand format.
+     *
+     * @param categoryId the unique identifier of the category
+     * @return ResponseEntity containing a list of TouristGuideShorthandModel
+     */
     ResponseEntity<List<TouristGuideShorthandModel>> findByCategory(Integer categoryId);
+
+    /**
+     * Retrieves an overview of a specific tourist guide by its slug.
+     *
+     * @param slug the unique slug identifier of the tourist guide
+     * @return ResponseEntity containing the TouristGuideOverviewModel
+     */
     ResponseEntity<TouristGuideOverviewModel> findGuideOverview(String slug);
+
+    /**
+     * Creates a new tourist guide based on the provided TouristGuideCreateModel.
+     *
+     * @param request the model containing information to create a new tourist guide
+     * @param principal the security principal representing the current user
+     * @return ResponseEntity containing the created TouristGuideOverviewModel
+     */
     ResponseEntity<TouristGuideOverviewModel> create(TouristGuideCreateModel request, Principal principal);
 }

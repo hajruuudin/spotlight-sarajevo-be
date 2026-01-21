@@ -24,5 +24,8 @@ public class TransportMethodModel implements Serializable {
 
     @Schema(description = "Description of the transport method in English")
     private String methodDescriptionEn;
+
+    @Schema(description = "GeoJSON representation of the transport method geometry")
+    private String geometryGeoJson;
 }
 

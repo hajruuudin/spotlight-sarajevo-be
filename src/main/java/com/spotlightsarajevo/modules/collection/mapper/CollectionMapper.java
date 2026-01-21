@@ -7,10 +7,11 @@ import com.spotlightsarajevo.modules.collection.domain.entity.CollectionSpotEnti
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CollectionMapper {
     List<CollectionModel> entitiesToDtos(List<CollectionEntity> entities);
     CollectionEntity dtoToEntity(CollectionCreateModel dto);

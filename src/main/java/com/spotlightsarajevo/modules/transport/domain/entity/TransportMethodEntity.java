@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Geometry;
 
 import java.io.Serializable;
 
@@ -29,4 +30,7 @@ public class TransportMethodEntity implements Serializable {
 
     @Column(name = "method_description_en", columnDefinition = "TEXT", nullable = false)
     private String methodDescriptionEn;
+
+    @Column(name = "geometry", columnDefinition = "GEOMETRY")
+    private Geometry geometry;
 }

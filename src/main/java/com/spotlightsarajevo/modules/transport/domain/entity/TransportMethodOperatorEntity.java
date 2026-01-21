@@ -18,9 +18,6 @@ public class TransportMethodOperatorEntity implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "transport_type_id", nullable = false)
-    private Integer transportTypeId;
-
     @Column(name = "transport_operator_name", columnDefinition = "VARCHAR", length = 30, nullable = false)
     private String transportOperatorName;
 

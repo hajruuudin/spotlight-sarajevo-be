@@ -86,6 +86,18 @@ public class GlobalExceptionHandler {
     }
     /*==== AUTHENTICATION EXCEPTIONS END ====*/
 
+    /*==== TRANSPORT EXCEPTIONS START ====*/
+    @ExceptionHandler(TransportExceptions.TransportNotFoundException.class)
+    public ResponseEntity<?> handleTransportNotFoundException(TransportExceptions.TransportNotFoundException ex){
+        return buildResponse(HttpStatus.NOT_FOUND, "Transport Find Error", ex.getMessage(), ex.toString());
+    }
+
+    @ExceptionHandler(TransportExceptions.TransportBadRequestException.class)
+    public ResponseEntity<?> handleTransportBadRequestException(TransportExceptions.TransportBadRequestException ex){
+        return buildResponse(HttpStatus.BAD_REQUEST, "Transport Request Error", ex.getMessage(), ex.toString());
+    }
+    /*==== TRANSPORT EXCEPTIONS END ====*/
+
     /* General Exception handler for anything not specified */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGenericException(Exception ex) {
