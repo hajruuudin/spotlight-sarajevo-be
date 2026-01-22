@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserVisitedSpotsDAO extends JpaRepository<UserVisitedSpotsEntity, Integer> {
     Integer countAllByUserId(Integer id);
+
+    void deleteByUserIdAndSpotId(Integer userId, Integer spotId);
 }

@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserAttendedEventsDAO extends JpaRepository<UserAttendedEventsEntity, Integer> {
     Integer countAllByUserId(Integer id);
+
+    void deleteByUserIdAndEventId(Integer userId, Integer eventId);
 }

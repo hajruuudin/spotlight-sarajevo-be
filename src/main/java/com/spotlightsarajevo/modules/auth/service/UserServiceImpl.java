@@ -2,15 +2,13 @@ package com.spotlightsarajevo.modules.auth.service;
 
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.exceptions.AuthExceptions;
-import com.spotlightsarajevo.modules.auth.api.dto.LoggedUserModel;
+import com.spotlightsarajevo.modules.auth.api.dto.UserAttendedEventsModel;
 import com.spotlightsarajevo.modules.auth.api.dto.UserInfoModel;
+import com.spotlightsarajevo.modules.auth.api.dto.UserVisitedSpotsModel;
 import com.spotlightsarajevo.modules.auth.domain.*;
-import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
-import com.spotlightsarajevo.modules.auth.domain.entity.UserFavouriteEventsEntity;
-import com.spotlightsarajevo.modules.auth.domain.entity.UserFavouriteSpotsEntity;
+import com.spotlightsarajevo.modules.auth.domain.entity.*;
 import com.spotlightsarajevo.modules.auth.mapper.UserMapper;
 import com.spotlightsarajevo.modules.auth.utils.UserInfoUtils;
-import com.spotlightsarajevo.modules.category.api.dto.SpotCategoryModel;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,7 +20,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     UserDAO userDAO;
     UserAttendedEventsDAO userAttendedEventsDAO;
     UserVisitedSpotsDAO userVisitedSpotsDAO;
@@ -73,5 +71,68 @@ public class UserServiceImpl implements UserService{
         } else {
             throw new AuthExceptions.AuthenticationUserNotFoundException(ExceptionCodes.AuthExceptionCodes.AUTH_USER_NOT_FOUND.toString());
         }
+    }
+
+    @Override
+    public ResponseEntity<UserVisitedSpotsModel> addVisitedSpot(Principal principal, Integer spotId) {
+        if(spotId == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_SPOT_ID_MISSING.toString());
+        if(principal == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_UNAUTHORIZED_ACCESS.toString());
+        if(!utils.validateSpotExists(spotId)) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND.toString());
+
+        Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+
+        UserVisitedSpotsEntity entity = new UserVisitedSpotsEntity();
+        entity.setUserId(user.get().getId());
+        entity.setSpotId(spotId);
+
+        UserVisitedSpotsEntity savedEntity = userVisitedSpotsDAO.save(entity);
+
+        return ResponseEntity.status(200).body(userMapper.visitedSpotsEntityToDto(savedEntity));
+    }
+
+    @Override
+    public ResponseEntity<UserAttendedEventsModel> addAttendedEvent(Principal principal, Integer eventId) {
+        if(eventId == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_EVENT_ID_MISSING.toString());
+        if(principal == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_UNAUTHORIZED_ACCESS.toString());
+        if(!utils.validateEventExists(eventId)) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND.toString());
+
+        Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+
+        UserAttendedEventsEntity entity = new UserAttendedEventsEntity();
+        entity.setUserId(user.get().getId());
+        entity.setEventId(eventId);
+
+        System.out.println("To be added event ID: " + eventId + " for user ID: " + user.get().getId());
+        System.out.println("Entity to be saved: " + entity);
+
+        UserAttendedEventsEntity savedEntity = userAttendedEventsDAO.save(entity);
+
+        return ResponseEntity.status(200).body(userMapper.attendedEventsEntityToDto(savedEntity));
+    }
+
+    @Override
+    public ResponseEntity<Boolean> removeVisitedSpot(Principal principal, Integer spotId) {
+        if (spotId == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_SPOT_ID_MISSING.toString());
+        if (principal == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_UNAUTHORIZED_ACCESS.toString());
+        if (!utils.validateSpotExists(spotId))
+            throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND.toString());
+
+        Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+        userVisitedSpotsDAO.deleteByUserIdAndSpotId(user.get().getId(), spotId);
+
+        return ResponseEntity.status(200).body(true);
+    }
+
+    @Override
+    public ResponseEntity<Boolean> removeAttendedEvent(Principal principal, Integer eventId) {
+        if (eventId == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_EVENT_ID_MISSING.toString());
+        if (principal == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_UNAUTHORIZED_ACCESS.toString());
+        if (!utils.validateEventExists(eventId))
+            throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND.toString());
+
+        Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+        userAttendedEventsDAO.deleteByUserIdAndEventId(user.get().getId(), eventId);
+
+        return ResponseEntity.status(200).body(true);
     }
 }
