@@ -9,6 +9,7 @@ import com.spotlightsarajevo.modules.auth.domain.*;
 import com.spotlightsarajevo.modules.auth.domain.entity.*;
 import com.spotlightsarajevo.modules.auth.mapper.UserMapper;
 import com.spotlightsarajevo.modules.auth.utils.UserInfoUtils;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -111,6 +112,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<Boolean> removeVisitedSpot(Principal principal, Integer spotId) {
         if (spotId == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_SPOT_ID_MISSING.toString());
         if (principal == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_UNAUTHORIZED_ACCESS.toString());
@@ -124,6 +126,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<Boolean> removeAttendedEvent(Principal principal, Integer eventId) {
         if (eventId == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_EVENT_ID_MISSING.toString());
         if (principal == null) throw new AuthExceptions.AuthenticationEndpointException(ExceptionCodes.AuthExceptionCodes.AUTH_UNAUTHORIZED_ACCESS.toString());

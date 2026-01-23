@@ -9,4 +9,6 @@ public interface UserVisitedSpotsDAO extends JpaRepository<UserVisitedSpotsEntit
     Integer countAllByUserId(Integer id);
 
     void deleteByUserIdAndSpotId(Integer userId, Integer spotId);
+
+    boolean existsByUserIdAndSpotId(Integer userId, Integer spotId);
 }

@@ -2,6 +2,7 @@ package com.spotlightsarajevo.modules.spot.utils;
 
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.exceptions.SpotExceptions;
+import com.spotlightsarajevo.modules.auth.facades.UserVisitedSpotFacade;
 import com.spotlightsarajevo.modules.category.domain.SpotCategoryDAO;
 import com.spotlightsarajevo.modules.category.domain.entity.SpotCategoryEntity;
 import com.spotlightsarajevo.modules.spot.api.dto.SpotWorkHoursModel;
@@ -31,6 +32,7 @@ public class SpotUtilities {
     TagMapper tagMapper;
     SpotWorkHoursDAO spotWorkHoursDAO;
     SpotWorkHoursMapper spotWorkHoursMapper;
+    UserVisitedSpotFacade userVisitedSpotFacade;
 
     public void setSpotCategoriesAndRating(SpotEntity entity){
         Optional<SpotCategoryEntity> category = spotCategoryDAO.findById(entity.getCategoryId());
@@ -69,6 +71,10 @@ public class SpotUtilities {
 
             entity.setWorkHours(workHoursModels);
         }
+    }
+
+    public boolean checkIfUserVisitedSpot(Integer spotId, Integer userId){
+        return userVisitedSpotFacade.checkIfUserVisitedSpot(userId, spotId);
     }
 }
 

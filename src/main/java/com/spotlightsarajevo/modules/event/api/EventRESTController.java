@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -40,5 +41,14 @@ public class EventRESTController {
             @RequestParam(required = true) String eventSlug
     ){
         return eventService.findEventOverview(eventSlug);
+    }
+
+    @GetMapping(value = "/attended-event/check")
+    @Operation(description = "Check the status of the event and if the user has labeled it as attended/will attend")
+    public ResponseEntity<Boolean> getEventStatus(
+            @RequestParam(required = true) Integer eventId,
+            Principal principal
+    ){
+        return eventService.getEventAttendedStatus(eventId, principal);
     }
 }

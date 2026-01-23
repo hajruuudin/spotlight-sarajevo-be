@@ -9,4 +9,6 @@ public interface UserAttendedEventsDAO extends JpaRepository<UserAttendedEventsE
     Integer countAllByUserId(Integer id);
 
     void deleteByUserIdAndEventId(Integer userId, Integer eventId);
+
+    boolean existsByUserIdAndEventId(Integer userId, Integer eventId);
 }

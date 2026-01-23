@@ -1,5 +1,9 @@
 package com.spotlightsarajevo.modules.spot.service;
 
+import com.spotlightsarajevo.common.exceptions.EventExceptions;
+import com.spotlightsarajevo.common.utils.CommonFunctions;
+import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
+import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.media.service.MediaService;
 import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.SpotDAO;
@@ -21,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -35,6 +40,7 @@ public class SpotServiceImpl implements SpotService {
     private final SpotReviewMapper spotReviewMapper;
     private final MediaService mediaService;
     private final SpotUtilities utils;
+    private final CommonFunctions commonFunctions;
 
     @Override
     public ResponseEntity<Page<SpotModel>> findAll(PageRequest pageRequest) {
@@ -142,6 +148,22 @@ public class SpotServiceImpl implements SpotService {
 
         spotDAO.delete(entity);
         return ResponseEntity.ok(spotMapper.entityToDto(entity));
+    }
+
+    @Override
+    public ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal) {
+        if (spotId == null ) throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND);
+        if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        Optional<SpotEntity> spotEntity = spotDAO.findById(spotId);
+        UserEntity userEntity = commonFunctions.getUserFromPrincipal(principal);
+
+        if(spotEntity.isEmpty()){
+            throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND);
+        }
+
+        boolean isAttended = utils.checkIfUserVisitedSpot(spotEntity.get().getId(), userEntity.getId());
+        return ResponseEntity.status(200).body(isAttended);
     }
 }
 
