@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -55,4 +56,13 @@ public interface EventService {
      * @return ResponseEntity containing the EventOverviewModel
      */
     ResponseEntity<EventOverviewModel> findEventOverview(String eventSlug);
+
+    /**
+     * Checks if the user has marked the event as attended.
+     *
+     * @param eventId the unique identifier of the event
+     * @param principal the security principal representing the logged-in user
+     * @return ResponseEntity containing Boolean indicating attended status
+     */
+    ResponseEntity<Boolean> getEventAttendedStatus(Integer eventId, Principal principal);
 }

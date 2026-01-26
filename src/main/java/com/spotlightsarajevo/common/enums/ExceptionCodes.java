@@ -46,4 +46,14 @@ public class ExceptionCodes {
         TRANSPORT_METHOD_NOT_FOUND,
         TRANSPORT_INVALID_REQUEST
     }
+
+    public enum AuthExceptionCodes {
+        AUTH_INVALID_CREDENTIALS,
+        AUTH_USER_NOT_FOUND,
+        AUTH_UNAUTHORIZED_ACCESS,
+        AUTH_TOKEN_EXPIRED,
+        AUTH_TOKEN_INVALID,
+        AUTH_SPOT_ID_MISSING,
+        AUTH_EVENT_ID_MISSING
+    }
 }

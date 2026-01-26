@@ -1,6 +1,7 @@
 package com.spotlightsarajevo.modules.event.utils;
 
 import com.spotlightsarajevo.common.enums.ObjectType;
+import com.spotlightsarajevo.modules.auth.facades.UserAttendedEventFacade;
 import com.spotlightsarajevo.modules.category.domain.EventCategoryDAO;
 import com.spotlightsarajevo.modules.category.domain.entity.EventCategoryEntity;
 import com.spotlightsarajevo.modules.event.api.dto.EventOrganiserModel;
@@ -30,6 +31,7 @@ public class EventUtilities {
     EventTagsDAO eventTagsDAO;
     EventOrganiserDAO eventOrganiserDAO;
     EventOrganiserReviewStatsDAO eventOrganiserReviewStatsDAO;
+    UserAttendedEventFacade userAttendedEventFacade;
     TagDAO tagDAO;
     TagMapper tagMapper;
     EventOrganiserMapper eventOrganiserMapper;
@@ -79,5 +81,9 @@ public class EventUtilities {
             mediaService.lookupThumbnailImage(organiserModel, ObjectType.ORGANISER, organiserModel.getId());
             organiserEntity.ifPresent(eventOrganiserEntity -> entity.setOrganiser(organiserModel));
         }
+    }
+
+    public boolean checkIfUserAttendedEvent(Integer entity, Integer userId){
+       return userAttendedEventFacade.checkIfUserAttendedEvent(userId, entity);
     }
 }

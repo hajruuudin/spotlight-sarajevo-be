@@ -1,5 +1,7 @@
 package com.spotlightsarajevo.modules.event.service;
 
+import com.spotlightsarajevo.common.utils.CommonFunctions;
+import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
 import com.spotlightsarajevo.modules.event.api.dto.*;
 import com.spotlightsarajevo.modules.event.domain.EventDAO;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
@@ -18,6 +20,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +30,7 @@ import java.util.Optional;
 public class EventServiceImpl implements EventService {
     EventDAO eventDAO;
     EventUtilities utils;
+    CommonFunctions commonFunctions;
     EventMapper eventMapper;
     MediaService mediaService;
 
@@ -100,5 +104,21 @@ public class EventServiceImpl implements EventService {
 
             return ResponseEntity.status(200).body(eventOverviewModel);
         }
+    }
+
+    @Override
+    public ResponseEntity<Boolean> getEventAttendedStatus(Integer eventId, Principal principal) {
+        if (eventId == null ) throw new EventExceptions.EventNotFoundException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND);
+        if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        Optional<EventEntity> eventEntity = eventDAO.findById(eventId);
+        UserEntity userEntity = commonFunctions.getUserFromPrincipal(principal);
+
+        if(eventEntity.isEmpty()){
+            throw new EventExceptions.EventNotFoundException(ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND);
+        }
+
+        boolean isAttended = utils.checkIfUserAttendedEvent(eventEntity.get().getId(), userEntity.getId());
+        return ResponseEntity.status(200).body(isAttended);
     }
 }

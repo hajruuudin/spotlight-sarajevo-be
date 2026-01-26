@@ -2,7 +2,7 @@ package com.spotlightsarajevo.common.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import com.spotlightsarajevo.modules.user.service.AuthServiceImpl;
+import com.spotlightsarajevo.modules.auth.service.AuthServiceImpl;
 
 public class AuthExceptions {
     /**

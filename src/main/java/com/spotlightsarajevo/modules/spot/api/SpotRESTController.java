@@ -62,4 +62,13 @@ public class SpotRESTController {
     public ResponseEntity<SpotModel> delete(Integer request){
         return spotService.delete(request);
     }
+
+    @GetMapping(value = "/visited-spot/check")
+    @Operation(description = "Check the status of the spot and if the user has labeled it as visited/will visit")
+    public ResponseEntity<Boolean> getSpotVisitedStatus(
+            @RequestParam(required = true) Integer spotId,
+            Principal principal
+    ) {
+        return spotService.getSpotVisitedStatus(spotId, principal);
+    }
 }

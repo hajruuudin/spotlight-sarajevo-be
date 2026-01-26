@@ -9,5 +9,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SpotCategoryMapper {
+    SpotCategoryModel entityToDto(SpotCategoryEntity entity);
     List<SpotCategoryModel> entitiesToDtos(List<SpotCategoryEntity> entities);
 }

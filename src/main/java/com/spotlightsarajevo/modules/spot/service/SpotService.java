@@ -65,4 +65,13 @@ public interface SpotService {
      * @return ResponseEntity containing the deleted SpotModel
      */
     ResponseEntity<SpotModel> delete(Integer id);
+
+    /**
+     * Checks if the user has marked the spot as visited.
+     *
+     * @param spotId the unique identifier of the spot
+     * @param principal the security principal of the user
+     * @return ResponseEntity containing a Boolean indicating visited status
+     */
+    ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal);;
 }
