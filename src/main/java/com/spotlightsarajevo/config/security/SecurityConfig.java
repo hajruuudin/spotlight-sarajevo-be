@@ -35,9 +35,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // USER AUTHENTICATION REQUIRED ROUTES
                         .requestMatchers(HttpMethod.POST, "/review/spot/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/review/spot/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/review/spot/**").authenticated()
+                        // ADMINISTRATIVE ROUTES
+                        .requestMatchers(HttpMethod.GET, "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/admin/**").hasRole("ADMIN")
+                        // ALL OTHER ACCESS POINTS
                         .anyRequest().permitAll()
                 )
                 .authenticationProvider(authenticationProvider())
