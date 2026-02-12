@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -26,10 +28,12 @@ public class CommunityRequestEntity implements Serializable {
     private Integer userId;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "request_type", columnDefinition = "request_type_enum", nullable = false)
     private RequestType requestType;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "object_type", columnDefinition = "object_type_enum", nullable = false)
     private ObjectType objectType;
 
@@ -39,6 +43,8 @@ public class CommunityRequestEntity implements Serializable {
     @Column(name = "request_description", columnDefinition = "VARCHAR", length = 255, nullable = false)
     private String requestDescription;
 
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", columnDefinition = "request_status_enum", nullable = false)
     private RequestStatus status;
 

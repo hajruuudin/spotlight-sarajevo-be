@@ -2,13 +2,14 @@ package com.spotlightsarajevo.modules.community.api.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.spotlightsarajevo.common.enums.ObjectType;
-import com.spotlightsarajevo.common.enums.RequestStatus;
 import com.spotlightsarajevo.common.enums.RequestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import lombok.Data;
 
+import java.io.Serializable;
+
+@Data
 public class CommunityRequestCreateModel implements Serializable {
     @Schema(description = "Type of request submitted")
     private RequestType requestType;

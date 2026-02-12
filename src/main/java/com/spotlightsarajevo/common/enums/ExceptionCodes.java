@@ -56,4 +56,10 @@ public class ExceptionCodes {
         AUTH_SPOT_ID_MISSING,
         AUTH_EVENT_ID_MISSING
     }
+
+    public enum CommunityRequestExceptionCodes {
+        CR_UNAUTHORIZED,
+        CR_INVALID_REQUEST_BODY,
+        CR_REQUEST_NOT_FOUND
+    }
 }

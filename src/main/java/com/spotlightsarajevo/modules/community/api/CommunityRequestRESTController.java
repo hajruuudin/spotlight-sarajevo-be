@@ -23,16 +23,16 @@ public class CommunityRequestRESTController {
     public ResponseEntity<List<UserCommunityRequestModel>> getUserCommunityRequests(
             Principal principal
     ) {
-        return null;
+        return communityRequestService.getUserCommunityRequests(principal);
     }
 
     @PostMapping(value = "/create-request")
     @Operation(description = "This API endpoint allows an authenticated user to create a new community request")
     public ResponseEntity<CommunityRequestModel> createCommunityRequest(
-            CommunityRequestCreateModel request,
+            @RequestBody CommunityRequestCreateModel request,
             Principal principal
     ){
-        return null;
+        return communityRequestService.createCommunityRequest(request, principal);
     }
 
     /* ADMIN ROUTES */
@@ -41,7 +41,7 @@ public class CommunityRequestRESTController {
     public ResponseEntity<List<CommunityRequestModel>> getAllCommunityRequests(
             Principal principal
     ){
-        return null;
+        return communityRequestService.getAllCommunityRequests(principal);
     }
 
     /* TODO: Could potentially be a bug later on. Might need to modify the DTOs */
@@ -51,7 +51,7 @@ public class CommunityRequestRESTController {
             @PathVariable Integer requestId,
             Principal principal
     ) {
-        return null;
+        return communityRequestService.getCommunityRequestById(requestId, principal);
     }
 
     @PutMapping(value = "/admin/update-request-status")
@@ -60,7 +60,7 @@ public class CommunityRequestRESTController {
             CommunityRequestStatusUpdate request,
             Principal principal
     ) {
-        return null;
+        return communityRequestService.updateCommunityRequestStatus(request, principal);
     }
 
     @DeleteMapping(value = "/admin/delete-request/{requestId}")
@@ -69,8 +69,6 @@ public class CommunityRequestRESTController {
             @PathVariable Integer requestId,
             Principal principal
     ) {
-        return null;
+        return communityRequestService.deleteCommunityRequest(requestId, principal);
     }
-
-
 }
