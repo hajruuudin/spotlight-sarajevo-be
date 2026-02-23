@@ -38,7 +38,7 @@ public class AuthExceptions {
     /**
      * Thrown when an error occurs during data saving within the database.
      *
-     * <p>This exception is typically thrown from {@link AuthServiceImpl} or {@link CommonFunctions}
+     * <p>This exception is typically thrown from {@link AuthServiceImpl}
      * when registering data (System or Google) into the database tables.</p>
      *
      * @see GlobalExceptionHandler

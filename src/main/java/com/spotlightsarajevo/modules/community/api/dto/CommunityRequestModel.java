@@ -1,9 +1,13 @@
 package com.spotlightsarajevo.modules.community.api.dto;
 
+import com.spotlightsarajevo.common.enums.ObjectType;
+import com.spotlightsarajevo.common.enums.RequestStatus;
+import com.spotlightsarajevo.common.enums.RequestType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @Schema(description = "Default, all property, table model for the Community Request Entity")
@@ -16,19 +20,22 @@ public class CommunityRequestModel implements Serializable {
     @Schema(description = "Identifier of the user who made the request")
     private Integer userId;
 
-    @Schema(description = "Full name of the user making the request")
-    private String userFullName;
-
     @Schema(description = "Type of request submitted")
-    private String requestType;
+    private RequestType requestType;
 
     @Schema(description = "Type of object the request concerns")
-    private String objectType;
+    private ObjectType objectType;
 
     @Schema(description = "Short header or title of the request")
     private String requestHeader;
 
     @Schema(description = "Detailed description of the request")
     private String requestDescription;
+
+    @Schema(description = "Status of the request as of being added")
+    private RequestStatus status;
+
+    @Schema(description = "Timestamp when the request was created")
+    private LocalDateTime createdAt;
 }
 

@@ -438,24 +438,23 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     public boolean isItemSavedInSystemCollection(Integer objectId, String type, Principal principal) {
-        try {
-            UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (principal == null) throw new CollectionExceptions.CollectionUnauthorisedException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_UNAUTHORISED_ACCESS);
+        if (objectId == null || type == null) throw new CollectionExceptions.CollectionRequestContentException(ExceptionCodes.CollectionExceptionCodes.COLLECTION_REQUEST_INVALID);
 
-            Integer systemCollectionId = collectionUtils.getSystemCollectionId(
-                    user.getId(),
-                    type,
-                    collectionDAO
-            );
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
 
-            if (type.equals(ObjectType.SPOT.toString())) {
-                return collectionSpotDAO.existsByCollectionIdAndSpotId(systemCollectionId, objectId);
-            } else if (type.equals(ObjectType.EVENT.toString())) {
-                return collectionEventDAO.existsByCollectionIdAndEventId(systemCollectionId, objectId);
-            }
+        Integer systemCollectionId = collectionUtils.getSystemCollectionId(
+                user.getId(),
+                type,
+                collectionDAO
+        );
 
-            return false;
-        } catch (CollectionExceptions.CollectionNotFoundException e) {
-            return false;
+        if (type.equals(ObjectType.SPOT.toString())) {
+            return collectionSpotDAO.existsByCollectionIdAndSpotId(systemCollectionId, objectId);
+        } else if (type.equals(ObjectType.EVENT.toString())) {
+            return collectionEventDAO.existsByCollectionIdAndEventId(systemCollectionId, objectId);
         }
+
+        return false;
     }
 }
