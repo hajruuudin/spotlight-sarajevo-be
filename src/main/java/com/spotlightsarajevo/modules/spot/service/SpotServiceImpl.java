@@ -165,5 +165,26 @@ public class SpotServiceImpl implements SpotService {
         boolean isAttended = utils.checkIfUserVisitedSpot(spotEntity.get().getId(), userEntity.getId());
         return ResponseEntity.status(200).body(isAttended);
     }
+
+    @Override
+    public ResponseEntity<List<SpotMapModel>> findSpotsForMap(String searchTerm, List<Integer> categoryIds) {
+        if (categoryIds == null)
+            categoryIds = new ArrayList<>();
+
+        Specification<SpotEntity> spec = Specification
+                .allOf(SpotSpecifications.hasSearchTerm(searchTerm))
+                .and(SpotSpecifications.hasCategories(categoryIds));
+
+        List<SpotEntity> spots = spotDAO.findAll(spec);
+
+        for (SpotEntity spot : spots) {
+            utils.setSpotCategoriesAndRating(spot);
+            mediaService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
+        }
+
+        List<SpotMapModel> response = spotMapper.entitiesToMapDtos(spots);
+
+        return ResponseEntity.ok(response);
+    }
 }
 

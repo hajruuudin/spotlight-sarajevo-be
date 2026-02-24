@@ -97,4 +97,5 @@ public class EventEntity implements Serializable {
 
     @Transient
     private EventOrganiserModel organiser;
+
 }

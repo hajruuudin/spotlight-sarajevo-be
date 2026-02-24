@@ -37,6 +37,14 @@ public class SpotRESTController {
         return spotService.findSpotsPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption, categoryIds);
     }
 
+    @GetMapping(value = "/find-spots-map")
+    @Operation(description = "Retrieve all spots for map view based on search term and category filters")
+    public ResponseEntity<List<SpotMapModel>> findSpotsForMap(
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) List<Integer> categoryIds) {
+        return spotService.findSpotsForMap(searchTerm, categoryIds);
+    }
+
     @GetMapping(value = "/find-spot-overview")
     @Operation(description = "Get a complete spot overview object")
     public ResponseEntity<SpotOverviewModel> findSpotOverview(

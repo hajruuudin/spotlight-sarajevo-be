@@ -24,4 +24,6 @@ public interface SpotMapper {
     })
     SpotOverviewModel entityOverviewToDto(SpotEntity entity);
     SpotShorthandModel entityToShorthandDto(SpotEntity entity);
+    SpotMapModel entityToMapDto(SpotEntity entity);
+    List<SpotMapModel> entitiesToMapDtos(List<SpotEntity> entities);
 }

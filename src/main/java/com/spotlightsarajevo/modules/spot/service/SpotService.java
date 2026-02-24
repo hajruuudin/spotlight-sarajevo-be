@@ -73,5 +73,14 @@ public interface SpotService {
      * @param principal the security principal of the user
      * @return ResponseEntity containing a Boolean indicating visited status
      */
-    ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal);;
+    ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal);
+
+    /**
+     * Retrieves a list of spots for map view based on search term and category filters.
+     *
+     * @param searchTerm the term to search for in spot names
+     * @param categoryIds the list of category IDs to filter the spots
+     * @return ResponseEntity containing a List of SpotMapModel
+     */
+    ResponseEntity<List<SpotMapModel>> findSpotsForMap(String searchTerm, List<Integer> categoryIds);
 }
