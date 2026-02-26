@@ -149,22 +149,22 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ResponseEntity<Map<LocalDate, Boolean>> checkEventDatesForMonth(YearMonth yearMonth) {
-        if (yearMonth == null) {
+    public ResponseEntity<Map<LocalDate, Boolean>> checkEventDatesForMonth(Integer year, Integer month) {
+        if (year == null || month == null || month < 1 || month > 12) {
             throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
         }
 
+        YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate startOfMonth = yearMonth.atDay(1);
         LocalDate endOfMonth = yearMonth.atEndOfMonth();
 
-        // Get all events that overlap with this month
         Specification<EventEntity> spec = Specification
                 .allOf(EventSpecification.hasDateRange(startOfMonth, endOfMonth));
 
         List<EventEntity> eventEntities = eventDAO.findAll(spec);
 
-        // Build the result map for each day of the month
         Map<LocalDate, Boolean> result = new LinkedHashMap<>();
+
         for (int day = 1; day <= yearMonth.lengthOfMonth(); day++) {
             LocalDate currentDate = yearMonth.atDay(day);
             boolean hasEvents = eventEntities.stream()

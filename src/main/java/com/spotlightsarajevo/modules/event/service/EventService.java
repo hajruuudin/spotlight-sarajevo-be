@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 
@@ -80,8 +79,9 @@ public interface EventService {
     /**
      * Checks which dates in a given month have events.
      *
-     * @param yearMonth the year and month to check
-     * @return ResponseEntity containing a Map of LocalDate to Boolean indicating if events exist
+     * @param year The year of the search variable
+     * @param month The month indexed by a number (e.g. 1 = January, 2 = February)
+     * @return A list of dates for the current month where there is an event per day.
      */
-    ResponseEntity<Map<LocalDate, Boolean>> checkEventDatesForMonth(YearMonth yearMonth);
+    ResponseEntity<Map<LocalDate, Boolean>> checkEventDatesForMonth(Integer year, Integer month);
 }
