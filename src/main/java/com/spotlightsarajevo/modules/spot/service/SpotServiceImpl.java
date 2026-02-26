@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -54,7 +55,7 @@ public class SpotServiceImpl implements SpotService {
     }
 
     @Override
-    public ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds) {
+    public ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds, BigDecimal userLatitude, BigDecimal userLongitude) {
         if (pageRequest == null)
             throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
 
@@ -64,7 +65,7 @@ public class SpotServiceImpl implements SpotService {
         Specification<SpotEntity> spec = Specification
                 .allOf(SpotSpecifications.hasSearchTerm(searchTerm))
                 .and(SpotSpecifications.hasCategories(categoryIds))
-                .and(SpotSpecifications.withDynamicSorting(sortOption));
+                .and(SpotSpecifications.withDynamicSorting(sortOption, userLatitude, userLongitude));
 
         Page<SpotEntity> page = spotDAO.findAll(spec, pageRequest);
 

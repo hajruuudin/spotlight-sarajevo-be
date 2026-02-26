@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
@@ -28,11 +29,13 @@ public interface SpotService {
      *
      * @param pageRequest the pagination information
      * @param searchTerm the term to search for in spot names or descriptions
-     * @param sortOption the option to sort the results
+     * @param sortOption the option to sort the results (ALPHABETICAL, RATING, PROXIMITY)
      * @param categoryIds the list of category IDs to filter the spots
+     * @param userLatitude the user's latitude for proximity sorting (optional, required for PROXIMITY sort)
+     * @param userLongitude the user's longitude for proximity sorting (optional, required for PROXIMITY sort)
      * @return ResponseEntity containing a Page of SpotShorthandModel
      */
-    ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds);
+    ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds, BigDecimal userLatitude, BigDecimal userLongitude);
 
     /**
      * Retrieves an overview of a specific spot by its slug.
