@@ -62,23 +62,15 @@ public class SpotSpecifications {
                     query.orderBy(criteriaBuilder.desc(reviewStatsJoin.get("combinedRating")));
                 }
                 case PROXIMITY -> {
-                    // Haversine formula approximation for distance calculation
-                    // Using simplified Euclidean distance with latitude correction for performance
-                    // Formula: sqrt((lat2-lat1)^2 + ((lon2-lon1)*cos(lat1))^2)
-                    // This is accurate enough for sorting purposes within a city/region
-
                     Expression<BigDecimal> spotLat = root.get("latitude");
                     Expression<BigDecimal> spotLon = root.get("longitude");
 
-                    // Calculate (spotLat - userLat)^2
                     Expression<Number> latDiff = criteriaBuilder.diff(spotLat, userLatitude);
                     Expression<Number> latDiffSquared = criteriaBuilder.prod(latDiff, latDiff);
 
-                    // Calculate (spotLon - userLon)^2
                     Expression<Number> lonDiff = criteriaBuilder.diff(spotLon, userLongitude);
                     Expression<Number> lonDiffSquared = criteriaBuilder.prod(lonDiff, lonDiff);
 
-                    // Calculate approximate distance squared (no need for sqrt for sorting)
                     Expression<Number> distanceSquared = criteriaBuilder.sum(latDiffSquared, lonDiffSquared);
 
                     query.orderBy(criteriaBuilder.asc(distanceSquared));
@@ -86,6 +78,16 @@ public class SpotSpecifications {
             }
 
             return criteriaBuilder.conjunction();
+        };
+    }
+
+    public static Specification<SpotEntity> excludeVisitedSpots(List<Integer> visitedSpotIds) {
+        return (root, query, criteriaBuilder) -> {
+            if (visitedSpotIds == null || visitedSpotIds.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+
+            return criteriaBuilder.not(root.get("id").in(visitedSpotIds));
         };
     }
 

@@ -33,9 +33,11 @@ public interface SpotService {
      * @param categoryIds the list of category IDs to filter the spots
      * @param userLatitude the user's latitude for proximity sorting (optional, required for PROXIMITY sort)
      * @param userLongitude the user's longitude for proximity sorting (optional, required for PROXIMITY sort)
+     * @param excludeVisited if true, exclude spots that the user has marked as visited (requires principal)
+     * @param principal the security principal of the user (required if excludeVisited is true)
      * @return ResponseEntity containing a Page of SpotShorthandModel
      */
-    ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds, BigDecimal userLatitude, BigDecimal userLongitude);
+    ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds, BigDecimal userLatitude, BigDecimal userLongitude, Boolean excludeVisited, Principal principal);
 
     /**
      * Retrieves an overview of a specific spot by its slug.
