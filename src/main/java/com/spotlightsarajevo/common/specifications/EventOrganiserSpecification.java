@@ -35,6 +35,8 @@ public class EventOrganiserSpecification {
             switch (sortingOptions){
                 case ALPHABETICAL -> query.orderBy(criteriaBuilder.asc(root.get("header")));
                 case ALPHABETICAL_DESC -> query.orderBy(criteriaBuilder.desc(root.get("header")));
+                case RATING -> query.orderBy(criteriaBuilder.asc(root.get("userOverallRating")));
+                case RATING_DESC -> query.orderBy(criteriaBuilder.desc(root.get("userOverallRating")));
             }
 
             return criteriaBuilder.conjunction();

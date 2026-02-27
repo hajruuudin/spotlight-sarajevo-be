@@ -41,6 +41,9 @@ public class EventShorthandModel implements Serializable, CollectionItem {
     @Schema(description = "The start date of the event")
     private LocalDateTime startDate;
 
+    @Schema(description = "The end date of the event")
+    private LocalDateTime endDate;
+
     @Schema(description = "The thumbnail image of the event")
     private String thumbnailImage;
 
