@@ -17,6 +17,8 @@ import com.spotlightsarajevo.common.specifications.SpotSpecifications;
 import com.spotlightsarajevo.modules.review.mapper.SpotReviewMapper;
 import com.spotlightsarajevo.modules.spot.utils.SpotUtilities;
 import com.spotlightsarajevo.modules.auth.domain.UserDAO;
+import com.spotlightsarajevo.modules.auth.domain.UserVisitedSpotsDAO;
+import com.spotlightsarajevo.modules.auth.domain.entity.UserVisitedSpotsEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -35,6 +38,7 @@ public class SpotServiceImpl implements SpotService {
 
     private final SpotDAO spotDAO;
     private final UserDAO userDAO;
+    private final UserVisitedSpotsDAO userVisitedSpotsDAO;
     private final SpotReviewDAO spotReviewDAO;
     private final SpotMapper spotMapper;
     private final SpotReviewMapper spotReviewMapper;
@@ -54,17 +58,27 @@ public class SpotServiceImpl implements SpotService {
     }
 
     @Override
-    public ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds) {
+    public ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds, BigDecimal userLatitude, BigDecimal userLongitude, Boolean excludeVisited, Principal principal) {
         if (pageRequest == null)
             throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
 
         if (categoryIds == null)
             categoryIds = new ArrayList<>();
 
+        List<Integer> visitedSpotIds = new ArrayList<>();
+        if (Boolean.TRUE.equals(excludeVisited) && principal != null) {
+            UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+            visitedSpotIds = userVisitedSpotsDAO.findAllByUserId(user.getId())
+                    .stream()
+                    .map(entity -> entity.getSpotId())
+                    .toList();
+        }
+
         Specification<SpotEntity> spec = Specification
                 .allOf(SpotSpecifications.hasSearchTerm(searchTerm))
                 .and(SpotSpecifications.hasCategories(categoryIds))
-                .and(SpotSpecifications.withDynamicSorting(sortOption));
+                .and(SpotSpecifications.excludeVisitedSpots(visitedSpotIds))
+                .and(SpotSpecifications.withDynamicSorting(sortOption, userLatitude, userLongitude));
 
         Page<SpotEntity> page = spotDAO.findAll(spec, pageRequest);
 
@@ -164,6 +178,27 @@ public class SpotServiceImpl implements SpotService {
 
         boolean isAttended = utils.checkIfUserVisitedSpot(spotEntity.get().getId(), userEntity.getId());
         return ResponseEntity.status(200).body(isAttended);
+    }
+
+    @Override
+    public ResponseEntity<List<SpotMapModel>> findSpotsForMap(String searchTerm, List<Integer> categoryIds) {
+        if (categoryIds == null)
+            categoryIds = new ArrayList<>();
+
+        Specification<SpotEntity> spec = Specification
+                .allOf(SpotSpecifications.hasSearchTerm(searchTerm))
+                .and(SpotSpecifications.hasCategories(categoryIds));
+
+        List<SpotEntity> spots = spotDAO.findAll(spec);
+
+        for (SpotEntity spot : spots) {
+            utils.setSpotCategoriesAndRating(spot);
+            mediaService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
+        }
+
+        List<SpotMapModel> response = spotMapper.entitiesToMapDtos(spots);
+
+        return ResponseEntity.ok(response);
     }
 }
 

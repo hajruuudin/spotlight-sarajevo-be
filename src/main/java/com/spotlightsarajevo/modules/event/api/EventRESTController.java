@@ -5,17 +5,18 @@ import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
 import com.spotlightsarajevo.modules.event.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.websocket.server.PathParam;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Tag(name = "event", description = "Event API")
@@ -33,6 +34,22 @@ public class EventRESTController {
             @RequestParam(defaultValue = "ALPHABETICAL", required = false) String sortOption,
             @RequestParam(required = false) List<Integer> categoryIds) {
         return eventService.findEventsPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption, categoryIds);
+    }
+
+    @GetMapping(value = "/events-on-day/{date}")
+    @Operation(description = "Retrieve all events for a specific date (calendar view)")
+    public ResponseEntity<List<EventShorthandModel>> findEventsPerDay(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return eventService.findEventsForDate(date);
+    }
+
+    @GetMapping(value = "/event-dates-check")
+    @Operation(description = "Check which dates in a given month have events")
+    public ResponseEntity<Map<LocalDate, Boolean>> checkEventDatesForMonth(
+            @RequestParam(required = true) Integer year,
+            @RequestParam(required = true) Integer month
+    ) {
+        return eventService.checkEventDatesForMonth(year, month);
     }
 
     @GetMapping(value = "/find-event-overview")

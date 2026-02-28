@@ -6,7 +6,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * EventService interface defines methods for managing events.
@@ -65,4 +67,21 @@ public interface EventService {
      * @return ResponseEntity containing Boolean indicating attended status
      */
     ResponseEntity<Boolean> getEventAttendedStatus(Integer eventId, Principal principal);
+
+    /**
+     * Retrieves a list of events for a specific date.
+     *
+     * @param date the date to filter events
+     * @return ResponseEntity containing a List of EventShorthandModel
+     */
+    ResponseEntity<List<EventShorthandModel>> findEventsForDate(LocalDate date);
+
+    /**
+     * Checks which dates in a given month have events.
+     *
+     * @param year The year of the search variable
+     * @param month The month indexed by a number (e.g. 1 = January, 2 = February)
+     * @return A list of dates for the current month where there is an event per day.
+     */
+    ResponseEntity<Map<LocalDate, Boolean>> checkEventDatesForMonth(Integer year, Integer month);
 }

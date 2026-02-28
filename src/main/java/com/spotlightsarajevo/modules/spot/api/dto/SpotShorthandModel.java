@@ -38,6 +38,12 @@ public class SpotShorthandModel implements Serializable, CollectionItem {
     @Schema(description = "Category name for the spot in english")
     private String categoryNameEn;
 
+    @Schema(description = "Latitude of the spot")
+    private BigDecimal latitude;
+
+    @Schema(description = "Longitude of the spot")
+    private BigDecimal longitude;
+
     @Schema(description = "The average rating of the spot taken from the spot review stats view")
     private BigDecimal combinedRating;
 

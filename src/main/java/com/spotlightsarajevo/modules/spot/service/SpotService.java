@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
@@ -28,11 +29,15 @@ public interface SpotService {
      *
      * @param pageRequest the pagination information
      * @param searchTerm the term to search for in spot names or descriptions
-     * @param sortOption the option to sort the results
+     * @param sortOption the option to sort the results (ALPHABETICAL, RATING, PROXIMITY)
      * @param categoryIds the list of category IDs to filter the spots
+     * @param userLatitude the user's latitude for proximity sorting (optional, required for PROXIMITY sort)
+     * @param userLongitude the user's longitude for proximity sorting (optional, required for PROXIMITY sort)
+     * @param excludeVisited if true, exclude spots that the user has marked as visited (requires principal)
+     * @param principal the security principal of the user (required if excludeVisited is true)
      * @return ResponseEntity containing a Page of SpotShorthandModel
      */
-    ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds);
+    ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds, BigDecimal userLatitude, BigDecimal userLongitude, Boolean excludeVisited, Principal principal);
 
     /**
      * Retrieves an overview of a specific spot by its slug.
@@ -73,5 +78,14 @@ public interface SpotService {
      * @param principal the security principal of the user
      * @return ResponseEntity containing a Boolean indicating visited status
      */
-    ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal);;
+    ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal);
+
+    /**
+     * Retrieves a list of spots for map view based on search term and category filters.
+     *
+     * @param searchTerm the term to search for in spot names
+     * @param categoryIds the list of category IDs to filter the spots
+     * @return ResponseEntity containing a List of SpotMapModel
+     */
+    ResponseEntity<List<SpotMapModel>> findSpotsForMap(String searchTerm, List<Integer> categoryIds);
 }

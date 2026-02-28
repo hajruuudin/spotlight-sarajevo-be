@@ -4,6 +4,8 @@ import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.common.enums.SortingOptions;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class EventSpecification {
@@ -33,7 +35,7 @@ public class EventSpecification {
     }
 
     public static Specification<EventEntity> withDynamicSorting(String sortOption){
-        return (root, query, crieriaBuilder) -> {
+        return (root, query, criteriaBuilder) -> {
 
             SortingOptions sort;
 
@@ -43,12 +45,49 @@ public class EventSpecification {
                 sort = SortingOptions.ALPHABETICAL;
             }
 
-            switch (sort) {
-                case ALPHABETICAL -> query.orderBy(crieriaBuilder.asc(root.get("officialNameEn")));
-                case DATE -> query.orderBy(crieriaBuilder.asc(root.get("startDate")));
-            };
+            LocalDateTime now = LocalDateTime.now();
 
-            return crieriaBuilder.conjunction();
+            switch (sort) {
+                case ALPHABETICAL -> query.orderBy(criteriaBuilder.asc(root.get("officialNameEn")));
+                case DATE_UPCOMING -> {
+                    query.orderBy(criteriaBuilder.asc(root.get("startDate")));
+                    return criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), now);
+                }
+                case DATE_PAST -> {
+                    query.orderBy(criteriaBuilder.desc(root.get("endDate")));
+                    return criteriaBuilder.lessThan(root.get("endDate"), now);
+                }
+            }
+
+            return criteriaBuilder.conjunction();
+        };
+    }
+
+    public static Specification<EventEntity> hasDate(LocalDate date) {
+        return (root, query, criteriaBuilder) -> {
+            if (date == null) {
+                return criteriaBuilder.conjunction();
+            }
+
+            // Events that span over the specified date (start_date <= end_of_day AND end_date >= start_of_day)
+            return criteriaBuilder.and(
+                    criteriaBuilder.lessThanOrEqualTo(root.get("startDate"), date.plusDays(1).atStartOfDay()),
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), date.atStartOfDay())
+            );
+        };
+    }
+
+    public static Specification<EventEntity> hasDateRange(LocalDate startDate, LocalDate endDate) {
+        return (root, query, criteriaBuilder) -> {
+            if (startDate == null || endDate == null) {
+                return criteriaBuilder.conjunction();
+            }
+
+            // Events that overlap with the date range (event starts before range ends AND event ends after range starts)
+            return criteriaBuilder.and(
+                    criteriaBuilder.lessThanOrEqualTo(root.get("startDate"), endDate.plusDays(1).atStartOfDay()),
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), startDate.atStartOfDay())
+            );
         };
     }
 }

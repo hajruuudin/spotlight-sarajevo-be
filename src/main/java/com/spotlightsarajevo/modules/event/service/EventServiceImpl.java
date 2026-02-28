@@ -21,8 +21,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -120,5 +124,55 @@ public class EventServiceImpl implements EventService {
 
         boolean isAttended = utils.checkIfUserAttendedEvent(eventEntity.get().getId(), userEntity.getId());
         return ResponseEntity.status(200).body(isAttended);
+    }
+
+    @Override
+    public ResponseEntity<List<EventShorthandModel>> findEventsForDate(LocalDate date) {
+        if (date == null) {
+            throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+        }
+
+        Specification<EventEntity> spec = Specification
+                .allOf(EventSpecification.hasDate(date));
+
+        List<EventEntity> eventEntities = eventDAO.findAll(spec);
+
+        for (EventEntity eventEntity : eventEntities) {
+            utils.setEventCategories(eventEntity);
+            utils.setEventTags(eventEntity);
+            mediaService.lookupThumbnailImage(eventEntity, ObjectType.EVENT, eventEntity.getId());
+        }
+
+        List<EventShorthandModel> response = eventMapper.entitiesToShorthandDtos(eventEntities);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Map<LocalDate, Boolean>> checkEventDatesForMonth(Integer year, Integer month) {
+        if (year == null || month == null || month < 1 || month > 12) {
+            throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+        }
+
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate startOfMonth = yearMonth.atDay(1);
+        LocalDate endOfMonth = yearMonth.atEndOfMonth();
+
+        Specification<EventEntity> spec = Specification
+                .allOf(EventSpecification.hasDateRange(startOfMonth, endOfMonth));
+
+        List<EventEntity> eventEntities = eventDAO.findAll(spec);
+
+        Map<LocalDate, Boolean> result = new LinkedHashMap<>();
+
+        for (int day = 1; day <= yearMonth.lengthOfMonth(); day++) {
+            LocalDate currentDate = yearMonth.atDay(day);
+            boolean hasEvents = eventEntities.stream()
+                    .anyMatch(event -> !event.getStartDate().toLocalDate().isAfter(currentDate)
+                            && !event.getEndDate().toLocalDate().isBefore(currentDate));
+            result.put(currentDate, hasEvents);
+        }
+
+        return ResponseEntity.ok(result);
     }
 }

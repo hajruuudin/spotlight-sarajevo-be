@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 
@@ -27,14 +28,27 @@ public class SpotRESTController {
     }
 
     @GetMapping(value = "/find-spots")
-    @Operation(description = "Retrieve a paginated result of spots based on specific criteria")
+    @Operation(description = "Retrieve a paginated result of spots based on specific criteria. For PROXIMITY sorting, provide userLatitude and userLongitude. Set excludeVisited=true to filter out spots the user has visited.")
     public ResponseEntity<Page<SpotShorthandModel>> findSpotsPaginated(
             @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
             @RequestParam(defaultValue = "10", required = false) Integer pageSize,
             @RequestParam(required = false) String searchTerm,
             @RequestParam(defaultValue = "ALPHABETICAL", required = false) String sortOption,
+            @RequestParam(required = false) List<Integer> categoryIds,
+            @RequestParam(required = false) BigDecimal userLatitude,
+            @RequestParam(required = false) BigDecimal userLongitude,
+            @RequestParam(defaultValue = "false", required = false) Boolean excludeVisited,
+            Principal principal
+    ) {
+        return spotService.findSpotsPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption, categoryIds, userLatitude, userLongitude, excludeVisited, principal);
+    }
+
+    @GetMapping(value = "/find-spots-map")
+    @Operation(description = "Retrieve all spots for map view based on search term and category filters")
+    public ResponseEntity<List<SpotMapModel>> findSpotsForMap(
+            @RequestParam(required = false) String searchTerm,
             @RequestParam(required = false) List<Integer> categoryIds) {
-        return spotService.findSpotsPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption, categoryIds);
+        return spotService.findSpotsForMap(searchTerm, categoryIds);
     }
 
     @GetMapping(value = "/find-spot-overview")
