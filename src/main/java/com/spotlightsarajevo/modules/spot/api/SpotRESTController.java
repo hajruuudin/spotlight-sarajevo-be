@@ -67,8 +67,8 @@ public class SpotRESTController {
 
     @PutMapping
     @Operation(description = "Update a spot from the database")
-    public ResponseEntity<SpotModel> update(SpotUpdateModel request){
-        return spotService.update(request);
+    public ResponseEntity<SpotModel> update(@RequestBody SpotUpdateModel request, Principal principal){
+        return spotService.update(request, principal);
     }
 
     @DeleteMapping

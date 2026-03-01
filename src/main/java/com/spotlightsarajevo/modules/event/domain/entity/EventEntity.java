@@ -1,6 +1,7 @@
 package com.spotlightsarajevo.modules.event.domain.entity;
 
 import com.spotlightsarajevo.modules.event.api.dto.EventOrganiserModel;
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -90,7 +91,10 @@ public class EventEntity implements Serializable {
     private String categoryNameEn;
 
     @Transient
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
+
+    @Transient
+    private List<MediaStoreModel> images;
 
     @Transient
     private List<TagModel> eventTags;

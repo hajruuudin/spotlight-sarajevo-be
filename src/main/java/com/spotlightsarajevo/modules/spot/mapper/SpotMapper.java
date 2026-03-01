@@ -11,6 +11,7 @@ public interface SpotMapper {
     SpotEntity dtoToEntity(SpotCreateModel spotCreateModel);
     SpotModel entityToDto(SpotEntity spotEntity);
     List<SpotModel> entitiesToDtos(List<SpotEntity> spotEntityList);
+    @Mapping(target = "thumbnailImage", ignore = true)
     void updateEntityFromDto(SpotUpdateModel spotUpdateModel, @MappingTarget SpotEntity spotEntity);
     List<SpotShorthandModel> entitiesToShorthandDtos(List<SpotEntity> entities);
     @Mappings({

@@ -59,9 +59,10 @@ public interface SpotService {
      * Updates an existing spot based on the provided SpotUpdateModel.
      *
      * @param spotUpdateModel the model containing updated information for the spot
+     * @param principal the security principal of the admin user
      * @return ResponseEntity containing the updated SpotModel
      */
-    ResponseEntity<SpotModel> update(SpotUpdateModel spotUpdateModel);
+    ResponseEntity<SpotModel> update(SpotUpdateModel spotUpdateModel, Principal principal);
 
     /**
      * Deletes a spot by its unique identifier.
