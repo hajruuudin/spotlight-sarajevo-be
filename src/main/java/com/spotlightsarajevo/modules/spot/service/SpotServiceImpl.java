@@ -59,7 +59,10 @@ public class SpotServiceImpl implements SpotService {
     private final MediaService mediaService;
     private final SpotUtilities utils;
     private final CommonFunctions commonFunctions;
-    private final ImageBBUtils imageBBUtils;
+
+    /*=============================================================================*/
+    /*============================== DATA RETRIEVAL ===============================*/
+    /*=============================================================================*/
 
     @Override
     public ResponseEntity<Page<SpotModel>> findAll(PageRequest pageRequest) {
@@ -138,147 +141,6 @@ public class SpotServiceImpl implements SpotService {
         return ResponseEntity.ok(model);
     }
 
-    /* ---------------------------------------------
-     *  CREATE / UPDATE / DELETE SPOT
-     * --------------------------------------------- */
-
-    @Override
-    public ResponseEntity<SpotModel> create(SpotCreateModel dto) {
-        SpotEntity entity = spotMapper.dtoToEntity(dto);
-        entity.setCreated(LocalDateTime.now());
-        entity.setCreatedBy("Admin User");
-
-        SpotEntity created = spotDAO.save(entity);
-
-        return ResponseEntity.ok(spotMapper.entityToDto(created));
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<SpotModel> update(SpotUpdateModel dto, Principal principal) {
-        // Security checks
-        if (principal == null) {
-            throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
-        }
-
-        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
-        if (!user.getIsAdmin()) {
-            throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
-        }
-
-        if (dto == null) {
-            throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
-        }
-
-        // Retrieve existing spot
-        SpotEntity entity = spotDAO.findById(dto.getId())
-                .orElseThrow(() ->
-                        new SpotExceptions.SpotNotFoundException(
-                                ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND));
-
-        // Update basic fields via mapper
-        spotMapper.updateEntityFromDto(dto, entity);
-        entity.setModified(LocalDateTime.now());
-        entity.setModifiedBy(user.getUsername());
-
-        // Handle tags: delete all existing tags and add new ones
-        if (dto.getTagIds() != null) {
-            spotTagsDAO.deleteAllBySpotId(entity.getId());
-
-            List<SpotTagsEntity> newTags = new ArrayList<>();
-            for (Integer tagId : dto.getTagIds()) {
-                SpotTagsEntity spotTag = new SpotTagsEntity();
-                spotTag.setSpotId(entity.getId());
-                spotTag.setTagId(tagId);
-                newTags.add(spotTag);
-            }
-            if (!newTags.isEmpty()) {
-                spotTagsDAO.saveAllAndFlush(newTags);
-            }
-        }
-
-        // Handle work hours: delete all existing work hours and add new ones
-        if (dto.getWorkHoursModel() != null) {
-            spotWorkHoursDAO.deleteAllBySpotId(entity.getId());
-
-            List<SpotWorkHoursEntity> newWorkHours = new ArrayList<>();
-            for (SpotWorkHoursModel workHoursModel : dto.getWorkHoursModel()) {
-                SpotWorkHoursEntity workHoursEntity = spotWorkHoursMapper.dtoToEntity(workHoursModel);
-                workHoursEntity.setSpotId(entity.getId());
-                newWorkHours.add(workHoursEntity);
-            }
-            if (!newWorkHours.isEmpty()) {
-                spotWorkHoursDAO.saveAllAndFlush(newWorkHours);
-            }
-        }
-
-        // Handle thumbnail image: if new one provided, delete old from ImageBB and database, then add new
-        if (dto.getNewThumbnailImage() != null) {
-            // Get existing thumbnail to delete from ImageBB
-            MediaStoreEntity existingThumbnail = mediaStoreDAO.findThumbnailByItemIdAndItemCategory(entity.getId(), ObjectType.SPOT);
-            if (existingThumbnail != null && existingThumbnail.getImageDeleteUrl() != null) {
-                imageBBUtils.deleteImage(existingThumbnail.getImageDeleteUrl());
-            }
-
-            // Delete existing thumbnail from database
-            mediaStoreDAO.deleteByItemIdAndItemCategoryAndIsThumbnailTrue(entity.getId(), ObjectType.SPOT);
-
-            // Add new thumbnail
-            MediaStoreCreateModel thumbnailModel = dto.getNewThumbnailImage();
-            thumbnailModel.setItemId(entity.getId());
-            thumbnailModel.setItemCategory(ObjectType.SPOT.toString());
-            thumbnailModel.setIsThumbnail(true);
-            thumbnailModel.setCreated(LocalDateTime.now());
-            thumbnailModel.setCreatedBy(user.getUsername());
-            mediaService.create(thumbnailModel);
-        }
-
-        // Handle new images to add
-        if (dto.getToAddImages() != null && !dto.getToAddImages().isEmpty()) {
-            for (MediaStoreCreateModel imageModel : dto.getToAddImages()) {
-                imageModel.setItemId(entity.getId());
-                imageModel.setItemCategory(ObjectType.SPOT.toString());
-                imageModel.setIsThumbnail(false);
-                imageModel.setCreated(LocalDateTime.now());
-                imageModel.setCreatedBy(user.getUsername());
-                mediaService.create(imageModel);
-            }
-        }
-
-        // Handle images to remove - delete from ImageBB first, then from database
-        if (dto.getToRemoveImages() != null && !dto.getToRemoveImages().isEmpty()) {
-            for (Integer imageId : dto.getToRemoveImages()) {
-                // Get the image entity to retrieve the delete URL
-                Optional<MediaStoreEntity> imageEntity = mediaStoreDAO.findById(imageId);
-                if (imageEntity.isPresent()) {
-                    // Delete from ImageBB
-                    String deleteUrl = imageEntity.get().getImageDeleteUrl();
-                    if (deleteUrl != null && !deleteUrl.isBlank()) {
-                        imageBBUtils.deleteImage(deleteUrl);
-                    }
-                    // Delete from database
-                    mediaStoreDAO.deleteById(imageId);
-                }
-            }
-        }
-
-        // Save the updated entity
-        spotDAO.save(entity);
-
-        return ResponseEntity.ok(spotMapper.entityToDto(entity));
-    }
-
-    @Override
-    public ResponseEntity<SpotModel> delete(Integer id) {
-        SpotEntity entity = spotDAO.findById(id)
-                .orElseThrow(() ->
-                        new SpotExceptions.SpotNotFoundException(
-                                ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND));
-
-        spotDAO.delete(entity);
-        return ResponseEntity.ok(spotMapper.entityToDto(entity));
-    }
-
     @Override
     public ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal) {
         if (spotId == null ) throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND);
@@ -314,6 +176,121 @@ public class SpotServiceImpl implements SpotService {
         List<SpotMapModel> response = spotMapper.entitiesToMapDtos(spots);
 
         return ResponseEntity.ok(response);
+    }
+
+    /*=============================================================================*/
+    /*======================== CREATE / UPDATE / DELETE ===========================*/
+    /*=============================================================================*/
+
+    @Override
+    public ResponseEntity<SpotModel> create(SpotCreateModel dto) {
+        SpotEntity entity = spotMapper.dtoToEntity(dto);
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy("Admin User");
+
+        SpotEntity created = spotDAO.save(entity);
+
+        return ResponseEntity.ok(spotMapper.entityToDto(created));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<SpotModel> update(SpotUpdateModel dto, Principal principal) {
+        if (principal == null) throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+        if (dto == null) throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        SpotEntity entity = spotDAO.findById(dto.getId())
+                .orElseThrow(() ->
+                        new SpotExceptions.SpotNotFoundException(
+                                ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND));
+
+        // From Section 1: Updating Basic Fields
+        spotMapper.updateEntityFromDto(dto, entity);
+        entity.setModified(LocalDateTime.now());
+        entity.setModifiedBy(user.getUsername());
+
+        // From Section 2: Update existing tags
+        if (dto.getTagIds() != null) {
+            spotTagsDAO.deleteAllBySpotId(entity.getId());
+
+            List<SpotTagsEntity> newTags = new ArrayList<>();
+            for (Integer tagId : dto.getTagIds()) {
+                SpotTagsEntity spotTag = new SpotTagsEntity();
+                spotTag.setSpotId(entity.getId());
+                spotTag.setTagId(tagId);
+                newTags.add(spotTag);
+            }
+            if (!newTags.isEmpty()) {
+                spotTagsDAO.saveAllAndFlush(newTags);
+            }
+        }
+
+        // From Section 3: Update Existing Work Hours
+        if (dto.getWorkHoursModel() != null) {
+            spotWorkHoursDAO.deleteAllBySpotId(entity.getId());
+
+            List<SpotWorkHoursEntity> newWorkHours = new ArrayList<>();
+            for (SpotWorkHoursModel workHoursModel : dto.getWorkHoursModel()) {
+                SpotWorkHoursEntity workHoursEntity = spotWorkHoursMapper.dtoToEntity(workHoursModel);
+                workHoursEntity.setSpotId(entity.getId());
+                newWorkHours.add(workHoursEntity);
+            }
+            if (!newWorkHours.isEmpty()) {
+                spotWorkHoursDAO.saveAllAndFlush(newWorkHours);
+            }
+        }
+
+        // From Section 4: Handle updating thumbnail image and additional images
+        if (dto.getNewThumbnailImage() != null) {
+            MediaStoreEntity existingThumbnail = mediaStoreDAO.findThumbnailByItemIdAndItemCategory(entity.getId(), ObjectType.SPOT);
+            mediaStoreDAO.deleteByItemIdAndItemCategoryAndIsThumbnailTrue(entity.getId(), ObjectType.SPOT);
+
+            MediaStoreCreateModel thumbnailModel = dto.getNewThumbnailImage();
+            thumbnailModel.setItemId(entity.getId());
+            thumbnailModel.setItemCategory(ObjectType.SPOT.toString());
+            thumbnailModel.setIsThumbnail(true);
+            thumbnailModel.setCreated(LocalDateTime.now());
+            thumbnailModel.setCreatedBy(user.getUsername());
+            mediaService.create(thumbnailModel);
+        }
+
+        if (dto.getToAddImages() != null && !dto.getToAddImages().isEmpty()) {
+            for (MediaStoreCreateModel imageModel : dto.getToAddImages()) {
+                imageModel.setItemId(entity.getId());
+                imageModel.setItemCategory(ObjectType.SPOT.toString());
+                imageModel.setIsThumbnail(false);
+                imageModel.setCreated(LocalDateTime.now());
+                imageModel.setCreatedBy(user.getUsername());
+                mediaService.create(imageModel);
+            }
+        }
+
+        if (dto.getToRemoveImages() != null && !dto.getToRemoveImages().isEmpty()) {
+            for (Integer imageId : dto.getToRemoveImages()) {
+                Optional<MediaStoreEntity> imageEntity = mediaStoreDAO.findById(imageId);
+                if (imageEntity.isPresent()) {
+                    mediaStoreDAO.deleteById(imageId);
+                }
+            }
+        }
+
+        spotDAO.save(entity);
+
+        return ResponseEntity.ok(spotMapper.entityToDto(entity));
+    }
+
+    @Override
+    public ResponseEntity<SpotModel> delete(Integer id) {
+        SpotEntity entity = spotDAO.findById(id)
+                .orElseThrow(() ->
+                        new SpotExceptions.SpotNotFoundException(
+                                ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND));
+
+        spotDAO.delete(entity);
+        return ResponseEntity.ok(spotMapper.entityToDto(entity));
     }
 }
 

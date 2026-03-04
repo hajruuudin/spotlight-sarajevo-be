@@ -16,6 +16,11 @@ import java.util.List;
  * retrieve spot overviews, and create, update, or delete spots.
  */
 public interface SpotService {
+
+    /*=============================================================================*/
+    /*============================== DATA RETRIEVAL ===============================*/
+    /*=============================================================================*/
+
     /**
      * Retrieves a paginated list of all spots.
      *
@@ -48,6 +53,29 @@ public interface SpotService {
     ResponseEntity<SpotOverviewModel> findSpotOverview(String spotSlug);
 
     /**
+     * Checks if the user has marked the spot as visited.
+     *
+     * @param spotId the unique identifier of the spot
+     * @param principal the security principal of the user
+     * @return ResponseEntity containing a Boolean indicating visited status
+     */
+    ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal);
+
+    /**
+     * Retrieves a list of spots for map view based on search term and category filters.
+     *
+     * @param searchTerm the term to search for in spot names
+     * @param categoryIds the list of category IDs to filter the spots
+     * @return ResponseEntity containing a List of SpotMapModel
+     */
+    ResponseEntity<List<SpotMapModel>> findSpotsForMap(String searchTerm, List<Integer> categoryIds);
+
+
+    /*=======================================================================================*/
+    /*============================== CREATE / UPDATE / DELETE ===============================*/
+    /*=======================================================================================*/
+
+    /**
      * Creates a new spot based on the provided SpotCreateModel.
      *
      * @param spotCreateModel the model containing information to create a new spot
@@ -71,22 +99,4 @@ public interface SpotService {
      * @return ResponseEntity containing the deleted SpotModel
      */
     ResponseEntity<SpotModel> delete(Integer id);
-
-    /**
-     * Checks if the user has marked the spot as visited.
-     *
-     * @param spotId the unique identifier of the spot
-     * @param principal the security principal of the user
-     * @return ResponseEntity containing a Boolean indicating visited status
-     */
-    ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal);
-
-    /**
-     * Retrieves a list of spots for map view based on search term and category filters.
-     *
-     * @param searchTerm the term to search for in spot names
-     * @param categoryIds the list of category IDs to filter the spots
-     * @return ResponseEntity containing a List of SpotMapModel
-     */
-    ResponseEntity<List<SpotMapModel>> findSpotsForMap(String searchTerm, List<Integer> categoryIds);
 }
