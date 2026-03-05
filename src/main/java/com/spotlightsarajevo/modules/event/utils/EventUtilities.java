@@ -5,6 +5,7 @@ import com.spotlightsarajevo.modules.auth.facades.UserAttendedEventFacade;
 import com.spotlightsarajevo.modules.category.domain.EventCategoryDAO;
 import com.spotlightsarajevo.modules.category.domain.entity.EventCategoryEntity;
 import com.spotlightsarajevo.modules.event.api.dto.EventOrganiserModel;
+import com.spotlightsarajevo.modules.event.api.dto.EventUpdateModel;
 import com.spotlightsarajevo.modules.event.domain.EventOrganiserDAO;
 import com.spotlightsarajevo.modules.event.domain.EventOrganiserReviewStatsDAO;
 import com.spotlightsarajevo.modules.event.domain.EventTagsDAO;
@@ -14,6 +15,7 @@ import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserReviewSta
 import com.spotlightsarajevo.modules.event.domain.entity.EventTagsEntity;
 import com.spotlightsarajevo.modules.event.mapper.EventOrganiserMapper;
 import com.spotlightsarajevo.modules.media.service.MediaService;
+import com.spotlightsarajevo.modules.spot.domain.entity.SpotTagsEntity;
 import com.spotlightsarajevo.modules.tag.domain.TagDAO;
 import com.spotlightsarajevo.modules.tag.domain.entity.TagEntity;
 import com.spotlightsarajevo.modules.tag.mappers.TagMapper;
@@ -85,5 +87,22 @@ public class EventUtilities {
 
     public boolean checkIfUserAttendedEvent(Integer entity, Integer userId){
        return userAttendedEventFacade.checkIfUserAttendedEvent(userId, entity);
+    }
+
+    public void updateEventTagsBulk(EventUpdateModel eventUpdateModel, EventEntity entity){
+        if (eventUpdateModel.getTagIds() != null) {
+            eventTagsDAO.deleteAllByEventId(entity.getId());
+
+            List<EventTagsEntity> newTags = new ArrayList<>();
+            for (Integer tagId : eventUpdateModel.getTagIds()) {
+                EventTagsEntity eventTag = new EventTagsEntity();
+                eventTag.setEventId(entity.getId());
+                eventTag.setTagId(tagId);
+                newTags.add(eventTag);
+            }
+            if (!newTags.isEmpty()) {
+                eventTagsDAO.saveAllAndFlush(newTags);
+            }
+        }
     }
 }

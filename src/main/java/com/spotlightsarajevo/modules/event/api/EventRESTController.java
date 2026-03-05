@@ -1,7 +1,9 @@
 package com.spotlightsarajevo.modules.event.api;
 
+import com.spotlightsarajevo.modules.event.api.dto.EventModel;
 import com.spotlightsarajevo.modules.event.api.dto.EventOverviewModel;
 import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
+import com.spotlightsarajevo.modules.event.api.dto.EventUpdateModel;
 import com.spotlightsarajevo.modules.event.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -67,5 +69,14 @@ public class EventRESTController {
             Principal principal
     ){
         return eventService.getEventAttendedStatus(eventId, principal);
+    }
+
+    @PutMapping
+    @Operation(description = "Update a whole Entity Overview within the system")
+    public ResponseEntity<EventModel> updateEvent(
+            @RequestBody EventUpdateModel eventUpdateModel,
+            Principal principal
+    ){
+        return eventService.update(eventUpdateModel, principal);
     }
 }

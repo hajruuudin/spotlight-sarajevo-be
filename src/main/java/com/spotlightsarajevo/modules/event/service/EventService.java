@@ -41,7 +41,7 @@ public interface EventService {
      * @param eventUpdateModel the model containing updated information for the event
      * @return ResponseEntity containing the updated EventModel
      */
-    ResponseEntity<EventModel> update(EventUpdateModel eventUpdateModel);
+    ResponseEntity<EventModel> update(EventUpdateModel eventUpdateModel, Principal principal);
 
     /**
      * Deletes an event by its unique identifier.

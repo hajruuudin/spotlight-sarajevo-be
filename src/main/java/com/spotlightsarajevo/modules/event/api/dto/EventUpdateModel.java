@@ -1,16 +1,21 @@
 package com.spotlightsarajevo.modules.event.api.dto;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Schema(description = "Default, all property, entity update model for the Event Entity")
 public class EventUpdateModel implements Serializable {
     private static final Long versionUUID = 1L;
+
+    @Schema(description = "Unique identifier of the Event object")
+    private Integer id;
 
     @Schema(description = "Slug used in URLs for the event")
     private String slug;
@@ -66,8 +71,20 @@ public class EventUpdateModel implements Serializable {
     @Schema(description = "Physical location of the event")
     private String location;
 
-    @Schema(description = "Identifier of the event organiser")
-    private Integer organiserId;
+    @Schema(description = "Tag IDs of the event model")
+    private List<Integer> tagIds;
+
+    @Schema(description = "Current thumbnail image URL of the Spot")
+    private String thumbnailImage;
+
+    @Schema(description = "New Thumbnail image Object of the Spot")
+    private MediaStoreCreateModel newThumbnailImage;
+
+    @Schema(description = "List of new Objects to be added for images of the Spot")
+    private List<MediaStoreCreateModel> toAddImages;
+
+    @Schema(description = "List of IDs of the images to be removed")
+    private List<Integer> toRemoveImages;
 }
 
 

@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.event.service;
 
+import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
 import com.spotlightsarajevo.modules.event.api.dto.*;
@@ -11,7 +12,14 @@ import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.EventExceptions;
 import com.spotlightsarajevo.common.specifications.EventSpecification;
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
+import com.spotlightsarajevo.modules.media.domain.MediaStoreDAO;
+import com.spotlightsarajevo.modules.media.domain.entity.MediaStoreEntity;
 import com.spotlightsarajevo.modules.media.service.MediaService;
+import com.spotlightsarajevo.modules.spot.api.dto.SpotWorkHoursModel;
+import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
+import com.spotlightsarajevo.modules.spot.domain.entity.SpotTagsEntity;
+import com.spotlightsarajevo.modules.spot.domain.entity.SpotWorkHoursEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,9 +27,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.events.EventException;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -37,6 +47,7 @@ public class EventServiceImpl implements EventService {
     CommonFunctions commonFunctions;
     EventMapper eventMapper;
     MediaService mediaService;
+    MediaStoreDAO mediaStoreDAO;
 
     @Override
     public ResponseEntity<Page<EventShorthandModel>> findEventsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds) {
@@ -77,8 +88,65 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ResponseEntity<EventModel> update(EventUpdateModel eventUpdateModel) {
-        return null;
+    public ResponseEntity<EventModel> update(EventUpdateModel eventUpdateModel, Principal principal) {
+        if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+        if (eventUpdateModel == null) throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        EventEntity entity = eventDAO.findById(eventUpdateModel.getId())
+                .orElseThrow(() ->
+                        new EventExceptions.EventNotFoundException(
+                                ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND));
+
+        // From Section 1: Updating Basic Fields
+        eventMapper.updateEntityFromDto(eventUpdateModel, entity);
+        entity.setModified(LocalDateTime.now());
+        entity.setModifiedBy(user.getUsername());
+
+        // From Section 2: Update existing tags
+        utils.updateEventTagsBulk(eventUpdateModel, entity);
+
+        // From Section 3: Update Event Information (Handled by the first mapper section info section)
+
+        // From Section 4: Handle updating thumbnail image and additional images
+        if (eventUpdateModel.getNewThumbnailImage() != null) {
+            MediaStoreEntity existingThumbnail = mediaStoreDAO.findThumbnailByItemIdAndItemCategory(entity.getId(), ObjectType.EVENT);
+            mediaStoreDAO.deleteByItemIdAndItemCategoryAndIsThumbnailTrue(entity.getId(), ObjectType.EVENT);
+
+            MediaStoreCreateModel thumbnailModel = eventUpdateModel.getNewThumbnailImage();
+            thumbnailModel.setItemId(entity.getId());
+            thumbnailModel.setItemCategory(ObjectType.EVENT.toString());
+            thumbnailModel.setIsThumbnail(true);
+            thumbnailModel.setCreated(LocalDateTime.now());
+            thumbnailModel.setCreatedBy(user.getUsername());
+            mediaService.create(thumbnailModel);
+        }
+
+        if (eventUpdateModel.getToAddImages() != null && !eventUpdateModel.getToAddImages().isEmpty()) {
+            for (MediaStoreCreateModel imageModel : eventUpdateModel.getToAddImages()) {
+                imageModel.setItemId(entity.getId());
+                imageModel.setItemCategory(ObjectType.EVENT.toString());
+                imageModel.setIsThumbnail(false);
+                imageModel.setCreated(LocalDateTime.now());
+                imageModel.setCreatedBy(user.getUsername());
+                mediaService.create(imageModel);
+            }
+        }
+
+        if (eventUpdateModel.getToRemoveImages() != null && !eventUpdateModel.getToRemoveImages().isEmpty()) {
+            for (Integer imageId : eventUpdateModel.getToRemoveImages()) {
+                Optional<MediaStoreEntity> imageEntity = mediaStoreDAO.findById(imageId);
+                if (imageEntity.isPresent()) {
+                    mediaStoreDAO.deleteById(imageId);
+                }
+            }
+        }
+
+        eventDAO.save(entity);
+
+        return ResponseEntity.ok(eventMapper.entityToDto(entity));
     }
 
     @Override

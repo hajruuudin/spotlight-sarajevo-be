@@ -84,6 +84,18 @@ public class EventEntity implements Serializable {
     @Column(name = "organiser_id", nullable = false)
     private Integer organiserId;
 
+    @Column(name = "created",columnDefinition = "TIMESTAMP")
+    private LocalDateTime created;
+
+    @Column(name = "created_by", columnDefinition = "VARCHAR", length = 255)
+    private String createdBy;
+
+    @Column(name = "modified",columnDefinition = "TIMESTAMP")
+    private LocalDateTime modified;
+
+    @Column(name = "modified_by", columnDefinition = "VARCHAR", length = 255)
+    private String modifiedBy;
+
     @Transient
     private String categoryNameBs;
 

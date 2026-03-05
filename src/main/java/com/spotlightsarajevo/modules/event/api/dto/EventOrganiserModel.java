@@ -53,5 +53,4 @@ public class EventOrganiserModel implements Serializable {
 
     @Schema(description = "Overall aggregate quality rating of the organiser form the Users")
     private BigDecimal overallQuality;
-
 }

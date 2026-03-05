@@ -46,6 +46,9 @@ public class EventOverviewModel implements Serializable {
     @Schema(description = "Slug link of the location (points to a spot or venue)")
     private String locationLinkSlug;
 
+    @Schema(description = "Category ID of the event")
+    private Integer categoryId;
+
     @Schema(description = "Category name of the event in English")
     private String categoryNameEn;
 
