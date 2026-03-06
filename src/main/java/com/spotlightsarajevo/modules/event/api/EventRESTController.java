@@ -1,9 +1,6 @@
 package com.spotlightsarajevo.modules.event.api;
 
-import com.spotlightsarajevo.modules.event.api.dto.EventModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventOverviewModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventUpdateModel;
+import com.spotlightsarajevo.modules.event.api.dto.*;
 import com.spotlightsarajevo.modules.event.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -78,5 +75,14 @@ public class EventRESTController {
             Principal principal
     ){
         return eventService.update(eventUpdateModel, principal);
+    }
+
+    @PutMapping(value = "/organiser")
+    @Operation(description = "Update an event organiser within the system")
+    public ResponseEntity<EventOrganiserModel> updateOrganiserEntity(
+            @RequestBody EventOrganiserUpdateModel request,
+            Principal principal
+    ){
+        return eventService.update(request, principal);
     }
 }

@@ -39,9 +39,19 @@ public interface EventService {
      * Updates an existing event based on the provided EventUpdateModel.
      *
      * @param eventUpdateModel the model containing updated information for the event
-     * @return ResponseEntity containing the updated EventModel
+     * @return ResponseEntity containing the updated Event
      */
     ResponseEntity<EventModel> update(EventUpdateModel eventUpdateModel, Principal principal);
+
+
+    /**
+     * Updates an existing event organiser based on the provided EventOrganiserUpdateModel
+     *
+     * @param request The EventOrganiserUpdateModel sent from the frontend
+     * @param principal The principal object sent with the request from the frontend. Used for checking authentication
+     * @return ResponseEntity containing the updated EventOrganiser
+     */
+    ResponseEntity<EventOrganiserModel> update(EventOrganiserUpdateModel request, Principal principal);
 
     /**
      * Deletes an event by its unique identifier.

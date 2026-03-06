@@ -3,19 +3,14 @@ package com.spotlightsarajevo.modules.spot.service;
 import com.spotlightsarajevo.common.exceptions.EventExceptions;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
-import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
-import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
-import com.spotlightsarajevo.modules.media.domain.MediaStoreDAO;
-import com.spotlightsarajevo.modules.media.domain.entity.MediaStoreEntity;
 import com.spotlightsarajevo.modules.media.service.MediaService;
-import com.spotlightsarajevo.modules.media.utils.ImageBBUtils;
+import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
 import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.SpotDAO;
 import com.spotlightsarajevo.modules.spot.domain.SpotTagsDAO;
 import com.spotlightsarajevo.modules.spot.domain.SpotWorkHoursDAO;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotTagsEntity;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotWorkHoursEntity;
-import com.spotlightsarajevo.modules.review.domain.SpotReviewDAO;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
 import com.spotlightsarajevo.modules.spot.mapper.SpotMapper;
 import com.spotlightsarajevo.modules.spot.mapper.SpotWorkHoursMapper;
@@ -23,11 +18,8 @@ import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.common.specifications.SpotSpecifications;
-import com.spotlightsarajevo.modules.review.mapper.SpotReviewMapper;
 import com.spotlightsarajevo.modules.spot.utils.SpotUtilities;
-import com.spotlightsarajevo.modules.auth.domain.UserDAO;
 import com.spotlightsarajevo.modules.auth.domain.UserVisitedSpotsDAO;
-import com.spotlightsarajevo.modules.auth.domain.entity.UserVisitedSpotsEntity;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,16 +39,13 @@ import java.util.*;
 public class SpotServiceImpl implements SpotService {
 
     private final SpotDAO spotDAO;
-    private final UserDAO userDAO;
     private final UserVisitedSpotsDAO userVisitedSpotsDAO;
-    private final SpotReviewDAO spotReviewDAO;
     private final SpotTagsDAO spotTagsDAO;
     private final SpotWorkHoursDAO spotWorkHoursDAO;
-    private final MediaStoreDAO mediaStoreDAO;
     private final SpotMapper spotMapper;
     private final SpotWorkHoursMapper spotWorkHoursMapper;
-    private final SpotReviewMapper spotReviewMapper;
     private final MediaService mediaService;
+    private final MediaUtilities mediaUtilities;
     private final SpotUtilities utils;
     private final CommonFunctions commonFunctions;
 
@@ -244,38 +233,9 @@ public class SpotServiceImpl implements SpotService {
         }
 
         // From Section 4: Handle updating thumbnail image and additional images
-        if (dto.getNewThumbnailImage() != null) {
-            MediaStoreEntity existingThumbnail = mediaStoreDAO.findThumbnailByItemIdAndItemCategory(entity.getId(), ObjectType.SPOT);
-            mediaStoreDAO.deleteByItemIdAndItemCategoryAndIsThumbnailTrue(entity.getId(), ObjectType.SPOT);
-
-            MediaStoreCreateModel thumbnailModel = dto.getNewThumbnailImage();
-            thumbnailModel.setItemId(entity.getId());
-            thumbnailModel.setItemCategory(ObjectType.SPOT.toString());
-            thumbnailModel.setIsThumbnail(true);
-            thumbnailModel.setCreated(LocalDateTime.now());
-            thumbnailModel.setCreatedBy(user.getUsername());
-            mediaService.create(thumbnailModel);
-        }
-
-        if (dto.getToAddImages() != null && !dto.getToAddImages().isEmpty()) {
-            for (MediaStoreCreateModel imageModel : dto.getToAddImages()) {
-                imageModel.setItemId(entity.getId());
-                imageModel.setItemCategory(ObjectType.SPOT.toString());
-                imageModel.setIsThumbnail(false);
-                imageModel.setCreated(LocalDateTime.now());
-                imageModel.setCreatedBy(user.getUsername());
-                mediaService.create(imageModel);
-            }
-        }
-
-        if (dto.getToRemoveImages() != null && !dto.getToRemoveImages().isEmpty()) {
-            for (Integer imageId : dto.getToRemoveImages()) {
-                Optional<MediaStoreEntity> imageEntity = mediaStoreDAO.findById(imageId);
-                if (imageEntity.isPresent()) {
-                    mediaStoreDAO.deleteById(imageId);
-                }
-            }
-        }
+        mediaUtilities.updateThumbnailImage(dto.getNewThumbnailImage(), entity.getId(), ObjectType.SPOT, user.getUsername());
+        mediaUtilities.addImages(dto.getToAddImages(), entity.getId(), ObjectType.SPOT, user.getUsername());
+        mediaUtilities.deleteImages(dto.getToRemoveImages());
 
         spotDAO.save(entity);
 
