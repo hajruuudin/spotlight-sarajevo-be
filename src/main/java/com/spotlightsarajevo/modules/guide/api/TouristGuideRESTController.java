@@ -7,6 +7,9 @@ import com.spotlightsarajevo.modules.guide.service.TouristGuideService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.apache.catalina.connector.Response;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +28,17 @@ public class TouristGuideRESTController {
     @Operation(description = "Get all tourist guides from the system")
     public ResponseEntity<List<TouristGuideShorthandModel>> findAllGuides(){
         return guideService.findAllGuides();
+    }
+
+    @GetMapping()
+    @Operation(description = "Get all tourist guides from the system via pagination and sorting options")
+    public ResponseEntity<Page<TouristGuideShorthandModel>> findGuidesPaginated(
+            @RequestParam(defaultValue = "0") Integer pageNumber,
+            @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) String sortOption
+    ){
+        return guideService.findGuidesPaginated(PageRequest.of(pageNumber, pageSize), searchTerm, sortOption);
     }
 
     @GetMapping(value = "/category/{categoryId}")

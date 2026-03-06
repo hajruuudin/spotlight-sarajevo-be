@@ -3,7 +3,9 @@ package com.spotlightsarajevo.modules.guide.service;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.TouristGuideExceptions;
+import com.spotlightsarajevo.common.specifications.TouristGuideSpecification;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
+import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
 import com.spotlightsarajevo.modules.guide.api.dto.*;
 import com.spotlightsarajevo.modules.guide.domain.TouristGuideDAO;
 import com.spotlightsarajevo.modules.guide.domain.TouristGuideSectionDAO;
@@ -16,6 +18,10 @@ import com.spotlightsarajevo.modules.media.service.MediaService;
 import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +55,33 @@ public class TouristGuideServiceImpl implements TouristGuideService {
 
         return ResponseEntity.status(200).body(models);
     }
+
+    @Override
+    public ResponseEntity<Page<TouristGuideShorthandModel>> findGuidesPaginated(PageRequest pageRequest, String searchTerm, String sortOption) {
+        if (pageRequest == null) throw new TouristGuideExceptions.TouristGuideRequestException(ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_C_BR);
+
+        PageRequest endPageRequest = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+
+        Specification<TouristGuideEntity> spec = Specification
+                .allOf(TouristGuideSpecification.hasSearchTerms(searchTerm))
+                .and(TouristGuideSpecification.withDynamicSorting(sortOption));
+
+        Page<TouristGuideEntity> response = touristGuideDAO.findAll(spec, pageRequest);
+
+        for(TouristGuideEntity entity : response.getContent()){
+            guideUtilities.setGuideCategoryNames(entity);
+            mediaService.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
+        }
+
+        Page<TouristGuideShorthandModel> responseList = new PageImpl<>(
+                touristGuideMapper.entitiesToShorthandDtos(response.getContent()),
+                endPageRequest,
+                response.getTotalElements()
+        );
+
+        return ResponseEntity.status(200).body(responseList);
+    }
+
 
     @Override
     public ResponseEntity<List<TouristGuideShorthandModel>> findByCategory(Integer categoryId) {

@@ -4,6 +4,8 @@ import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideCreateModel;
 import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideOverviewModel;
 import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideShorthandModel;
 import org.apache.catalina.connector.Response;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
@@ -20,6 +22,13 @@ public interface TouristGuideService {
      * @return ResponseEntity containing a list of TouristGuideShorthandModel
      */
     ResponseEntity<List<TouristGuideShorthandModel>> findAllGuides();
+
+    /**
+     * Retrieves a list of paginated tourist guides in shorthand format
+     *
+     * @return A list of paginated response, sorted and based on the search term
+     */
+    ResponseEntity<Page<TouristGuideShorthandModel>> findGuidesPaginated(PageRequest request, String searchTerm, String sortOption);
 
     /**
      * Retrieves a list of tourist guides by category ID in shorthand format.
