@@ -1,8 +1,6 @@
 package com.spotlightsarajevo.modules.guide.api;
 
-import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideCreateModel;
-import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideOverviewModel;
-import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideShorthandModel;
+import com.spotlightsarajevo.modules.guide.api.dto.*;
 import com.spotlightsarajevo.modules.guide.service.TouristGuideService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,5 +62,14 @@ public class TouristGuideRESTController {
             Principal principal
     ){
         return guideService.create(request, principal);
+    }
+
+    @PutMapping
+    @Operation(description = "Update an existing Tourist guide, including its individual sections (either creating new ones or modifying eisting ones)")
+    public ResponseEntity<TouristGuideModel> update(
+            @RequestBody TouristGuideUpdateModel request,
+            Principal principal
+    ){
+        return guideService.update(request, principal);
     }
 }

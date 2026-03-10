@@ -16,6 +16,7 @@ import com.spotlightsarajevo.modules.guide.utils.TouristGuideUtilities;
 import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
 import com.spotlightsarajevo.modules.media.service.MediaService;
 import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
+import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,6 +40,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
     TouristGuideMapper touristGuideMapper;
     TouristGuideUtilities guideUtilities;
     MediaService mediaService;
+    MediaUtilities mediaUtilities;
     CommonFunctions utils;
 
     @Override
@@ -183,5 +185,36 @@ public class TouristGuideServiceImpl implements TouristGuideService {
         }
 
         return ResponseEntity.status(200).body(touristGuideMapper.entityToOverviewDto(storedEntity));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<TouristGuideModel> update(TouristGuideUpdateModel request, Principal principal) {
+        if (request == null) throw new TouristGuideExceptions.TouristGuideRequestException(ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_C_BR);
+
+        UserEntity user = utils.getUserFromPrincipal(principal);
+        if (user == null || !user.getIsAdmin()) throw new TouristGuideExceptions.TouristGuideAuth(ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_C_AU);
+
+        TouristGuideEntity entity = touristGuideDAO.findById(request.getId())
+                .orElseThrow(() ->
+                        new TouristGuideExceptions.TouristGuideNotFound(
+                                ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_NOT_FOUND
+                        ));
+
+        // Section 1: Updating the existing basic fields
+        touristGuideMapper.updateEntityFromDto(request, entity);
+
+        // Section 2: Updating the thumbnail image of the guide
+        mediaUtilities.updateThumbnailImage(request.getNewThumbnailImage(), entity.getId(), ObjectType.GUIDE_THUMBNAIL, user.getUsername());
+
+        // Section 3: Updating the individual sections (removing specified, creating new ones, updating existing ones)
+        if(!request.getToAddSections().isEmpty()) guideUtilities.createNewSections(request.getToAddSections(), entity);
+        if(!request.getToUpdateSections().isEmpty()) guideUtilities.updateExistingSections(request.getToUpdateSections(), entity);
+        if(!request.getToDeleteSections().isEmpty()) guideUtilities.deleteExistingSections(request.getToDeleteSections(), entity);
+
+        // Return the existing model
+        touristGuideDAO.save(entity);
+
+        return ResponseEntity.status(200).body(touristGuideMapper.entityToDto(entity));
     }
 }

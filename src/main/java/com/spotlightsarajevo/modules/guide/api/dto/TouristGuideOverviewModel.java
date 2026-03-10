@@ -36,6 +36,9 @@ public class TouristGuideOverviewModel implements Serializable {
     @Schema(description = "Comprehensive introductory text in English (supports HTML content)")
     private String guideFullDescriptionEn;
 
+    @Schema(description = "Category ID of the guide")
+    private Integer categoryId;
+
     @Schema(description = "Name of the category in Bosnian", example = "Tradicija")
     private String categoryNameBs;
 

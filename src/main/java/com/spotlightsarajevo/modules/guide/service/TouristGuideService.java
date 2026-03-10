@@ -1,8 +1,6 @@
 package com.spotlightsarajevo.modules.guide.service;
 
-import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideCreateModel;
-import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideOverviewModel;
-import com.spotlightsarajevo.modules.guide.api.dto.TouristGuideShorthandModel;
+import com.spotlightsarajevo.modules.guide.api.dto.*;
 import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -54,4 +52,13 @@ public interface TouristGuideService {
      * @return ResponseEntity containing the created TouristGuideOverviewModel
      */
     ResponseEntity<TouristGuideOverviewModel> create(TouristGuideCreateModel request, Principal principal);
+
+    /**
+     * Updates an existing tourist guide, alongside its individual sections.
+     *
+     * @param request The TouristGuideUpdateModel sent from the FE
+     * @param principal The principal object that is sent alongside the authenticated user data
+     * @return ResponseEntity containing the newly updated TouristGuideModel (The simple one with the updated status)
+     */
+    ResponseEntity<TouristGuideModel> update(TouristGuideUpdateModel request, Principal principal);
 }
