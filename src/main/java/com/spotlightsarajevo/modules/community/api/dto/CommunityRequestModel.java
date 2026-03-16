@@ -20,6 +20,9 @@ public class CommunityRequestModel implements Serializable {
     @Schema(description = "Identifier of the user who made the request")
     private Integer userId;
 
+    @Schema(description = "Username of the user who made the request")
+    private String username;
+
     @Schema(description = "Type of request submitted")
     private RequestType requestType;
 

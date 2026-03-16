@@ -1,6 +1,7 @@
 package com.spotlightsarajevo.modules.community.service;
 
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
+import com.spotlightsarajevo.common.enums.FilterOptions;
 import com.spotlightsarajevo.common.enums.RequestStatus;
 import com.spotlightsarajevo.common.exceptions.CommunityRequestExceptions;
 import com.spotlightsarajevo.modules.auth.domain.UserDAO;
@@ -11,6 +12,7 @@ import com.spotlightsarajevo.modules.community.domain.CommunityRequestDataDAO;
 import com.spotlightsarajevo.modules.community.domain.entity.CommunityRequestDataEntity;
 import com.spotlightsarajevo.modules.community.domain.entity.CommunityRequestEntity;
 import com.spotlightsarajevo.modules.community.mapper.CommunityRequestMapper;
+import com.spotlightsarajevo.modules.community.utils.CommunityRequestSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -72,13 +74,20 @@ public class CommunityRequestServiceImpl implements CommunityRequestService {
     }
 
     @Override
-    public ResponseEntity<List<CommunityRequestModel>> getAllCommunityRequests(Principal principal) {
+    public ResponseEntity<List<CommunityRequestModel>> getAllCommunityRequests(FilterOptions filterOption, Principal principal) {
         if (principal == null) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
         Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
         if (user.isEmpty()) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
         if (!user.get().getIsAdmin()) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
 
-        List<CommunityRequestEntity> entities = communityRequestDAO.findAll();
+        // Get specification based on filter option
+        var specification = CommunityRequestSpecification.getByFilterOption(filterOption);
+
+        // Fetch entities using specification (if specification is null, all entities are returned)
+        List<CommunityRequestEntity> entities = specification == null
+            ? communityRequestDAO.findAll()
+            : communityRequestDAO.findAll(specification);
+
         List<CommunityRequestModel> models = communityRequestMapper.entitiesToDtos(entities);
 
         return ResponseEntity.ok(models);
@@ -95,6 +104,34 @@ public class CommunityRequestServiceImpl implements CommunityRequestService {
         if (dataEntity.isEmpty()) throw new CommunityRequestExceptions.RequestNotFound(ExceptionCodes.CommunityRequestExceptionCodes.CR_REQUEST_NOT_FOUND);
 
         return ResponseEntity.ok(communityRequestMapper.dataEntityToDto(dataEntity.get()));
+    }
+
+    @Override
+    public ResponseEntity<CommunityRequestOverviewModel> getCommunityRequestOverview(Integer requestId, Principal principal) {
+        if (principal == null) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
+        Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+        if (user.isEmpty()) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
+        if (!user.get().getIsAdmin()) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
+
+        Optional<CommunityRequestEntity> requestEntity = communityRequestDAO.findById(requestId);
+        if (requestEntity.isEmpty()) throw new CommunityRequestExceptions.RequestNotFound(ExceptionCodes.CommunityRequestExceptionCodes.CR_REQUEST_NOT_FOUND);
+
+        Optional<CommunityRequestDataEntity> dataEntity = communityRequestDataDAO.findByCommunityRequestId(requestId);
+        if (dataEntity.isEmpty()) throw new CommunityRequestExceptions.RequestNotFound(ExceptionCodes.CommunityRequestExceptionCodes.CR_REQUEST_NOT_FOUND);
+
+        CommunityRequestEntity entity = requestEntity.get();
+        CommunityRequestDataEntity data = dataEntity.get();
+
+        CommunityRequestOverviewModel  model = communityRequestMapper.entityToOverviewDto(entity);
+        model.setPendingInfo(data.getPendingInfo());
+
+        // Get username from user entity
+        Optional<UserEntity> requestUser = userDAO.findById(entity.getUserId());
+        if (requestUser.isPresent()) {
+            model.setUsername(requestUser.get().getUsername());
+        }
+
+        return ResponseEntity.ok(model);
     }
 
     @Override

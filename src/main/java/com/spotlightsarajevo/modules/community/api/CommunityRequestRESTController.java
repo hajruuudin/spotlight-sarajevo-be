@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.community.api;
 
+import com.spotlightsarajevo.common.enums.FilterOptions;
 import com.spotlightsarajevo.modules.community.api.dto.*;
 import com.spotlightsarajevo.modules.community.service.CommunityRequestService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,21 +38,21 @@ public class CommunityRequestRESTController {
 
     /* ADMIN ROUTES */
     @GetMapping(value = "/admin/get-all-requests")
-    @Operation(description = "This API endpoint retrieves all community requests from the database view for administrative purposes")
+    @Operation(description = "This API endpoint retrieves all community requests from the database view for administrative purposes, filtered by the specified filter option")
     public ResponseEntity<List<CommunityRequestModel>> getAllCommunityRequests(
+            @RequestParam(defaultValue = "ALL") FilterOptions filterOption,
             Principal principal
     ){
-        return communityRequestService.getAllCommunityRequests(principal);
+        return communityRequestService.getAllCommunityRequests(filterOption, principal);
     }
 
-    /* TODO: Could potentially be a bug later on. Might need to modify the DTOs */
     @GetMapping(value = "/admin/get-request/{requestId}")
-    @Operation(description = "This API endpoint retrieves the details of a specific community request by its ID for administrative purposes")
-    public ResponseEntity<CommunityRequestDataModel> getCommunityRequestById(
+    @Operation(description = "This API endpoint retrieves an overview of a specific community request by its ID for administrative purposes, including pending information and request description")
+    public ResponseEntity<CommunityRequestOverviewModel> getCommunityRequestOverview(
             @PathVariable Integer requestId,
             Principal principal
     ) {
-        return communityRequestService.getCommunityRequestById(requestId, principal);
+        return communityRequestService.getCommunityRequestOverview(requestId, principal);
     }
 
     @PutMapping(value = "/admin/update-request-status")

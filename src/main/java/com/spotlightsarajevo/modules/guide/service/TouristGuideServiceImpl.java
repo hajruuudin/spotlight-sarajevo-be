@@ -212,7 +212,6 @@ public class TouristGuideServiceImpl implements TouristGuideService {
         if(!request.getToUpdateSections().isEmpty()) guideUtilities.updateExistingSections(request.getToUpdateSections(), entity);
         if(!request.getToDeleteSections().isEmpty()) guideUtilities.deleteExistingSections(request.getToDeleteSections(), entity);
 
-        // Return the existing model
         touristGuideDAO.save(entity);
 
         return ResponseEntity.status(200).body(touristGuideMapper.entityToDto(entity));

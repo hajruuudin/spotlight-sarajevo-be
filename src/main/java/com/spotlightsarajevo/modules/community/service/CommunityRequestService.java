@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.community.service;
 
+import com.spotlightsarajevo.common.enums.FilterOptions;
 import com.spotlightsarajevo.modules.community.api.dto.*;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
@@ -33,12 +34,13 @@ public interface CommunityRequestService {
 
     /* ADMIN ROUTES */
     /**
-     * Retrieves all community requests from the database view for administrative purposes.
+     * Retrieves all community requests from the database view for administrative purposes, filtered by the specified option.
      *
+     * @param filterOption The FilterOptions enum value to filter requests by status (ALL, PENDING, REJECTED, APPROVED).
      * @param principal The security principal representing the authenticated user (admin).
-     * @return A ResponseEntity containing a list of CommunityRequestModel objects representing all community requests.
+     * @return A ResponseEntity containing a list of CommunityRequestModel objects representing the filtered community requests.
      */
-    ResponseEntity<List<CommunityRequestModel>> getAllCommunityRequests(Principal principal);
+    ResponseEntity<List<CommunityRequestModel>> getAllCommunityRequests(FilterOptions filterOption, Principal principal);
 
     /**
      * Retrieves the details of a specific community request by its ID for administrative purposes.
@@ -48,6 +50,16 @@ public interface CommunityRequestService {
      * @return A ResponseEntity containing a CommunityRequestDataModel object representing the details of the specified community request.
      */
     ResponseEntity<CommunityRequestDataModel> getCommunityRequestById(Integer requestId, Principal principal);
+
+    /**
+     * Retrieves an overview of a specific community request by its ID for administrative purposes.
+     * The overview includes the request details along with pending information and request description.
+     *
+     * @param requestId The unique identifier of the community request to be retrieved.
+     * @param principal The security principal representing the authenticated user (admin).
+     * @return A ResponseEntity containing a CommunityRequestOverviewModel object representing the overview of the specified community request.
+     */
+    ResponseEntity<CommunityRequestOverviewModel> getCommunityRequestOverview(Integer requestId, Principal principal);
 
     /**
      * Updates the status of the specified community request.
