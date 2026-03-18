@@ -172,12 +172,44 @@ public class SpotServiceImpl implements SpotService {
     /*=============================================================================*/
 
     @Override
+    @Transactional
     public ResponseEntity<SpotModel> create(SpotCreateModel dto) {
+        if (dto == null) throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        // From Section 1: Create the spot entity from DTO
         SpotEntity entity = spotMapper.dtoToEntity(dto);
         entity.setCreated(LocalDateTime.now());
         entity.setCreatedBy("Admin User");
 
+        // Save the spot entity first to get the ID
         SpotEntity created = spotDAO.save(entity);
+
+        // From Section 2: Add tags
+        if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
+            List<SpotTagsEntity> tags = new ArrayList<>();
+            for (Integer tagId : dto.getTagIds()) {
+                SpotTagsEntity spotTag = new SpotTagsEntity();
+                spotTag.setSpotId(created.getId());
+                spotTag.setTagId(tagId);
+                tags.add(spotTag);
+            }
+            spotTagsDAO.saveAllAndFlush(tags);
+        }
+
+        // From Section 3: Add work hours
+        if (dto.getWorkHoursModel() != null && !dto.getWorkHoursModel().isEmpty()) {
+            List<SpotWorkHoursEntity> workHours = new ArrayList<>();
+            for (SpotWorkHoursModel workHoursModel : dto.getWorkHoursModel()) {
+                SpotWorkHoursEntity workHoursEntity = spotWorkHoursMapper.dtoToEntity(workHoursModel);
+                workHoursEntity.setSpotId(created.getId());
+                workHours.add(workHoursEntity);
+            }
+            spotWorkHoursDAO.saveAllAndFlush(workHours);
+        }
+
+        // From Section 4: Handle thumbnail image and additional images
+        mediaUtilities.updateThumbnailImage(dto.getNewThumbnailImage(), created.getId(), ObjectType.SPOT, "Admin User");
+        mediaUtilities.addImages(dto.getToAddImages(), created.getId(), ObjectType.SPOT, "Admin User");
 
         return ResponseEntity.ok(spotMapper.entityToDto(created));
     }

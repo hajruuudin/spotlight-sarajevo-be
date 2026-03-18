@@ -61,7 +61,7 @@ public class SpotRESTController {
 
     @PostMapping
     @Operation(description = "Add a spot to the database")
-    public ResponseEntity<SpotModel> create(SpotCreateModel request){
+    public ResponseEntity<SpotModel> create(@RequestBody SpotCreateModel request){
         return spotService.create(request);
     }
 
