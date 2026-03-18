@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.spot.domain.entity;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import com.spotlightsarajevo.modules.review.api.dto.SpotReviewModel;
 import com.spotlightsarajevo.modules.spot.api.dto.SpotWorkHoursModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
@@ -84,10 +85,10 @@ public class SpotEntity implements Serializable {
     private BigDecimal combinedRating;
 
     @Transient
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
 
     @Transient
-    private List<String> images;
+    private List<MediaStoreModel> images;
 
     @Transient
     private List<TagModel> spotTags;

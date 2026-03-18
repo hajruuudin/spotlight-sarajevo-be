@@ -16,4 +16,5 @@ public interface CommunityRequestMapper {
     UserCommunityRequestModel entityToUserDto(CommunityRequestEntity entity);
     List<UserCommunityRequestModel> entitiesToUserDtos(List<CommunityRequestEntity> entities);
     CommunityRequestDataModel dataEntityToDto(CommunityRequestDataEntity entity);
+    CommunityRequestOverviewModel entityToOverviewDto(CommunityRequestEntity entity);
 }

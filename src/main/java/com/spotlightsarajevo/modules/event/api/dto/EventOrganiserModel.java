@@ -21,6 +21,9 @@ public class EventOrganiserModel implements Serializable {
     @Schema(description = "Date when the organiser entity was created")
     private LocalDateTime organiserCreationDate;
 
+    @Schema(description = "Category ID of the event organiser (identical to the Event Category)")
+    private Integer organiserCategoryId;
+
     @Schema(description = "Category name of the organiser in English")
     private String organiserCategoryNameEn;
 
@@ -50,5 +53,4 @@ public class EventOrganiserModel implements Serializable {
 
     @Schema(description = "Overall aggregate quality rating of the organiser form the Users")
     private BigDecimal overallQuality;
-
 }

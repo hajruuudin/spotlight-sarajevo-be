@@ -27,4 +27,15 @@ public interface MediaStoreDAO extends JpaRepository<MediaStoreEntity, Integer> 
     // Retrieve all thumbnail image URLs for a specific item and category
     @Query("SELECT me.imageUrl FROM MediaStoreEntity me WHERE me.itemId = :itemId AND me.itemCategory = :itemCategory AND me.isThumbnail = true")
     List<String> findAllThumbnailUrlsByItemIdAndItemCategory(@Param("itemId") Integer itemId, @Param("itemCategory") ObjectType itemCategory);
+
+    // Retrieve thumbnail entity for a specific item and category
+    @Query("SELECT me FROM MediaStoreEntity me WHERE me.itemId = :itemId AND me.itemCategory = :itemCategory AND me.isThumbnail = true")
+    MediaStoreEntity findThumbnailByItemIdAndItemCategory(@Param("itemId") Integer itemId, @Param("itemCategory") ObjectType itemCategory);
+
+    // Retrieve all non-thumbnail image entities for a specific item and category
+    @Query("SELECT me FROM MediaStoreEntity me WHERE me.itemId = :itemId AND me.itemCategory = :itemCategory AND (me.isThumbnail = false OR me.isThumbnail IS NULL)")
+    List<MediaStoreEntity> findAllNonThumbnailByItemIdAndItemCategory(@Param("itemId") Integer itemId, @Param("itemCategory") ObjectType itemCategory);
+
+    // Delete thumbnail by item ID and category
+    void deleteByItemIdAndItemCategoryAndIsThumbnailTrue(Integer itemId, ObjectType itemCategory);
 }

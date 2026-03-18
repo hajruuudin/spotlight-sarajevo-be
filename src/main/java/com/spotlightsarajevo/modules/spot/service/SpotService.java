@@ -16,6 +16,11 @@ import java.util.List;
  * retrieve spot overviews, and create, update, or delete spots.
  */
 public interface SpotService {
+
+    /*=============================================================================*/
+    /*============================== DATA RETRIEVAL ===============================*/
+    /*=============================================================================*/
+
     /**
      * Retrieves a paginated list of all spots.
      *
@@ -48,30 +53,6 @@ public interface SpotService {
     ResponseEntity<SpotOverviewModel> findSpotOverview(String spotSlug);
 
     /**
-     * Creates a new spot based on the provided SpotCreateModel.
-     *
-     * @param spotCreateModel the model containing information to create a new spot
-     * @return ResponseEntity containing the created SpotModel
-     */
-    ResponseEntity<SpotModel> create(SpotCreateModel spotCreateModel);
-
-    /**
-     * Updates an existing spot based on the provided SpotUpdateModel.
-     *
-     * @param spotUpdateModel the model containing updated information for the spot
-     * @return ResponseEntity containing the updated SpotModel
-     */
-    ResponseEntity<SpotModel> update(SpotUpdateModel spotUpdateModel);
-
-    /**
-     * Deletes a spot by its unique identifier.
-     *
-     * @param id the unique identifier of the spot to be deleted
-     * @return ResponseEntity containing the deleted SpotModel
-     */
-    ResponseEntity<SpotModel> delete(Integer id);
-
-    /**
      * Checks if the user has marked the spot as visited.
      *
      * @param spotId the unique identifier of the spot
@@ -88,4 +69,34 @@ public interface SpotService {
      * @return ResponseEntity containing a List of SpotMapModel
      */
     ResponseEntity<List<SpotMapModel>> findSpotsForMap(String searchTerm, List<Integer> categoryIds);
+
+
+    /*=======================================================================================*/
+    /*============================== CREATE / UPDATE / DELETE ===============================*/
+    /*=======================================================================================*/
+
+    /**
+     * Creates a new spot based on the provided SpotCreateModel.
+     *
+     * @param spotCreateModel the model containing information to create a new spot
+     * @return ResponseEntity containing the created SpotModel
+     */
+    ResponseEntity<SpotModel> create(SpotCreateModel spotCreateModel);
+
+    /**
+     * Updates an existing spot based on the provided SpotUpdateModel.
+     *
+     * @param spotUpdateModel the model containing updated information for the spot
+     * @param principal the security principal of the admin user
+     * @return ResponseEntity containing the updated SpotModel
+     */
+    ResponseEntity<SpotModel> update(SpotUpdateModel spotUpdateModel, Principal principal);
+
+    /**
+     * Deletes a spot by its unique identifier.
+     *
+     * @param id the unique identifier of the spot to be deleted
+     * @return ResponseEntity containing the deleted SpotModel
+     */
+    ResponseEntity<SpotModel> delete(Integer id);
 }

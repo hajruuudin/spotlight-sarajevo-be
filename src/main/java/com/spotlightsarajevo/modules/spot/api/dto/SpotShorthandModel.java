@@ -1,6 +1,7 @@
 package com.spotlightsarajevo.modules.spot.api.dto;
 
 import com.spotlightsarajevo.common.utils.CollectionItem;
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -48,7 +49,7 @@ public class SpotShorthandModel implements Serializable, CollectionItem {
     private BigDecimal combinedRating;
 
     @Schema(description = "The thumbnail image of the spot")
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
 
     @Schema(description = "Tags related to the spot")
     private List<TagModel> spotTags;

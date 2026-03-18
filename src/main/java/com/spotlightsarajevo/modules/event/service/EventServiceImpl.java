@@ -4,14 +4,19 @@ import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
 import com.spotlightsarajevo.modules.event.api.dto.*;
 import com.spotlightsarajevo.modules.event.domain.EventDAO;
+import com.spotlightsarajevo.modules.event.domain.EventOrganiserDAO;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
+import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserEntity;
 import com.spotlightsarajevo.modules.event.utils.EventUtilities;
 import com.spotlightsarajevo.modules.event.mapper.EventMapper;
+import com.spotlightsarajevo.modules.event.mapper.EventOrganiserMapper;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.EventExceptions;
 import com.spotlightsarajevo.common.specifications.EventSpecification;
 import com.spotlightsarajevo.modules.media.service.MediaService;
+import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,21 +27,21 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
 public class EventServiceImpl implements EventService {
     EventDAO eventDAO;
+    EventOrganiserDAO eventOrganiserDAO;
     EventUtilities utils;
     CommonFunctions commonFunctions;
     EventMapper eventMapper;
+    EventOrganiserMapper eventOrganiserMapper;
     MediaService mediaService;
+    MediaUtilities mediaUtilities;
 
     @Override
     public ResponseEntity<Page<EventShorthandModel>> findEventsPaginated(PageRequest pageRequest, String searchTerm, String sortOption, List<Integer> categoryIds) {
@@ -77,8 +82,63 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ResponseEntity<EventModel> update(EventUpdateModel eventUpdateModel) {
-        return null;
+    @Transactional
+    public ResponseEntity<EventModel> update(EventUpdateModel eventUpdateModel, Principal principal) {
+        if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+        if (eventUpdateModel == null) throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        EventEntity entity = eventDAO.findById(eventUpdateModel.getId())
+                .orElseThrow(() ->
+                        new EventExceptions.EventNotFoundException(
+                                ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND));
+
+        // From Section 1: Updating Basic Fields
+        eventMapper.updateEntityFromDto(eventUpdateModel, entity);
+        entity.setModified(LocalDateTime.now());
+        entity.setModifiedBy(user.getUsername());
+
+        // From Section 2: Update existing tags
+        utils.updateEventTagsBulk(eventUpdateModel, entity);
+
+        // From Section 3: Update Event Information (Handled by the first mapper section info section)
+
+        // From Section 4: Handle updating thumbnail image and additional images
+        mediaUtilities.updateThumbnailImage(eventUpdateModel.getNewThumbnailImage(), entity.getId(), ObjectType.EVENT, user.getUsername());
+        mediaUtilities.addImages(eventUpdateModel.getToAddImages(), entity.getId(), ObjectType.EVENT, user.getUsername());
+        mediaUtilities.deleteImages(eventUpdateModel.getToRemoveImages());
+
+        eventDAO.save(entity);
+
+        return ResponseEntity.ok(eventMapper.entityToDto(entity));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<EventOrganiserModel> update(EventOrganiserUpdateModel request, Principal principal) {
+        if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+        if (request == null) throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        EventOrganiserEntity entity = eventOrganiserDAO.findById(request.getId())
+                .orElseThrow(() ->
+                        new EventExceptions.EventNotFoundException(
+                                ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND));
+
+        eventOrganiserMapper.updateEntityFromDto(request, entity);
+
+        mediaUtilities.updateThumbnailImage(request.getNewThumbnailImage(), entity.getId(), ObjectType.ORGANISER, user.getUsername());
+
+        eventOrganiserDAO.save(entity);
+
+        EventOrganiserModel response = eventOrganiserMapper.entityToDto(entity);
+        mediaService.lookupThumbnailImage(response, ObjectType.ORGANISER, entity.getId());
+
+        return ResponseEntity.ok(response);
     }
 
     @Override

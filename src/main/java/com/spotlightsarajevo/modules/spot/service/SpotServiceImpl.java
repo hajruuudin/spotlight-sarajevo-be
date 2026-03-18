@@ -3,22 +3,24 @@ package com.spotlightsarajevo.modules.spot.service;
 import com.spotlightsarajevo.common.exceptions.EventExceptions;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
-import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.media.service.MediaService;
+import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
 import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.SpotDAO;
-import com.spotlightsarajevo.modules.review.domain.SpotReviewDAO;
+import com.spotlightsarajevo.modules.spot.domain.SpotTagsDAO;
+import com.spotlightsarajevo.modules.spot.domain.SpotWorkHoursDAO;
+import com.spotlightsarajevo.modules.spot.domain.entity.SpotTagsEntity;
+import com.spotlightsarajevo.modules.spot.domain.entity.SpotWorkHoursEntity;
 import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
 import com.spotlightsarajevo.modules.spot.mapper.SpotMapper;
+import com.spotlightsarajevo.modules.spot.mapper.SpotWorkHoursMapper;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.SpotExceptions;
 import com.spotlightsarajevo.common.specifications.SpotSpecifications;
-import com.spotlightsarajevo.modules.review.mapper.SpotReviewMapper;
 import com.spotlightsarajevo.modules.spot.utils.SpotUtilities;
-import com.spotlightsarajevo.modules.auth.domain.UserDAO;
 import com.spotlightsarajevo.modules.auth.domain.UserVisitedSpotsDAO;
-import com.spotlightsarajevo.modules.auth.domain.entity.UserVisitedSpotsEntity;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,14 +39,19 @@ import java.util.*;
 public class SpotServiceImpl implements SpotService {
 
     private final SpotDAO spotDAO;
-    private final UserDAO userDAO;
     private final UserVisitedSpotsDAO userVisitedSpotsDAO;
-    private final SpotReviewDAO spotReviewDAO;
+    private final SpotTagsDAO spotTagsDAO;
+    private final SpotWorkHoursDAO spotWorkHoursDAO;
     private final SpotMapper spotMapper;
-    private final SpotReviewMapper spotReviewMapper;
+    private final SpotWorkHoursMapper spotWorkHoursMapper;
     private final MediaService mediaService;
+    private final MediaUtilities mediaUtilities;
     private final SpotUtilities utils;
     private final CommonFunctions commonFunctions;
+
+    /*=============================================================================*/
+    /*============================== DATA RETRIEVAL ===============================*/
+    /*=============================================================================*/
 
     @Override
     public ResponseEntity<Page<SpotModel>> findAll(PageRequest pageRequest) {
@@ -123,47 +130,6 @@ public class SpotServiceImpl implements SpotService {
         return ResponseEntity.ok(model);
     }
 
-    /* ---------------------------------------------
-     *  CREATE / UPDATE / DELETE SPOT
-     * --------------------------------------------- */
-
-    @Override
-    public ResponseEntity<SpotModel> create(SpotCreateModel dto) {
-        SpotEntity entity = spotMapper.dtoToEntity(dto);
-        entity.setCreated(LocalDateTime.now());
-        entity.setCreatedBy("Admin User");
-
-        SpotEntity created = spotDAO.save(entity);
-
-        return ResponseEntity.ok(spotMapper.entityToDto(created));
-    }
-
-    @Override
-    public ResponseEntity<SpotModel> update(SpotUpdateModel dto) {
-        SpotEntity entity = spotDAO.findById(dto.getId())
-                .orElseThrow(() ->
-                        new SpotExceptions.SpotNotFoundException(
-                                ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND));
-
-        spotMapper.updateEntityFromDto(dto, entity);
-        entity.setModified(LocalDateTime.now());
-        entity.setModifiedBy("Admin User");
-
-        spotDAO.save(entity);
-        return ResponseEntity.ok(spotMapper.entityToDto(entity));
-    }
-
-    @Override
-    public ResponseEntity<SpotModel> delete(Integer id) {
-        SpotEntity entity = spotDAO.findById(id)
-                .orElseThrow(() ->
-                        new SpotExceptions.SpotNotFoundException(
-                                ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND));
-
-        spotDAO.delete(entity);
-        return ResponseEntity.ok(spotMapper.entityToDto(entity));
-    }
-
     @Override
     public ResponseEntity<Boolean> getSpotVisitedStatus(Integer spotId, Principal principal) {
         if (spotId == null ) throw new SpotExceptions.SpotNotFoundException(ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND);
@@ -199,6 +165,92 @@ public class SpotServiceImpl implements SpotService {
         List<SpotMapModel> response = spotMapper.entitiesToMapDtos(spots);
 
         return ResponseEntity.ok(response);
+    }
+
+    /*=============================================================================*/
+    /*======================== CREATE / UPDATE / DELETE ===========================*/
+    /*=============================================================================*/
+
+    @Override
+    public ResponseEntity<SpotModel> create(SpotCreateModel dto) {
+        SpotEntity entity = spotMapper.dtoToEntity(dto);
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy("Admin User");
+
+        SpotEntity created = spotDAO.save(entity);
+
+        return ResponseEntity.ok(spotMapper.entityToDto(created));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<SpotModel> update(SpotUpdateModel dto, Principal principal) {
+        if (principal == null) throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+        if (dto == null) throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        SpotEntity entity = spotDAO.findById(dto.getId())
+                .orElseThrow(() ->
+                        new SpotExceptions.SpotNotFoundException(
+                                ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND));
+
+        // From Section 1: Updating Basic Fields
+        spotMapper.updateEntityFromDto(dto, entity);
+        entity.setModified(LocalDateTime.now());
+        entity.setModifiedBy(user.getUsername());
+
+        // From Section 2: Update existing tags
+        if (dto.getTagIds() != null) {
+            spotTagsDAO.deleteAllBySpotId(entity.getId());
+
+            List<SpotTagsEntity> newTags = new ArrayList<>();
+            for (Integer tagId : dto.getTagIds()) {
+                SpotTagsEntity spotTag = new SpotTagsEntity();
+                spotTag.setSpotId(entity.getId());
+                spotTag.setTagId(tagId);
+                newTags.add(spotTag);
+            }
+            if (!newTags.isEmpty()) {
+                spotTagsDAO.saveAllAndFlush(newTags);
+            }
+        }
+
+        // From Section 3: Update Existing Work Hours
+        if (dto.getWorkHoursModel() != null) {
+            spotWorkHoursDAO.deleteAllBySpotId(entity.getId());
+
+            List<SpotWorkHoursEntity> newWorkHours = new ArrayList<>();
+            for (SpotWorkHoursModel workHoursModel : dto.getWorkHoursModel()) {
+                SpotWorkHoursEntity workHoursEntity = spotWorkHoursMapper.dtoToEntity(workHoursModel);
+                workHoursEntity.setSpotId(entity.getId());
+                newWorkHours.add(workHoursEntity);
+            }
+            if (!newWorkHours.isEmpty()) {
+                spotWorkHoursDAO.saveAllAndFlush(newWorkHours);
+            }
+        }
+
+        // From Section 4: Handle updating thumbnail image and additional images
+        mediaUtilities.updateThumbnailImage(dto.getNewThumbnailImage(), entity.getId(), ObjectType.SPOT, user.getUsername());
+        mediaUtilities.addImages(dto.getToAddImages(), entity.getId(), ObjectType.SPOT, user.getUsername());
+        mediaUtilities.deleteImages(dto.getToRemoveImages());
+
+        spotDAO.save(entity);
+
+        return ResponseEntity.ok(spotMapper.entityToDto(entity));
+    }
+
+    @Override
+    public ResponseEntity<SpotModel> delete(Integer id) {
+        SpotEntity entity = spotDAO.findById(id)
+                .orElseThrow(() ->
+                        new SpotExceptions.SpotNotFoundException(
+                                ExceptionCodes.SpotExceptionCodes.SPOT_NOT_FOUND));
+
+        spotDAO.delete(entity);
+        return ResponseEntity.ok(spotMapper.entityToDto(entity));
     }
 }
 

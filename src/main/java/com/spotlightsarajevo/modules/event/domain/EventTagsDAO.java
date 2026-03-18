@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface EventTagsDAO extends JpaRepository<EventTagsEntity, Integer> {
     List<EventTagsEntity> findByEventId(Integer id);
+    void deleteAllByEventId(Integer id);
 }

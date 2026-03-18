@@ -1,6 +1,7 @@
 package com.spotlightsarajevo.modules.event.domain.entity;
 
 import com.spotlightsarajevo.modules.event.api.dto.EventOrganiserModel;
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -83,6 +84,18 @@ public class EventEntity implements Serializable {
     @Column(name = "organiser_id", nullable = false)
     private Integer organiserId;
 
+    @Column(name = "created",columnDefinition = "TIMESTAMP")
+    private LocalDateTime created;
+
+    @Column(name = "created_by", columnDefinition = "VARCHAR", length = 255)
+    private String createdBy;
+
+    @Column(name = "modified",columnDefinition = "TIMESTAMP")
+    private LocalDateTime modified;
+
+    @Column(name = "modified_by", columnDefinition = "VARCHAR", length = 255)
+    private String modifiedBy;
+
     @Transient
     private String categoryNameBs;
 
@@ -90,7 +103,10 @@ public class EventEntity implements Serializable {
     private String categoryNameEn;
 
     @Transient
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
+
+    @Transient
+    private List<MediaStoreModel> images;
 
     @Transient
     private List<TagModel> eventTags;

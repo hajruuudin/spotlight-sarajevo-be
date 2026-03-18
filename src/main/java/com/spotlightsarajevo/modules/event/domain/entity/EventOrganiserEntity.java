@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -23,7 +24,7 @@ public class EventOrganiserEntity implements Serializable {
     private String organiserName;
 
     @Column(name = "organiser_creation_date", nullable = false)
-    private LocalDateTime organiserCreationDate;
+    private LocalDate organiserCreationDate;
 
     @Column(name = "organiser_category_id", columnDefinition = "VARCHAR", length = 255, nullable = false)
     private Integer organiserCategoryId;

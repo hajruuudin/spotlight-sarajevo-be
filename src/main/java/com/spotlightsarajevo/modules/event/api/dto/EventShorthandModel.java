@@ -1,6 +1,7 @@
 package com.spotlightsarajevo.modules.event.api.dto;
 
 import com.spotlightsarajevo.common.utils.CollectionItem;
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -45,7 +46,7 @@ public class EventShorthandModel implements Serializable, CollectionItem {
     private LocalDateTime endDate;
 
     @Schema(description = "The thumbnail image of the event")
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
 
     @Schema(description = "Tags related to the event")
     private List<TagModel> eventTags;

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -26,32 +27,71 @@ public class MediaServiceImpl implements MediaService {
             return;
         }
 
-        String thumbnailUrl = mediaStoreDAO.findThumbnailUrlByItemIdAndItemCategory(objectId, objectType);
+        MediaStoreEntity thumbnailEntity = mediaStoreDAO.findThumbnailByItemIdAndItemCategory(objectId, objectType);
 
-        if (thumbnailUrl != null) {
+        if (thumbnailEntity != null) {
+            MediaStoreModel thumbnailModel = mediaStoreMapper.entityToDto(thumbnailEntity);
             try {
-                Method setImageURLMethod = objectModel.getClass().getMethod("setThumbnailImage", String.class);
-                setImageURLMethod.invoke(objectModel, thumbnailUrl);
+                // Try to set as MediaStoreModel first (for overview models)
+                Method setThumbnailMethod = objectModel.getClass().getMethod("setThumbnailImage", MediaStoreModel.class);
+                setThumbnailMethod.invoke(objectModel, thumbnailModel);
             } catch (NoSuchMethodException e) {
-                System.err.println("Object of type " + objectModel.getClass().getName() + " does not have a setThumbnailImage(String) method.");
+                // Fall back to String setter (for shorthand models that only need URL)
+                try {
+                    Method setImageURLMethod = objectModel.getClass().getMethod("setThumbnailImage", String.class);
+                    setImageURLMethod.invoke(objectModel, thumbnailEntity.getImageUrl());
+                } catch (NoSuchMethodException ex) {
+                    System.err.println("Object of type " + objectModel.getClass().getName() + " does not have a setThumbnailImage method.");
+                } catch (Exception ex) {
+                    System.err.println("Error invoking setThumbnailImage method on " + objectModel.getClass().getName() + ": " + ex.getMessage());
+                }
             } catch (Exception e) {
-                System.err.println("Error invoking setImageUrl method on " + objectModel.getClass().getName() + ": " + e.getMessage());
+                System.err.println("Error invoking setThumbnailImage method on " + objectModel.getClass().getName() + ": " + e.getMessage());
             }
         } else {
+            // Set fallback image as MediaStoreModel with no delete URL
+            MediaStoreModel fallbackModel = new MediaStoreModel();
+            fallbackModel.setImageUrl("https://i.ibb.co/W472hxLk/FALLBACK.png");
+            fallbackModel.setImageDeleteUrl(null);
+            fallbackModel.setIsThumbnail(true);
+
             try {
-                Method setImageURLMethod = objectModel.getClass().getMethod("setThumbnailImage", String.class);
-                setImageURLMethod.invoke(objectModel, "https://i.ibb.co/W472hxLk/FALLBACK.png");
+                // Try to set as MediaStoreModel first (for overview models)
+                Method setThumbnailMethod = objectModel.getClass().getMethod("setThumbnailImage", MediaStoreModel.class);
+                setThumbnailMethod.invoke(objectModel, fallbackModel);
             } catch (NoSuchMethodException e) {
-
+                // Fall back to String setter (for shorthand models that only need URL)
+                try {
+                    Method setImageURLMethod = objectModel.getClass().getMethod("setThumbnailImage", String.class);
+                    setImageURLMethod.invoke(objectModel, fallbackModel.getImageUrl());
+                } catch (NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException ex) {
+                    // Ignore - model might not have either method
+                }
             } catch (Exception e) {
-
+                // Ignore
             }
         }
     }
 
     @Override
     public <T> void lookupAllImages(T objectModel, ObjectType objectType, Integer objectId) {
+        if (objectModel == null || objectType == null || objectId == null) {
+            return;
+        }
 
+        List<MediaStoreEntity> imageEntities = mediaStoreDAO.findAllNonThumbnailByItemIdAndItemCategory(objectId, objectType);
+
+        if (imageEntities != null && !imageEntities.isEmpty()) {
+            List<MediaStoreModel> imageModels = mediaStoreMapper.entitiesToModels(imageEntities);
+            try {
+                Method setImagesMethod = objectModel.getClass().getMethod("setImages", List.class);
+                setImagesMethod.invoke(objectModel, imageModels);
+            } catch (NoSuchMethodException e) {
+                System.err.println("Object of type " + objectModel.getClass().getName() + " does not have a setImages(List) method.");
+            } catch (Exception e) {
+                System.err.println("Error invoking setImages method on " + objectModel.getClass().getName() + ": " + e.getMessage());
+            }
+        }
     }
 
     @Override

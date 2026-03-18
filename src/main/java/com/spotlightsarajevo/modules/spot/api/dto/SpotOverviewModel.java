@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.spot.api.dto;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import com.spotlightsarajevo.modules.review.api.dto.SpotReviewModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,6 +41,9 @@ public class SpotOverviewModel implements Serializable {
 
     @Schema(description = "Legal address of the Spot location")
     private String address;
+
+    @Schema(description = "Category ID of the spot overview")
+    private Integer categoryId;
 
     @Schema(description = "Category name for the spot in English")
     private String categoryNameEn;
@@ -84,8 +88,8 @@ public class SpotOverviewModel implements Serializable {
     private List<SpotWorkHoursModel> workHours;
 
     @Schema(description = "Thumbnail image of the spot")
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
 
     @Schema(description = "List of all other images of the spot")
-    private List<String> images;
+    private List<MediaStoreModel> images;
 }

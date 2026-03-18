@@ -3,7 +3,9 @@ package com.spotlightsarajevo.modules.guide.service;
 import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.TouristGuideExceptions;
+import com.spotlightsarajevo.common.specifications.TouristGuideSpecification;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
+import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
 import com.spotlightsarajevo.modules.guide.api.dto.*;
 import com.spotlightsarajevo.modules.guide.domain.TouristGuideDAO;
 import com.spotlightsarajevo.modules.guide.domain.TouristGuideSectionDAO;
@@ -14,8 +16,13 @@ import com.spotlightsarajevo.modules.guide.utils.TouristGuideUtilities;
 import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
 import com.spotlightsarajevo.modules.media.service.MediaService;
 import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
+import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +40,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
     TouristGuideMapper touristGuideMapper;
     TouristGuideUtilities guideUtilities;
     MediaService mediaService;
+    MediaUtilities mediaUtilities;
     CommonFunctions utils;
 
     @Override
@@ -49,6 +57,33 @@ public class TouristGuideServiceImpl implements TouristGuideService {
 
         return ResponseEntity.status(200).body(models);
     }
+
+    @Override
+    public ResponseEntity<Page<TouristGuideShorthandModel>> findGuidesPaginated(PageRequest pageRequest, String searchTerm, String sortOption) {
+        if (pageRequest == null) throw new TouristGuideExceptions.TouristGuideRequestException(ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_C_BR);
+
+        PageRequest endPageRequest = PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize());
+
+        Specification<TouristGuideEntity> spec = Specification
+                .allOf(TouristGuideSpecification.hasSearchTerms(searchTerm))
+                .and(TouristGuideSpecification.withDynamicSorting(sortOption));
+
+        Page<TouristGuideEntity> response = touristGuideDAO.findAll(spec, pageRequest);
+
+        for(TouristGuideEntity entity : response.getContent()){
+            guideUtilities.setGuideCategoryNames(entity);
+            mediaService.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
+        }
+
+        Page<TouristGuideShorthandModel> responseList = new PageImpl<>(
+                touristGuideMapper.entitiesToShorthandDtos(response.getContent()),
+                endPageRequest,
+                response.getTotalElements()
+        );
+
+        return ResponseEntity.status(200).body(responseList);
+    }
+
 
     @Override
     public ResponseEntity<List<TouristGuideShorthandModel>> findByCategory(Integer categoryId) {
@@ -150,5 +185,35 @@ public class TouristGuideServiceImpl implements TouristGuideService {
         }
 
         return ResponseEntity.status(200).body(touristGuideMapper.entityToOverviewDto(storedEntity));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<TouristGuideModel> update(TouristGuideUpdateModel request, Principal principal) {
+        if (request == null) throw new TouristGuideExceptions.TouristGuideRequestException(ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_C_BR);
+
+        UserEntity user = utils.getUserFromPrincipal(principal);
+        if (user == null || !user.getIsAdmin()) throw new TouristGuideExceptions.TouristGuideAuth(ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_C_AU);
+
+        TouristGuideEntity entity = touristGuideDAO.findById(request.getId())
+                .orElseThrow(() ->
+                        new TouristGuideExceptions.TouristGuideNotFound(
+                                ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_NOT_FOUND
+                        ));
+
+        // Section 1: Updating the existing basic fields
+        touristGuideMapper.updateEntityFromDto(request, entity);
+
+        // Section 2: Updating the thumbnail image of the guide
+        mediaUtilities.updateThumbnailImage(request.getNewThumbnailImage(), entity.getId(), ObjectType.GUIDE_THUMBNAIL, user.getUsername());
+
+        // Section 3: Updating the individual sections (removing specified, creating new ones, updating existing ones)
+        if(!request.getToAddSections().isEmpty()) guideUtilities.createNewSections(request.getToAddSections(), entity);
+        if(!request.getToUpdateSections().isEmpty()) guideUtilities.updateExistingSections(request.getToUpdateSections(), entity);
+        if(!request.getToDeleteSections().isEmpty()) guideUtilities.deleteExistingSections(request.getToDeleteSections(), entity);
+
+        touristGuideDAO.save(entity);
+
+        return ResponseEntity.status(200).body(touristGuideMapper.entityToDto(entity));
     }
 }

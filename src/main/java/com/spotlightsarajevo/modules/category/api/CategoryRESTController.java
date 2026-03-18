@@ -2,6 +2,7 @@ package com.spotlightsarajevo.modules.category.api;
 
 import com.spotlightsarajevo.modules.category.api.dto.EventCategoryModel;
 import com.spotlightsarajevo.modules.category.api.dto.SpotCategoryModel;
+import com.spotlightsarajevo.modules.category.api.dto.TouristGuideCategoryModel;
 import com.spotlightsarajevo.modules.category.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,5 +31,12 @@ public class CategoryRESTController {
     @Operation(description = "Get all event categories from the system")
     public ResponseEntity<List<EventCategoryModel>> findAllEvent(){
         return this.categoryService.findAllEventCategories();
+    }
+
+
+    @GetMapping(value = "/allGuide")
+    @Operation(description = "Get all tourist guide categories from the system")
+    public ResponseEntity<List<TouristGuideCategoryModel>> findAllGuide(){
+        return this.categoryService.findAllGuideCategories();
     }
 }

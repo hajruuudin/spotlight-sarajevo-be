@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.spot.api.dto;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -36,6 +37,6 @@ public class SpotMapModel implements Serializable {
     private String categoryNameEn;
 
     @Schema(description = "The thumbnail image of the spot")
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
 }
 

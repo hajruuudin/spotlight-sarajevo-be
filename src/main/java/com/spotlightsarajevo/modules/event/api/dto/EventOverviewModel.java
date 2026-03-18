@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.event.api.dto;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -45,6 +46,9 @@ public class EventOverviewModel implements Serializable {
     @Schema(description = "Slug link of the location (points to a spot or venue)")
     private String locationLinkSlug;
 
+    @Schema(description = "Category ID of the event")
+    private Integer categoryId;
+
     @Schema(description = "Category name of the event in English")
     private String categoryNameEn;
 
@@ -85,8 +89,8 @@ public class EventOverviewModel implements Serializable {
     private EventOrganiserModel organiser;
 
     @Schema(description = "Thumbnail image of the event")
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
 
     @Schema(description = "List of additional event images")
-    private List<String> images;
+    private List<MediaStoreModel> images;
 }

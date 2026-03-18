@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.tag.service;
 
+import com.spotlightsarajevo.modules.tag.api.dto.TagModel;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface TagService {
     /**
      * Retrieves a list of all tags.
      *
-     * @return ResponseEntity containing a list of TagService
+     * @return ResponseEntity containing a list of TagModel
      */
-    ResponseEntity<List<TagService>> findAll();
+    ResponseEntity<List<TagModel>> findAll();
 }

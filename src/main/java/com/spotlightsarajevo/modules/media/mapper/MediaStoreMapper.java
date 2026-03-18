@@ -13,4 +13,5 @@ public interface MediaStoreMapper {
     MediaStoreEntity dtoToEntity(MediaStoreCreateModel dto);
     MediaStoreModel entityToDto(MediaStoreEntity entity);
     List<MediaStoreEntity> entitiesToDtos(List<MediaStoreCreateModel> dtos);
+    List<MediaStoreModel> entitiesToModels(List<MediaStoreEntity> entities);
 }
