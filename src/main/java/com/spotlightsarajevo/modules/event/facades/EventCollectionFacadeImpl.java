@@ -8,7 +8,7 @@ import com.spotlightsarajevo.modules.event.domain.EventDAO;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
 import com.spotlightsarajevo.modules.event.mapper.EventMapper;
 import com.spotlightsarajevo.modules.event.utils.EventUtilities;
-import com.spotlightsarajevo.modules.media.service.MediaService;
+import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class EventCollectionFacadeImpl implements EventCollectionFacade {
     private final EventDAO eventDAO;
     private final EventMapper eventMapper;
     private final EventUtilities eventUtilities;
-    private final MediaService mediaService;
+    private final MediaUtilities mediaUtilities;
 
     @Override
     public EventShorthandModel getEventShorthand(Integer eventId) {
@@ -31,7 +31,7 @@ public class EventCollectionFacadeImpl implements EventCollectionFacade {
         eventUtilities.setEventCategories(event);
         EventShorthandModel dto = eventMapper.entityToShorthandDto(event);
 
-        mediaService.lookupThumbnailImage(dto, ObjectType.EVENT, dto.getId());
+        mediaUtilities.lookupThumbnailImage(dto, ObjectType.EVENT, dto.getId());
         return dto;
     }
 }

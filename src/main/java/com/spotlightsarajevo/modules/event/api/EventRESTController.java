@@ -68,6 +68,21 @@ public class EventRESTController {
         return eventService.getEventAttendedStatus(eventId, principal);
     }
 
+    @GetMapping(value = "/organisers/all")
+    @Operation(description = "Find all event organisers (used mostly in the Add Event and Edit Event Functions on the FE)")
+    public ResponseEntity<List<EventOrganiserModel>> getAllOrganisers(){
+        return eventService.findAllOrganisers();
+    }
+
+    @PostMapping(value = "/organiser")
+    @Operation(description = "Create an event organiser object - Used on the Admin Add Event Option")
+    public ResponseEntity<EventOrganiserModel> createEventOrganiser(
+            @RequestBody EventOrganiserCreateModel request,
+            Principal principal
+    ){
+        return eventService.createEventOrganiser(request, principal);
+    }
+
     @PutMapping
     @Operation(description = "Update a whole Entity Overview within the system")
     public ResponseEntity<EventModel> updateEvent(

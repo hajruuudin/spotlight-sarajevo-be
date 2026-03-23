@@ -43,6 +43,21 @@ public interface EventService {
      */
     ResponseEntity<EventModel> update(EventUpdateModel eventUpdateModel, Principal principal);
 
+    /**
+     *  Finds all event organisers, returning them as a List of EventOrganiserModel objects
+     *
+     * @return A list of EventOrganiserModel
+     */
+    ResponseEntity<List<EventOrganiserModel>> findAllOrganisers();
+
+    /**
+     * Create a new Event Organiser. To access this method on the FE go on the Event Add Page on the Admin Panel.
+     *
+     * @param request The request object containing the data from the FE
+     * @param principal The principal security object sent from the FE
+     * @return EventOrganiserModel representing the newly created object.
+     */
+    ResponseEntity<EventOrganiserModel> createEventOrganiser(EventOrganiserCreateModel request, Principal principal);
 
     /**
      * Updates an existing event organiser based on the provided EventOrganiserUpdateModel

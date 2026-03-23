@@ -5,7 +5,6 @@ import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.TouristGuideExceptions;
 import com.spotlightsarajevo.common.specifications.TouristGuideSpecification;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
-import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
 import com.spotlightsarajevo.modules.guide.api.dto.*;
 import com.spotlightsarajevo.modules.guide.domain.TouristGuideDAO;
 import com.spotlightsarajevo.modules.guide.domain.TouristGuideSectionDAO;
@@ -14,7 +13,6 @@ import com.spotlightsarajevo.modules.guide.domain.entity.TouristGuideSectionEnti
 import com.spotlightsarajevo.modules.guide.mapper.TouristGuideMapper;
 import com.spotlightsarajevo.modules.guide.utils.TouristGuideUtilities;
 import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
-import com.spotlightsarajevo.modules.media.service.MediaService;
 import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
 import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
 import jakarta.transaction.Transactional;
@@ -39,7 +37,6 @@ public class TouristGuideServiceImpl implements TouristGuideService {
     TouristGuideSectionDAO touristGuideSectionDAO;
     TouristGuideMapper touristGuideMapper;
     TouristGuideUtilities guideUtilities;
-    MediaService mediaService;
     MediaUtilities mediaUtilities;
     CommonFunctions utils;
 
@@ -49,7 +46,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
 
         for(TouristGuideEntity entity : entities){
             guideUtilities.setGuideCategoryNames(entity);
-            mediaService.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
+            mediaUtilities.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
         }
 
         List<TouristGuideShorthandModel> models = touristGuideMapper.entitiesToShorthandDtos(entities);
@@ -72,7 +69,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
 
         for(TouristGuideEntity entity : response.getContent()){
             guideUtilities.setGuideCategoryNames(entity);
-            mediaService.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
+            mediaUtilities.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
         }
 
         Page<TouristGuideShorthandModel> responseList = new PageImpl<>(
@@ -97,7 +94,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
 
         for (TouristGuideEntity entity : entities) {
             guideUtilities.setGuideCategoryNames(entity);
-            mediaService.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
+            mediaUtilities.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
         }
 
         List<TouristGuideShorthandModel> models = touristGuideMapper.entitiesToShorthandDtos(entities);
@@ -114,7 +111,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
                 () -> new TouristGuideExceptions.TouristGuideRequestException(ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_NOT_FOUND)
         );
 
-        mediaService.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
+        mediaUtilities.lookupThumbnailImage(entity, ObjectType.GUIDE_THUMBNAIL, entity.getId());
         guideUtilities.setGuideCategoryNames(entity);
 
         TouristGuideOverviewModel overviewModel = touristGuideMapper.entityToOverviewDto(entity);
@@ -124,7 +121,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
 
 
         for(TouristGuideSectionEntity section : sectionEntities){
-            mediaService.lookupThumbnailImage(section, ObjectType.SECTION_GUIDE, section.getId());
+            mediaUtilities.lookupThumbnailImage(section, ObjectType.SECTION_GUIDE, section.getId());
             TouristGuideSectionModel model = touristGuideMapper.sectionEntityToDto(section);
             sectionModels.add(model);
         }
@@ -163,7 +160,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
                 user.getUsername()
         );
         System.out.println(guideImageModel);
-        mediaService.create(guideImageModel);
+        mediaUtilities.create(guideImageModel);
 
         // Create the individual section objects and add their images to the database
         for (TouristGuideSectionCreateModel section : request.getSections()){
@@ -181,7 +178,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
                     LocalDateTime.now(),
                     user.getUsername()
             );
-            mediaService.create(guideSectionImageModel);
+            mediaUtilities.create(guideSectionImageModel);
         }
 
         return ResponseEntity.status(200).body(touristGuideMapper.entityToOverviewDto(storedEntity));
