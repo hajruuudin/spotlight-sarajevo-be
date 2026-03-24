@@ -3,7 +3,6 @@ package com.spotlightsarajevo.modules.spot.service;
 import com.spotlightsarajevo.common.exceptions.EventExceptions;
 import com.spotlightsarajevo.common.utils.CommonFunctions;
 import com.spotlightsarajevo.modules.auth.domain.entity.UserEntity;
-import com.spotlightsarajevo.modules.media.service.MediaService;
 import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
 import com.spotlightsarajevo.modules.spot.api.dto.*;
 import com.spotlightsarajevo.modules.spot.domain.SpotDAO;
@@ -44,7 +43,6 @@ public class SpotServiceImpl implements SpotService {
     private final SpotWorkHoursDAO spotWorkHoursDAO;
     private final SpotMapper spotMapper;
     private final SpotWorkHoursMapper spotWorkHoursMapper;
-    private final MediaService mediaService;
     private final MediaUtilities mediaUtilities;
     private final SpotUtilities utils;
     private final CommonFunctions commonFunctions;
@@ -92,7 +90,7 @@ public class SpotServiceImpl implements SpotService {
         for (SpotEntity spot : page.getContent()) {
             utils.setSpotCategoriesAndRating(spot);
             utils.setSpotTags(spot);
-            mediaService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
+            mediaUtilities.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
         }
 
         Page<SpotShorthandModel> response = new PageImpl<>(
@@ -124,8 +122,8 @@ public class SpotServiceImpl implements SpotService {
 
         SpotOverviewModel model = spotMapper.entityOverviewToDto(spot);
 
-        mediaService.lookupThumbnailImage(model, ObjectType.SPOT, spot.getId());
-        mediaService.lookupAllImages(model, ObjectType.SPOT, spot.getId());
+        mediaUtilities.lookupThumbnailImage(model, ObjectType.SPOT, spot.getId());
+        mediaUtilities.lookupAllImages(model, ObjectType.SPOT, spot.getId());
 
         return ResponseEntity.ok(model);
     }
@@ -159,7 +157,7 @@ public class SpotServiceImpl implements SpotService {
 
         for (SpotEntity spot : spots) {
             utils.setSpotCategoriesAndRating(spot);
-            mediaService.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
+            mediaUtilities.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
         }
 
         List<SpotMapModel> response = spotMapper.entitiesToMapDtos(spots);
@@ -172,12 +170,44 @@ public class SpotServiceImpl implements SpotService {
     /*=============================================================================*/
 
     @Override
+    @Transactional
     public ResponseEntity<SpotModel> create(SpotCreateModel dto) {
+        if (dto == null) throw new SpotExceptions.SpotSystemException(ExceptionCodes.SpotExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        // From Section 1: Create the spot entity from DTO
         SpotEntity entity = spotMapper.dtoToEntity(dto);
         entity.setCreated(LocalDateTime.now());
         entity.setCreatedBy("Admin User");
 
+        // Save the spot entity first to get the ID
         SpotEntity created = spotDAO.save(entity);
+
+        // From Section 2: Add tags
+        if (dto.getTagIds() != null && !dto.getTagIds().isEmpty()) {
+            List<SpotTagsEntity> tags = new ArrayList<>();
+            for (Integer tagId : dto.getTagIds()) {
+                SpotTagsEntity spotTag = new SpotTagsEntity();
+                spotTag.setSpotId(created.getId());
+                spotTag.setTagId(tagId);
+                tags.add(spotTag);
+            }
+            spotTagsDAO.saveAllAndFlush(tags);
+        }
+
+        // From Section 3: Add work hours
+        if (dto.getWorkHoursModel() != null && !dto.getWorkHoursModel().isEmpty()) {
+            List<SpotWorkHoursEntity> workHours = new ArrayList<>();
+            for (SpotWorkHoursModel workHoursModel : dto.getWorkHoursModel()) {
+                SpotWorkHoursEntity workHoursEntity = spotWorkHoursMapper.dtoToEntity(workHoursModel);
+                workHoursEntity.setSpotId(created.getId());
+                workHours.add(workHoursEntity);
+            }
+            spotWorkHoursDAO.saveAllAndFlush(workHours);
+        }
+
+        // From Section 4: Handle thumbnail image and additional images
+        mediaUtilities.updateThumbnailImage(dto.getNewThumbnailImage(), created.getId(), ObjectType.SPOT, "Admin User");
+        mediaUtilities.addImages(dto.getToAddImages(), created.getId(), ObjectType.SPOT, "Admin User");
 
         return ResponseEntity.ok(spotMapper.entityToDto(created));
     }

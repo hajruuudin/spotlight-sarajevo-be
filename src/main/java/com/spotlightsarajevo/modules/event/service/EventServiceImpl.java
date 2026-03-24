@@ -14,7 +14,7 @@ import com.spotlightsarajevo.common.enums.ExceptionCodes;
 import com.spotlightsarajevo.common.enums.ObjectType;
 import com.spotlightsarajevo.common.exceptions.EventExceptions;
 import com.spotlightsarajevo.common.specifications.EventSpecification;
-import com.spotlightsarajevo.modules.media.service.MediaService;
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
 import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -40,7 +40,6 @@ public class EventServiceImpl implements EventService {
     CommonFunctions commonFunctions;
     EventMapper eventMapper;
     EventOrganiserMapper eventOrganiserMapper;
-    MediaService mediaService;
     MediaUtilities mediaUtilities;
 
     @Override
@@ -65,7 +64,7 @@ public class EventServiceImpl implements EventService {
         for(EventEntity eventEntity : eventEntities.getContent()){
             utils.setEventCategories(eventEntity);
             utils.setEventTags(eventEntity);
-            mediaService.lookupThumbnailImage(eventEntity, ObjectType.EVENT, eventEntity.getId());
+            mediaUtilities.lookupThumbnailImage(eventEntity, ObjectType.EVENT, eventEntity.getId());
         }
 
         Page<EventShorthandModel> responseList = new PageImpl<>(
@@ -77,8 +76,30 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ResponseEntity<EventModel> create(EventCreateModel eventCreateModel) {
-        return null;
+    @Transactional
+    public ResponseEntity<EventModel> create(EventCreateModel dto, Principal principal) {
+        if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+        if (dto == null) throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        // From Section 1: Create the event entity from DTO
+        EventEntity entity = eventMapper.dtoToEntity(dto);
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy(user.getUsername());
+
+        // Save the event entity first to get the ID
+        EventEntity created = eventDAO.save(entity);
+
+        // From Section 2: Add tags
+        utils.addEventTags(dto.getEventTagIds(), created.getId());
+
+        // From Section 3: Handle thumbnail image and additional images
+        mediaUtilities.updateThumbnailImage(dto.getNewThumbnailImage(), created.getId(), ObjectType.EVENT, user.getUsername());
+        mediaUtilities.addImages(dto.getToAddImages(), created.getId(), ObjectType.EVENT, user.getUsername());
+
+        return ResponseEntity.ok(eventMapper.entityToDto(created));
     }
 
     @Override
@@ -116,6 +137,34 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    public ResponseEntity<List<EventOrganiserModel>> findAllOrganisers() {
+        List<EventOrganiserEntity> organiserEntities = eventOrganiserDAO.findAll();
+        List<EventOrganiserModel> organiserModels = eventOrganiserMapper.entitiesToDtos(organiserEntities);
+
+        return ResponseEntity.status(200).body(organiserModels);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<EventOrganiserModel> createEventOrganiser(EventOrganiserCreateModel request, Principal principal) {
+        if(request == null) throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+        if(principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        UserEntity loggedUser = commonFunctions.getUserFromPrincipal(principal);
+        if (!loggedUser.getIsAdmin()) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        EventOrganiserEntity eventOrganiser = eventOrganiserMapper.dtoToEntity(request);
+        EventOrganiserEntity savedEntity = eventOrganiserDAO.save(eventOrganiser);
+
+        MediaStoreCreateModel image = request.getNewThumbnailImage();
+        image.setItemId(savedEntity.getId());
+
+        mediaUtilities.updateThumbnailImage(image, savedEntity.getId(), ObjectType.EVENT, loggedUser.getUsername());
+
+        return ResponseEntity.status(200).body(eventOrganiserMapper.entityToDto(savedEntity));
+    }
+
+    @Override
     @Transactional
     public ResponseEntity<EventOrganiserModel> update(EventOrganiserUpdateModel request, Principal principal) {
         if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
@@ -136,7 +185,7 @@ public class EventServiceImpl implements EventService {
         eventOrganiserDAO.save(entity);
 
         EventOrganiserModel response = eventOrganiserMapper.entityToDto(entity);
-        mediaService.lookupThumbnailImage(response, ObjectType.ORGANISER, entity.getId());
+        mediaUtilities.lookupThumbnailImage(response, ObjectType.ORGANISER, entity.getId());
 
         return ResponseEntity.ok(response);
     }
@@ -163,8 +212,8 @@ public class EventServiceImpl implements EventService {
 
             EventOverviewModel eventOverviewModel = eventMapper.entityToOverviewDto(eventEntity.get());
 
-            mediaService.lookupThumbnailImage(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
-            mediaService.lookupAllImages(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
+            mediaUtilities.lookupThumbnailImage(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
+            mediaUtilities.lookupAllImages(eventOverviewModel, ObjectType.EVENT, eventEntity.get().getId());
 
             return ResponseEntity.status(200).body(eventOverviewModel);
         }
@@ -200,7 +249,7 @@ public class EventServiceImpl implements EventService {
         for (EventEntity eventEntity : eventEntities) {
             utils.setEventCategories(eventEntity);
             utils.setEventTags(eventEntity);
-            mediaService.lookupThumbnailImage(eventEntity, ObjectType.EVENT, eventEntity.getId());
+            mediaUtilities.lookupThumbnailImage(eventEntity, ObjectType.EVENT, eventEntity.getId());
         }
 
         List<EventShorthandModel> response = eventMapper.entitiesToShorthandDtos(eventEntities);

@@ -14,8 +14,7 @@ import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventOrganiserReviewStatsEntity;
 import com.spotlightsarajevo.modules.event.domain.entity.EventTagsEntity;
 import com.spotlightsarajevo.modules.event.mapper.EventOrganiserMapper;
-import com.spotlightsarajevo.modules.media.service.MediaService;
-import com.spotlightsarajevo.modules.spot.domain.entity.SpotTagsEntity;
+import com.spotlightsarajevo.modules.media.utils.MediaUtilities;
 import com.spotlightsarajevo.modules.tag.domain.TagDAO;
 import com.spotlightsarajevo.modules.tag.domain.entity.TagEntity;
 import com.spotlightsarajevo.modules.tag.mappers.TagMapper;
@@ -37,7 +36,7 @@ public class EventUtilities {
     TagDAO tagDAO;
     TagMapper tagMapper;
     EventOrganiserMapper eventOrganiserMapper;
-    MediaService mediaService;
+    MediaUtilities mediaUtilities;
 
     public void setEventCategories(EventEntity entity){
         Optional<EventCategoryEntity> category = eventCategoryDAO.findById(entity.getCategoryId());
@@ -80,7 +79,7 @@ public class EventUtilities {
             Optional<EventOrganiserReviewStatsEntity> organiserReviewStatsEntity = eventOrganiserReviewStatsDAO.findByOrganiserId(organiserEntity.get().getId());
             organiserReviewStatsEntity.ifPresent(eventOrganiserReviewStatsEntity -> eventOrganiserMapper.updateOrganiserFromStats(eventOrganiserReviewStatsEntity, organiserModel));
 
-            mediaService.lookupThumbnailImage(organiserModel, ObjectType.ORGANISER, organiserModel.getId());
+            mediaUtilities.lookupThumbnailImage(organiserModel, ObjectType.ORGANISER, organiserModel.getId());
             organiserEntity.ifPresent(eventOrganiserEntity -> entity.setOrganiser(organiserModel));
         }
     }
@@ -104,5 +103,24 @@ public class EventUtilities {
                 eventTagsDAO.saveAllAndFlush(newTags);
             }
         }
+    }
+
+    /**
+     * Adds new event tags for a newly created event
+     *
+     * @param tagIds the list of tag IDs to add to the event
+     * @param eventId the ID of the event
+     */
+    public void addEventTags(List<Integer> tagIds, Integer eventId) {
+        if (tagIds == null || tagIds.isEmpty()) return;
+
+        List<EventTagsEntity> tags = new ArrayList<>();
+        for (Integer tagId : tagIds) {
+            EventTagsEntity eventTag = new EventTagsEntity();
+            eventTag.setEventId(eventId);
+            eventTag.setTagId(tagId);
+            tags.add(eventTag);
+        }
+        eventTagsDAO.saveAllAndFlush(tags);
     }
 }

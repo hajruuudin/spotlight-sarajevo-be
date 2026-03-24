@@ -1,10 +1,12 @@
 package com.spotlightsarajevo.modules.spot.api.dto;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @Schema(description = "Default, all property, entity creation model for the Spot Entity")
@@ -44,24 +46,15 @@ public class SpotCreateModel implements Serializable {
     @Schema(description = "Category Identifier for the spot")
     private Integer categoryId;
 
-    @Schema(description = "The initial spot overall rating given by the admin who added the spot")
-    private BigDecimal initialOverallRating;
+    @Schema(description = "Array of Tag IDs to be added to the spot")
+    private List<Integer> tagIds;
 
-    @Schema(description = "The initial spot cleanliness given by the admin who added the spot")
-    private BigDecimal initialCleanliness;
+    @Schema(description = "An object representing the Work Hours of the spot")
+    private List<SpotWorkHoursModel> workHoursModel;
 
-    @Schema(description = "The initial spot affordability given by the admin who added the spot")
-    private BigDecimal initialAffordability;
+    @Schema(description = "Thumbnail image Object of the Spot")
+    private MediaStoreCreateModel newThumbnailImage;
 
-    @Schema(description = "The initial spot accessibility given by the admin who added the spot")
-    private BigDecimal initialAccessibility;
-
-    @Schema(description = "The initial spot staff kindness by the admin who added the spot")
-    private BigDecimal initialStaffKindness;
-
-    @Schema(description = "The initial spot locale quality given by the admin who added the spot")
-    private BigDecimal initialLocaleQuality;
-
-    @Schema(description = "The initial spot atmosphere given by the admin who added the spot")
-    private BigDecimal initialAtmosphere;
+    @Schema(description = "List of Objects to be added for images of the Spot")
+    private List<MediaStoreCreateModel> toAddImages;
 }

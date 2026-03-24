@@ -1,12 +1,7 @@
 package com.spotlightsarajevo.modules.event.mapper;
 
-import com.spotlightsarajevo.modules.event.api.dto.EventModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventOverviewModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventShorthandModel;
-import com.spotlightsarajevo.modules.event.api.dto.EventUpdateModel;
+import com.spotlightsarajevo.modules.event.api.dto.*;
 import com.spotlightsarajevo.modules.event.domain.entity.EventEntity;
-import com.spotlightsarajevo.modules.spot.api.dto.SpotUpdateModel;
-import com.spotlightsarajevo.modules.spot.domain.entity.SpotEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -16,6 +11,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventMapper {
+    EventEntity dtoToEntity(EventCreateModel eventCreateModel);
     EventModel entityToDto(EventEntity entity);
     List<EventShorthandModel> entitiesToShorthandDtos(List<EventEntity> entities);
     EventOverviewModel entityToOverviewDto(EventEntity eventEntity);
