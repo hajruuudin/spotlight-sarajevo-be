@@ -29,11 +29,13 @@ public interface EventService {
 
     /**
      * Creates a new event based on the provided EventCreateModel.
+     * This is an admin-only operation.
      *
      * @param eventCreateModel the model containing information to create a new event
+     * @param principal the security principal representing the authenticated user (admin)
      * @return ResponseEntity containing the created EventModel
      */
-    ResponseEntity<EventModel> create(EventCreateModel eventCreateModel);
+    ResponseEntity<EventModel> create(EventCreateModel eventCreateModel, Principal principal);
 
     /**
      * Updates an existing event based on the provided EventUpdateModel.

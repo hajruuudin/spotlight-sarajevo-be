@@ -92,6 +92,15 @@ public class EventRESTController {
         return eventService.update(eventUpdateModel, principal);
     }
 
+    @PostMapping
+    @Operation(description = "Create a new event in the system")
+    public ResponseEntity<EventModel> createEvent(
+            @RequestBody EventCreateModel eventCreateModel,
+            Principal principal
+    ){
+        return eventService.create(eventCreateModel, principal);
+    }
+
     @PutMapping(value = "/organiser")
     @Operation(description = "Update an event organiser within the system")
     public ResponseEntity<EventOrganiserModel> updateOrganiserEntity(

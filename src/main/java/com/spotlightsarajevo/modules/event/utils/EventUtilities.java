@@ -104,4 +104,23 @@ public class EventUtilities {
             }
         }
     }
+
+    /**
+     * Adds new event tags for a newly created event
+     *
+     * @param tagIds the list of tag IDs to add to the event
+     * @param eventId the ID of the event
+     */
+    public void addEventTags(List<Integer> tagIds, Integer eventId) {
+        if (tagIds == null || tagIds.isEmpty()) return;
+
+        List<EventTagsEntity> tags = new ArrayList<>();
+        for (Integer tagId : tagIds) {
+            EventTagsEntity eventTag = new EventTagsEntity();
+            eventTag.setEventId(eventId);
+            eventTag.setTagId(tagId);
+            tags.add(eventTag);
+        }
+        eventTagsDAO.saveAllAndFlush(tags);
+    }
 }

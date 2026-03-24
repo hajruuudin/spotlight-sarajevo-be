@@ -76,8 +76,30 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ResponseEntity<EventModel> create(EventCreateModel eventCreateModel) {
-        return null;
+    @Transactional
+    public ResponseEntity<EventModel> create(EventCreateModel dto, Principal principal) {
+        if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+        if (dto == null) throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        // From Section 1: Create the event entity from DTO
+        EventEntity entity = eventMapper.dtoToEntity(dto);
+        entity.setCreated(LocalDateTime.now());
+        entity.setCreatedBy(user.getUsername());
+
+        // Save the event entity first to get the ID
+        EventEntity created = eventDAO.save(entity);
+
+        // From Section 2: Add tags
+        utils.addEventTags(dto.getEventTagIds(), created.getId());
+
+        // From Section 3: Handle thumbnail image and additional images
+        mediaUtilities.updateThumbnailImage(dto.getNewThumbnailImage(), created.getId(), ObjectType.EVENT, user.getUsername());
+        mediaUtilities.addImages(dto.getToAddImages(), created.getId(), ObjectType.EVENT, user.getUsername());
+
+        return ResponseEntity.ok(eventMapper.entityToDto(created));
     }
 
     @Override
@@ -123,6 +145,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<EventOrganiserModel> createEventOrganiser(EventOrganiserCreateModel request, Principal principal) {
         if(request == null) throw new EventExceptions.EventSystemException(ExceptionCodes.EventExceptionCodes.INVALID_REQUEST_CONTENT);
         if(principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);

@@ -1,11 +1,13 @@
 package com.spotlightsarajevo.modules.event.api.dto;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreCreateModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Schema(description = "Default, all property, entity creation model for the Event Entity")
@@ -68,5 +70,17 @@ public class EventCreateModel implements Serializable {
 
     @Schema(description = "Identifier of the event organiser")
     private Integer organiserId;
+
+    @Schema(description = "Array of Tag IDs to be added to the event")
+    private List<Integer> eventTagIds;
+
+    @Schema(description = "Slug link to the location/spot associated with the event")
+    private String locationLinkSlug;
+
+    @Schema(description = "Thumbnail image Object of the Event")
+    private MediaStoreCreateModel newThumbnailImage;
+
+    @Schema(description = "List of Objects to be added for images of the Event")
+    private List<MediaStoreCreateModel> toAddImages;
 }
 
