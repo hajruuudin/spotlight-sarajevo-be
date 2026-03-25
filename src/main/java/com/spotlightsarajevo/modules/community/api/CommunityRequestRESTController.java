@@ -73,4 +73,13 @@ public class CommunityRequestRESTController {
     ) {
         return communityRequestService.deleteCommunityRequest(requestId, principal);
     }
+
+    @GetMapping(value = "/admin/get-recently-added")
+    @Operation(description = "Fetch recently added community requests for admin dashboard")
+    public ResponseEntity<List<CommunityRequestModel>> getRecentlyAddedCommunityRequests(
+            @RequestParam(defaultValue = "10", required = false) Integer limit,
+            Principal principal
+    ) {
+        return communityRequestService.getRecentlyAddedCommunityRequests(limit, principal);
+    }
 }

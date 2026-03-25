@@ -282,5 +282,35 @@ public class SpotServiceImpl implements SpotService {
         spotDAO.delete(entity);
         return ResponseEntity.ok(spotMapper.entityToDto(entity));
     }
-}
 
+    @Override
+    public ResponseEntity<Long> getSpotsTotalCount(Principal principal) {
+        if (principal == null) throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+
+        Long count = spotDAO.countAllSpots();
+        return ResponseEntity.status(200).body(count);
+    }
+
+    @Override
+    public ResponseEntity<List<SpotShorthandModel>> getRecentlyAddedSpots(Integer limit, Principal principal) {
+        if (principal == null) throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+        if (limit == null || limit <= 0) limit = 5;
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new SpotExceptions.SpotUnauthorizedException(ExceptionCodes.SpotExceptionCodes.SPOT_UNAUTHORIZED_ACCESS);
+
+        List<SpotEntity> entities = spotDAO.findRecentlyAdded(limit);
+
+        for(SpotEntity spot : entities){
+            utils.setSpotCategoriesAndRating(spot);
+            utils.setSpotTags(spot);
+            mediaUtilities.lookupThumbnailImage(spot, ObjectType.SPOT, spot.getId());
+        }
+
+        List<SpotShorthandModel> models = spotMapper.entitiesToShorthandDtos(entities);
+        return ResponseEntity.status(200).body(models);
+    }
+}

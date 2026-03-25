@@ -99,4 +99,23 @@ public interface SpotService {
      * @return ResponseEntity containing the deleted SpotModel
      */
     ResponseEntity<SpotModel> delete(Integer id);
+
+    /**
+     * Method to retrieve the total count of spots in the system.
+     * This is an admin-only operation.
+     *
+     * @param principal the security principal representing the authenticated user (admin)
+     * @return ResponseEntity containing the total count of spots
+     */
+    ResponseEntity<Long> getSpotsTotalCount(Principal principal);
+
+    /**
+     * Method to retrieve recently added spots for admin dashboard.
+     * This is an admin-only operation.
+     *
+     * @param limit the maximum number of recent spots to retrieve
+     * @param principal the security principal representing the authenticated user (admin)
+     * @return ResponseEntity containing an array of recently added SpotShorthandModel objects
+     */
+    ResponseEntity<List<SpotShorthandModel>> getRecentlyAddedSpots(Integer limit, Principal principal);
 }

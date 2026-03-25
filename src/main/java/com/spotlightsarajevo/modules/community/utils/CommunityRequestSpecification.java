@@ -35,5 +35,20 @@ public class CommunityRequestSpecification {
     private static Specification<CommunityRequestEntity> byStatus(RequestStatus status) {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("status"), status);
     }
+
+    /**
+     * Builds a Specification to retrieve recently added community requests.
+     * Orders results by creation date in descending order.
+     *
+     * @return A Specification<CommunityRequestEntity> that orders by created date descending
+     */
+    public static Specification<CommunityRequestEntity> orderByRecentlyAdded() {
+        return (root, query, criteriaBuilder) -> {
+            if (query != null) {
+                query.orderBy(criteriaBuilder.desc(root.get("createdAt")));
+            }
+            return criteriaBuilder.conjunction();
+        };
+    }
 }
 

@@ -284,4 +284,35 @@ public class EventServiceImpl implements EventService {
 
         return ResponseEntity.ok(result);
     }
+
+    @Override
+    public ResponseEntity<Long> getEventsTotalCount(Principal principal) {
+        if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        Long count = eventDAO.countAllEvents();
+        return ResponseEntity.status(200).body(count);
+    }
+
+    @Override
+    public ResponseEntity<List<EventShorthandModel>> getRecentlyAddedEvents(Integer limit, Principal principal) {
+        if (principal == null) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+        if (limit == null || limit <= 0) limit = 5;
+
+        UserEntity user = commonFunctions.getUserFromPrincipal(principal);
+        if (!user.getIsAdmin()) throw new EventExceptions.EventUnauthorizedException(ExceptionCodes.EventExceptionCodes.EVENT_UNAUTHORIZED_ACCESS);
+
+        List<EventEntity> entities = eventDAO.findRecentlyAdded(limit);
+
+        for(EventEntity eventEntity : entities){
+            utils.setEventCategories(eventEntity);
+            utils.setEventTags(eventEntity);
+            mediaUtilities.lookupThumbnailImage(eventEntity, ObjectType.EVENT, eventEntity.getId());
+        }
+
+        List<EventShorthandModel> models = eventMapper.entitiesToShorthandDtos(entities);
+        return ResponseEntity.status(200).body(models);
+    }
 }
