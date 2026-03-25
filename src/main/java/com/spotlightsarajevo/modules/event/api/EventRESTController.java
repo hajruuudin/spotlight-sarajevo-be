@@ -109,4 +109,19 @@ public class EventRESTController {
     ){
         return eventService.update(request, principal);
     }
+
+    @GetMapping(value = "/admin/count")
+    @Operation(description = "Retrieve the total count of events in the system (admin-only)")
+    public ResponseEntity<Long> getEventsTotalCount(Principal principal) {
+        return eventService.getEventsTotalCount(principal);
+    }
+
+    @GetMapping(value = "/admin/recently-added")
+    @Operation(description = "Retrieve recently added events for admin dashboard")
+    public ResponseEntity<List<EventShorthandModel>> getRecentlyAddedEvents(
+            @RequestParam(defaultValue = "5", required = false) Integer limit,
+            Principal principal
+    ) {
+        return eventService.getRecentlyAddedEvents(limit, principal);
+    }
 }

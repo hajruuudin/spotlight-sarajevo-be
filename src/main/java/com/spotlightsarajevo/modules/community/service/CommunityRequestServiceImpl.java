@@ -14,6 +14,8 @@ import com.spotlightsarajevo.modules.community.domain.entity.CommunityRequestEnt
 import com.spotlightsarajevo.modules.community.mapper.CommunityRequestMapper;
 import com.spotlightsarajevo.modules.community.utils.CommunityRequestSpecification;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -174,5 +176,24 @@ public class CommunityRequestServiceImpl implements CommunityRequestService {
         communityRequestDAO.delete(entity);
 
         return ResponseEntity.ok(model);
+    }
+
+    @Override
+    public ResponseEntity<List<CommunityRequestModel>> getRecentlyAddedCommunityRequests(Integer limit, Principal principal) {
+        if (principal == null) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
+        if (limit == null || limit <= 0) limit = 10;
+
+        Optional<UserEntity> user = userDAO.findBySysEmailOrGoogleEmail(principal.getName());
+        if (user.isEmpty()) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
+        if (!user.get().getIsAdmin()) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
+
+        Pageable pageable = PageRequest.of(0, limit);
+        List<CommunityRequestEntity> entities = communityRequestDAO.findAll(
+            CommunityRequestSpecification.orderByRecentlyAdded(),
+            pageable
+        ).getContent();
+        List<CommunityRequestModel> models = communityRequestMapper.entitiesToDtos(entities);
+
+        return ResponseEntity.status(200).body(models);
     }
 }

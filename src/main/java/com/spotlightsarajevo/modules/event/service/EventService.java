@@ -111,4 +111,23 @@ public interface EventService {
      * @return A list of dates for the current month where there is an event per day.
      */
     ResponseEntity<Map<LocalDate, Boolean>> checkEventDatesForMonth(Integer year, Integer month);
+
+    /**
+     * Method to retrieve the total count of events in the system.
+     * This is an admin-only operation.
+     *
+     * @param principal the security principal representing the authenticated user (admin)
+     * @return ResponseEntity containing the total count of events
+     */
+    ResponseEntity<Long> getEventsTotalCount(Principal principal);
+
+    /**
+     * Method to retrieve recently added events for admin dashboard.
+     * This is an admin-only operation.
+     *
+     * @param limit the maximum number of recent events to retrieve
+     * @param principal the security principal representing the authenticated user (admin)
+     * @return ResponseEntity containing an array of recently added EventShorthandModel objects
+     */
+    ResponseEntity<List<EventShorthandModel>> getRecentlyAddedEvents(Integer limit, Principal principal);
 }

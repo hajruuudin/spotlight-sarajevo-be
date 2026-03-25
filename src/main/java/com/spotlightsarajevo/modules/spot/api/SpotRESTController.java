@@ -85,4 +85,19 @@ public class SpotRESTController {
     ) {
         return spotService.getSpotVisitedStatus(spotId, principal);
     }
+
+    @GetMapping(value = "/admin/count")
+    @Operation(description = "Retrieve the total count of spots in the system (admin-only)")
+    public ResponseEntity<Long> getSpotsTotalCount(Principal principal) {
+        return spotService.getSpotsTotalCount(principal);
+    }
+
+    @GetMapping(value = "/admin/recently-added")
+    @Operation(description = "Retrieve recently added spots for admin dashboard")
+    public ResponseEntity<List<SpotShorthandModel>> getRecentlyAddedSpots(
+            @RequestParam(defaultValue = "5", required = false) Integer limit,
+            Principal principal
+    ) {
+        return spotService.getRecentlyAddedSpots(limit, principal);
+    }
 }

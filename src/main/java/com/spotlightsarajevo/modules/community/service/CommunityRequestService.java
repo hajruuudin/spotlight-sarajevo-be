@@ -78,4 +78,14 @@ public interface CommunityRequestService {
      * @return A ResponseEntity containing a CommunityRequestModel object representing the deleted community request, or an appropriate response indicating the result of the deletion operation.
      */
     ResponseEntity<CommunityRequestModel> deleteCommunityRequest(Integer requestId, Principal principal);
+
+    /**
+     * Fetch recently added community requests for admin dashboard.
+     * In case the request is successfully processed, the backend will return an array of CommunityRequestModel objects.
+     *
+     * @param limit The maximum number of recent requests to retrieve
+     * @param principal The security principal representing the authenticated user (admin)
+     * @return A ResponseEntity containing an array of recently added CommunityRequestModel objects
+     */
+    ResponseEntity<List<CommunityRequestModel>> getRecentlyAddedCommunityRequests(Integer limit, Principal principal);
 }
