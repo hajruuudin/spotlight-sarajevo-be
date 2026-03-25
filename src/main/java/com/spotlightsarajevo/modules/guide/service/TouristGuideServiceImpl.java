@@ -51,7 +51,6 @@ public class TouristGuideServiceImpl implements TouristGuideService {
 
         List<TouristGuideShorthandModel> models = touristGuideMapper.entitiesToShorthandDtos(entities);
 
-
         return ResponseEntity.status(200).body(models);
     }
 
@@ -153,7 +152,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
         MediaStoreCreateModel guideImageModel = new MediaStoreCreateModel(
                 storedEntity.getId(),
                 ObjectType.GUIDE_THUMBNAIL.toString(),
-                request.getThumbnailImage(),
+                request.getThumbnailImage().getImageUrl(),
                 "EMPTY FOR NOW",
                 true,
                 LocalDateTime.now(),
@@ -172,7 +171,7 @@ public class TouristGuideServiceImpl implements TouristGuideService {
             MediaStoreCreateModel guideSectionImageModel = new MediaStoreCreateModel(
                     storedSectionEntity.getId(),
                     ObjectType.SECTION_GUIDE.toString(),
-                    section.getThumbnailImage(),
+                    section.getThumbnailImage().getImageUrl(),
                     "EMPTY FOR NOW",
                     true,
                     LocalDateTime.now(),

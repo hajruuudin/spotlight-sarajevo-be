@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.guide.domain.entity;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,5 +38,5 @@ public class TouristGuideSectionEntity implements Serializable {
     private Integer orderIdx;
 
     @Transient
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
 }

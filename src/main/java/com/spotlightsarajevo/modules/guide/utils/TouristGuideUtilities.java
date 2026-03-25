@@ -53,9 +53,9 @@ public class TouristGuideUtilities {
 
             TouristGuideSectionEntity savedSection = touristGuideSectionDAO.save(sectionEntity);
 
-            if(sectionModel.getThumbnailImage() != null && !sectionModel.getThumbnailImage().isEmpty()){
+            if(sectionModel.getThumbnailImage() != null){
                 MediaStoreCreateModel thumbnailModel = new MediaStoreCreateModel();
-                thumbnailModel.setImageUrl(sectionModel.getThumbnailImage());
+                thumbnailModel.setImageUrl(sectionModel.getThumbnailImage().getImageUrl());
                 mediaUtilities.updateThumbnailImage(thumbnailModel, savedSection.getId(), ObjectType.SECTION_GUIDE, username);
             }
         }

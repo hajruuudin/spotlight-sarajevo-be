@@ -1,6 +1,7 @@
 package com.spotlightsarajevo.modules.guide.api.dto;
 
 import com.spotlightsarajevo.common.enums.GuideType;
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import lombok.Data;
@@ -55,5 +56,5 @@ public class TouristGuideOverviewModel implements Serializable {
     private Map<String, String> contactInfo;
 
     @Schema(description = "Thumbnail image of the overview model")
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
 }
