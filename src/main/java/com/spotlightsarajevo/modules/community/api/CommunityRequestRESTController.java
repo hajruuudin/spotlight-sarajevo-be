@@ -58,9 +58,10 @@ public class CommunityRequestRESTController {
     @PutMapping(value = "/admin/update-request-status")
     @Operation(description = "This API endpoint updates the status of the specified community request")
     public ResponseEntity<CommunityRequestModel> updateCommunityRequestStatus(
-            CommunityRequestStatusUpdate request,
+            @RequestBody CommunityRequestStatusUpdate request,
             Principal principal
     ) {
+        System.out.println(request);
         return communityRequestService.updateCommunityRequestStatus(request, principal);
     }
 

@@ -1,6 +1,7 @@
 package com.spotlightsarajevo.modules.guide.api.dto;
 
 import com.spotlightsarajevo.common.enums.GuideType;
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -42,4 +43,7 @@ public class TouristGuideModel implements Serializable {
 
     @Schema(description = "The category ID associated with the guide")
     private Integer categoryId;
+
+    @Schema(description = " Thumbnail Image")
+    private MediaStoreModel thumbnailImage;
 }

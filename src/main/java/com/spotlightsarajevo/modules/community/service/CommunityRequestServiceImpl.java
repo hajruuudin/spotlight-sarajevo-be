@@ -142,7 +142,7 @@ public class CommunityRequestServiceImpl implements CommunityRequestService {
         if (user.isEmpty()) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
         if (!user.get().getIsAdmin()) throw new CommunityRequestExceptions.UnauthorizedAccess(ExceptionCodes.CommunityRequestExceptionCodes.CR_UNAUTHORIZED);
 
-        Optional<CommunityRequestEntity> entityOpt = communityRequestDAO.findById(request.getId());
+        Optional<CommunityRequestEntity> entityOpt = communityRequestDAO.findById(request.getRequestId());
         if (entityOpt.isEmpty()) throw new CommunityRequestExceptions.RequestNotFound(ExceptionCodes.CommunityRequestExceptionCodes.CR_REQUEST_NOT_FOUND);
 
         CommunityRequestEntity entity = entityOpt.get();

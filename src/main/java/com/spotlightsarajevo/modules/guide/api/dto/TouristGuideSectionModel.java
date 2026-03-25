@@ -1,5 +1,6 @@
 package com.spotlightsarajevo.modules.guide.api.dto;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -29,5 +30,5 @@ public class TouristGuideSectionModel implements Serializable {
     private String sectionBodyEn;
 
     @Schema(description = "Image of the section, labeled as thumbnail image")
-    private String thumbnailImage;
+    private MediaStoreModel thumbnailImage;
 }

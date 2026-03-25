@@ -1,9 +1,8 @@
 package com.spotlightsarajevo.modules.guide.api.dto;
 
+import com.spotlightsarajevo.modules.media.api.dto.MediaStoreModel;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -28,8 +27,8 @@ public class TouristGuideShorthandModel implements Serializable {
     @Schema(description = "Short summary/teaser of the guide in English", example = "A brief overview of key historical events...")
     private String guideSmallDescriptionEn;
 
-    @Schema(description = "URL of the thumbnail image representing the guide", example = "https://api.spotlightsarajevo.ba/media/guide_1_thumb.jpg")
-    private String thumbnailImage;
+    @Schema(description = "Thumbnail image object representing the guide")
+    private MediaStoreModel thumbnailImage;
 
     @Schema(description = "The name of the assigned category in Bosnian", example = "Kultura")
     private String categoryNameBs;

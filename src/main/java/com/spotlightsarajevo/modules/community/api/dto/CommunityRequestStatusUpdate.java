@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Schema(description = "Model for updating the status of a Community Request")
 public class CommunityRequestStatusUpdate implements Serializable {
     @Schema(description = "Unique identifier of the community request to be updated")
-    private Integer id;
+    private Integer requestId;
 
     @Schema(description = "New status to set for the community request")
     private String status;
