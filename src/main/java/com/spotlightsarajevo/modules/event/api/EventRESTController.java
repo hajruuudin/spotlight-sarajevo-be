@@ -124,4 +124,12 @@ public class EventRESTController {
     ) {
         return eventService.getRecentlyAddedEvents(limit, principal);
     }
+
+    @DeleteMapping(value = "/{id}")
+    @Operation(description = "Delete an event from the database")
+    public ResponseEntity<EventModel> delete(
+            @PathVariable Integer id
+    ){
+        return eventService.delete(id);
+    }
 }

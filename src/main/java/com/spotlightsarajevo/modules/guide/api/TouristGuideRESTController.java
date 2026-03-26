@@ -72,4 +72,12 @@ public class TouristGuideRESTController {
     ){
         return guideService.update(request, principal);
     }
+
+    @DeleteMapping(value = "/{id}")
+    @Operation(description = "Delete a tourist guide from the database by its ID")
+    public ResponseEntity<TouristGuideModel> delete(
+            @PathVariable Integer id
+    ){
+        return guideService.delete(id);
+    }
 }

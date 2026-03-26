@@ -212,4 +212,16 @@ public class TouristGuideServiceImpl implements TouristGuideService {
 
         return ResponseEntity.status(200).body(touristGuideMapper.entityToDto(entity));
     }
+
+    @Override
+    public ResponseEntity<TouristGuideModel> delete(Integer id) {
+        TouristGuideEntity entity = touristGuideDAO.findById(id)
+                .orElseThrow(() ->
+                        new TouristGuideExceptions.TouristGuideNotFound(
+                                ExceptionCodes.TouristGuideExceptionCodes.TOURIST_GUIDE_NOT_FOUND
+                        ));
+
+        touristGuideDAO.delete(entity);
+        return ResponseEntity.ok(touristGuideMapper.entityToDto(entity));
+    }
 }

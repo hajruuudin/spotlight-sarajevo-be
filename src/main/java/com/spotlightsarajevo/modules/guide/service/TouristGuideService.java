@@ -61,4 +61,12 @@ public interface TouristGuideService {
      * @return ResponseEntity containing the newly updated TouristGuideModel (The simple one with the updated status)
      */
     ResponseEntity<TouristGuideModel> update(TouristGuideUpdateModel request, Principal principal);
+
+    /**
+     * Deletes a tourist guide by its ID.
+     *
+     * @param id the unique identifier of the tourist guide to be deleted
+     * @return ResponseEntity containing the deleted TouristGuideModel
+     */
+    ResponseEntity<TouristGuideModel> delete(Integer id);
 }
