@@ -71,10 +71,12 @@ public class SpotRESTController {
         return spotService.update(request, principal);
     }
 
-    @DeleteMapping
+    @DeleteMapping(value = "/{id}")
     @Operation(description = "Delete a spot from the database")
-    public ResponseEntity<SpotModel> delete(Integer request){
-        return spotService.delete(request);
+    public ResponseEntity<SpotModel> delete(
+            @PathVariable Integer id
+    ){
+        return spotService.delete(id);
     }
 
     @GetMapping(value = "/visited-spot/check")

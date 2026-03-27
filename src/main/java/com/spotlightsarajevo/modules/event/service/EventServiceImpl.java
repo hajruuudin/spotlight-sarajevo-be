@@ -192,7 +192,13 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public ResponseEntity<EventModel> delete(Integer id) {
-        return null;
+        EventEntity entity = eventDAO.findById(id)
+                .orElseThrow(() ->
+                        new EventExceptions.EventNotFoundException(
+                                ExceptionCodes.EventExceptionCodes.EVENT_NOT_FOUND));
+
+        eventDAO.delete(entity);
+        return ResponseEntity.ok(eventMapper.entityToDto(entity));
     }
 
     @Override
