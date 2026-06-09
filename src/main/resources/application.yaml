@@ -13,6 +13,7 @@ spring:
         hibernate:
             format_sql: true
             dialect: org.hibernate.dialect.PostgreSQLDialect
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   datasource:
     driver-class-name: org.postgresql.Driver
